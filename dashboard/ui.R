@@ -10,7 +10,9 @@ shinyUI(fluidPage(
     
     # This links to the CSS stylesheet
     tags$head(
-        tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
+        tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
+        tags$title("Cardiff Dashboard") # Page Title. Need to Add Favicon Still
+        
     ),
     
     # Application title
