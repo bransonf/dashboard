@@ -1,0 +1,36 @@
+/* This CSS File is Used to Define Styles for the Cardiff Dashboard*/
+
+
+
+/* Source Google Fonts*/
+@import url('https://fonts.googleapis.com/css?family=Libre+Baskerville|Lora|Open+Sans&display=swap');
+
+/* Font Classes and Styling */
+.sans,.control-label{
+  font-family: 'Open Sans', sans-serif;
+}
+
+.title {
+  font-family: 'Libre Baskerville', serif;
+  text-align: center;
+}
+
+.heading {
+  font-family: 'Lora', serif;
+}
+
+/* Customize Range Slider */
+
+.irs-line{
+  background: #a51417;
+}
+
+.irs-bar{
+  background: #a51417;
+}
+
+/* Custom Button Style*/
+
+.btn-primary{
+  background-color: #a51417;
+}
