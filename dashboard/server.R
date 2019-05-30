@@ -45,13 +45,13 @@ shinyServer(function(input, output) {
       if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
       
       if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = 5,stroke = NA, popup = atm$name, fillColor = "red") -> leaf}
-      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar) -> leaf}
-      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club) -> leaf}
-      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor) -> leaf}
-      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas) -> leaf}
-      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food) -> leaf}
-      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus) -> leaf}
-      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school) -> leaf}
+      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = 5,stroke = NA, popup = bar$name, fillColor = "red") -> leaf}
+      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = 5,stroke = NA, popup = club$name, fillColor = "red") -> leaf}
+      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = 5,stroke = NA, popup = liquor$name, fillColor = "red") -> leaf}
+      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = 5,stroke = NA, popup = gas$name, fillColor = "red") -> leaf}
+      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = 5,stroke = NA, popup = food$name, fillColor = "red") -> leaf}
+      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = 5,stroke = NA, fillColor = "red") -> leaf}
+      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = 5,stroke = NA, popup = school$name, fillColor = "red") -> leaf}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
       
       #TODO Crime and Injury Data
@@ -59,6 +59,19 @@ shinyServer(function(input, output) {
       
       # add injury data
   
+      # add legend
+      if(input$legend){
+        if(input$demog_select != "None"){
+        p <- switch (input$demog_select, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
+        v <- switch (input$demog_select, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
+        t <- switch (input$demog_select, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
+        
+        leaf %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leaf
+        }
+        else(NULL)
+      }
+      else(NULL)
+        
       # print map
       return(leaf)
     })

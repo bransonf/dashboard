@@ -22,8 +22,14 @@ shinyUI(
                       column(9, leafletOutput("map", height = "600px")),
                       column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
                              selectInput("base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
-                             checkboxGroupInput("crime_chk", "Crime",
-                                                choices = c("Homicide", "Rape", "Robbery", "Assault")),
+                             pickerInput("crime_chk", "Crime",
+                                         choices = c("Homicide", "Rape", "Robbery", "Assault"),
+                                         options = list(
+                                           `actions-box` = TRUE, 
+                                           size = 10,
+                                           `selected-text-format` = "count > 3"
+                                         ), 
+                                         multiple = TRUE),
                              pickerInput("inj_chk", "Violent Injury",
                                          choices = c("Gun Shot", "Stabbing", "Rape"),
                                          options = list(
