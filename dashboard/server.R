@@ -41,10 +41,10 @@ shinyServer(function(input, output) {
       else if(input$demog_select == "Home Ownership"){        leaf %>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
             
       # add environment variables
-      if("Venues" %in% input$env_chk){        leaf %>% addPolygons(data = venues) -> leaf}
-      if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park) -> leaf}
+      if("Venues" %in% input$env_chk){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
+      if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
       
-      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm) -> leaf}
+      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = 5,stroke = NA, popup = atm$name, fillColor = "red") -> leaf}
       if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar) -> leaf}
       if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club) -> leaf}
       if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor) -> leaf}
