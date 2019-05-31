@@ -9,6 +9,7 @@ library(sf)
 # Load data and define palettes
 
 load("cardiff.rda")
+load("crime.rda")
 # using Jenks Natural Breaks
 inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,58786,32609,22880,45375,74425))
 pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
@@ -53,11 +54,23 @@ shinyServer(function(input, output) {
       if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = 5,stroke = NA, fillColor = "red") -> leaf}
       if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = 5,stroke = NA, popup = school$name, fillColor = "red") -> leaf}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
-      
-      #TODO Crime and Injury Data
+    
       # add crime Data
-      
-      # add injury data
+      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$crime_chk)){
+        
+          fmonth <- which(month.name == input$month)
+        # add to map
+          if("Homicide" %in% input$crime_chk){homicide <- homicide[which(homicide$month == fmonth),]
+            leaf %>% addCircleMarkers(data = homicide, radius = 5,stroke = NA, fillColor = "red") -> leaf}
+          if("Rape" %in% input$crime_chk)    {rape <- rape[which(rape$month == fmonth),]
+            leaf %>% addCircleMarkers(data = rape, radius = 5,stroke = NA, fillColor = "red") -> leaf}
+          if("Robbery" %in% input$crime_chk) {rob <- rob[which(rob$month == fmonth),]
+            leaf %>% addCircleMarkers(data = rob, radius = 5,stroke = NA, fillColor = "red") -> leaf}
+          if("Assault" %in% input$crime_chk) {assault <- assault[which(assault$month == fmonth),]
+            leaf %>% addCircleMarkers(data = assault, radius = 5,stroke = NA, fillColor = "red") -> leaf}
+        
+      }
+      #TODO add injury data
   
       # add legend
       if(input$legend){
