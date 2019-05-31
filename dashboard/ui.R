@@ -12,19 +12,6 @@ cur_month <- month.name[as.numeric(format(Sys.Date(), "%m"))]
 # Set Cardiff Text Here
 cardiff <- HTML("<p class=sans> The U.S. Department of Justice found that more than half of violent crime in the United States goes unreported to law enforcement. This is a clear limitation to understanding where violence occurs. The Cardiff Model combines police and hospital data on violence. As a result, key stakeholders from policy makers to public health experts can more accurately assess violence in the community. <a href='https://www.cdc.gov/violenceprevention/publichealthissue/fundedprograms/cardiffmodel/whatis.html'>Read More at the CDC</a></p>")
 
-# Data and time vis
-
-tvis <- timevis(
-  data.frame(
-  id      = 1:4,
-  content = c("Homicides: 177", "Homicides: 260"  ,"Ranged item", "Item four"),
-  start   = c("1990-01-01", "1991-01-01", "2016-01-20", "2016-02-14 15:00:00"),
-  end     = c("1990-12-31", "1991-12-31", "2016-02-04", NA)
-  )
-)
-
-
-
 # Begin Navbar page
 shinyUI(
   navbarPage("Cardiff STL", fluid = TRUE,
@@ -84,7 +71,7 @@ shinyUI(
            ),
            
            tabPanel("Timeline",
-                    tvis
+                    timevisOutput("time")
              
            ),
            tabPanel("Methods",

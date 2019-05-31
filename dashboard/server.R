@@ -10,6 +10,9 @@ library(sf)
 
 load("cardiff.rda")
 load("crime.rda")
+load("n_murder.rda")
+load("tvis.rda")
+
 # using Jenks Natural Breaks
 inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,58786,32609,22880,45375,74425))
 pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
@@ -17,6 +20,8 @@ hs_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99))
 ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
 unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
 home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
+
+
 
 # Define server logic
 shinyServer(function(input, output) {
@@ -29,6 +34,7 @@ shinyServer(function(input, output) {
       
         leaflet() %>%
             enableTileCaching() %>%
+            addFullscreenControl() %>%
             addTiles(bm, attribution = at) %>%
             setView(-90.2594, 38.6530, zoom = 11) -> leaf
             
@@ -45,14 +51,14 @@ shinyServer(function(input, output) {
       if("Venues" %in% input$env_chk){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
       if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
       
-      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = 5,stroke = NA, popup = atm$name, fillColor = "red") -> leaf}
-      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = 5,stroke = NA, popup = bar$name, fillColor = "red") -> leaf}
-      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = 5,stroke = NA, popup = club$name, fillColor = "red") -> leaf}
-      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = 5,stroke = NA, popup = liquor$name, fillColor = "red") -> leaf}
-      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = 5,stroke = NA, popup = gas$name, fillColor = "red") -> leaf}
-      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = 5,stroke = NA, popup = food$name, fillColor = "red") -> leaf}
-      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = 5,stroke = NA, fillColor = "red") -> leaf}
-      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = 5,stroke = NA, popup = school$name, fillColor = "red") -> leaf}
+      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = 5,stroke = NA, popup = atm$name, fillColor = "green") -> leaf}
+      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = 5,stroke = NA, popup = bar$name, fillColor = "brown") -> leaf}
+      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = 5,stroke = NA, popup = club$name, fillColor = "brown") -> leaf}
+      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = 5,stroke = NA, popup = liquor$name, fillColor = "brown") -> leaf}
+      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = 5,stroke = NA, popup = gas$name, fillColor = "orange") -> leaf}
+      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = 5,stroke = NA, popup = food$name, fillColor = "orange") -> leaf}
+      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = 5,stroke = NA, fillColor = "yellow") -> leaf}
+      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = 5,stroke = NA, popup = school$name, fillColor = "yellow") -> leaf}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
     
       # add crime Data
@@ -89,5 +95,9 @@ shinyServer(function(input, output) {
       return(leaf)
     })
 
+    # draw a timeline
+    output$time <- renderTimevis({
+      timevis(tvis)
+    })
 
 })
