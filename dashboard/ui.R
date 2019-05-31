@@ -71,14 +71,16 @@ shinyUI(
            ),
            
            tabPanel("Timeline",
-                    timevisOutput("time")
+                    headerPanel(HTML("<h1 class=title>Timeline</h1>")),
+                    timevisOutput("time"),
+                    dygraphOutput("n_murders")
              
            ),
            tabPanel("Methods",
-           HTML("<h1 class=title>Data and Methodology</h1>
-                <p class = sans>Currently, Demographic data comes from the 2017 American Community Survey 5 Year estimates (2013-2017 ACS5). Poverty was calculated as number of individuals living below the 2017 poverty line out of poverty calculable population. Educational Attainment was calculated for the population above the age of 18. Unemployment rate was calculated as number of individuals reporting unemployment out of total individuals reporting currently being in the workforce. Home ownership was calculated as number of individuals reporting ownership of the home they occupy out of total number of homes.</br>
-                Crime data comes from the City of Saint Louis and is only representative of 2018 in this demo. There were no cases of rape in the crime data for 2018. Assaults excluded those against police.</br>
-                Environmental data for schools, parks and bus stops were provided by the City of Saint Louis. Other environmental data was scraped from various web sources.</p>")
+                    headerPanel(HTML("<h1 class=title>Data and Methodology</h1>")),
+                    HTML("<p class = sans>Currently, Demographic data comes from the 2017 American Community Survey 5 Year estimates (2013-2017 ACS5). Poverty was calculated as number of individuals living below the 2017 poverty line out of poverty calculable population. Educational Attainment was calculated for the population above the age of 18. Unemployment rate was calculated as number of individuals reporting unemployment out of total individuals reporting currently being in the workforce. Home ownership was calculated as number of individuals reporting ownership of the home they occupy out of total number of homes.</br>
+                          Crime data comes from the City of Saint Louis and is only representative of 2018 in this demo. There were no cases of rape in the crime data for 2018. Assaults excluded those against police.</br>
+                          Environmental data for schools, parks and bus stops were provided by the City of Saint Louis. Other environmental data was scraped from various web sources.</p>")
            )
   )
 )

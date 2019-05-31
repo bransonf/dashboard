@@ -5,6 +5,7 @@ library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
 library(sf)
+library(dygraphs)
 
 # Load data and define palettes
 
@@ -87,9 +88,8 @@ shinyServer(function(input, output) {
         
         leaf %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leaf
         }
-        else(NULL)
       }
-      else(NULL)
+      
         
       # print map
       return(leaf)
@@ -98,6 +98,11 @@ shinyServer(function(input, output) {
     # draw a timeline
     output$time <- renderTimevis({
       timevis(tvis)
+    })
+    
+    #  draw a plot for murders
+    output$n_murders <- renderDygraph({
+      dygraph(n_homicides, xlab = "Year", ylab = "Number of Homicides",main = 'Homicides by Year')
     })
 
 })

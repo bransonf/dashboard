@@ -50,3 +50,8 @@
   background-color: #610c0d;
   border-color:#3c3c3d;
 }
+
+/* Nav Bar Brand Text*/
+.navbar-brand{
+  font-family: 'Lora', serif;
+}
