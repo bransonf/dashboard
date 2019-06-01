@@ -6,6 +6,7 @@ library(leaflet)
 library(leaflet.extras)
 library(sf)
 library(dygraphs)
+library(timevis)
 
 # Load data and define palettes
 
@@ -15,7 +16,7 @@ load("n_murder.rda")
 load("tvis.rda")
 
 # using Jenks Natural Breaks
-inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,58786,32609,22880,45375,74425))
+inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
 pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
 hs_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99))
 ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
