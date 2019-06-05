@@ -69,7 +69,7 @@ shinyUI(
                     dygraphOutput("funding_yr")
                     
            ),
-           tabPanel("About", value = "about", icon = icon("file-alt"),
+           tabPanel("About", value = "about", icon = icon("sticky-note"),
                     # This links to the CSS stylesheet
                     tags$head(
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
