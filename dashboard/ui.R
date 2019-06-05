@@ -55,7 +55,7 @@ shinyUI(
                              selectInput("demog_select", "Demographic",
                                          choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                                          selected = "None"),
-                             checkboxInput("legend", "Show Legend"),
+                             checkboxInput("legend", "Show Legend(s)"),
                              sliderTextInput("month", "Select a Month:", month.name, cur_month),
                              submitButton("Update")
                       )
