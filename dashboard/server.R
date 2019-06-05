@@ -54,14 +54,14 @@ shinyServer(function(input, output) {
       if("Venues" %in% input$env_chk){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
       if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
       
-      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = 6,stroke = NA, popup = atm$name, fillColor = "green") -> leaf}
-      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = 6,stroke = NA, popup = bar$name, fillColor = "brown") -> leaf}
-      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = 6,stroke = NA, popup = club$name, fillColor = "brown") -> leaf}
-      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = 6,stroke = NA, popup = liquor$name, fillColor = "brown") -> leaf}
-      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = 6,stroke = NA, popup = gas$name, fillColor = "orange") -> leaf}
-      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = 6,stroke = NA, popup = food$name, fillColor = "orange") -> leaf}
-      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = 6,stroke = NA, fillColor = "yellow") -> leaf}
-      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = 6,stroke = NA, popup = school$name, fillColor = "yellow") -> leaf}
+      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = 6,stroke = NA, popup = atm$name, fillColor = "palegreen") -> leaf}
+      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = 6,stroke = NA, popup = bar$name, fillColor = "orange") -> leaf}
+      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = 6,stroke = NA, popup = club$name, fillColor = "orange") -> leaf}
+      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = 6,stroke = NA, popup = liquor$name, fillColor = "orange") -> leaf}
+      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = 6,stroke = NA, popup = gas$name, fillColor = "purple") -> leaf}
+      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = 6,stroke = NA, popup = food$name, fillColor = "violetred") -> leaf}
+      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = 6,stroke = NA, fillColor = "olive", fillOpacity = .1) -> leaf}
+      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = 6,stroke = NA, popup = school$name, fillColor = "deepskyblue", fillOpacity = .45) -> leaf}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
     
       # add crime Data
