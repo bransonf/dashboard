@@ -14,6 +14,7 @@ load("cardiff.rda")
 load("crime.rda")
 load("n_murder.rda")
 load("tvis.rda")
+load("funding.rda")
 
 # using Jenks Natural Breaks
 inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
@@ -96,14 +97,30 @@ shinyServer(function(input, output) {
       return(leaf)
     })
 
-    # draw a timeline
+    # draw a timeline # https://visjs.org/docs/timeline/#Configuration_Options
     output$time <- renderTimevis({
-      timevis(tvis)
+      timevis(tvis, options = list(
+        start = "1990-06-01",
+        end = "1991-06-01",
+        stack = TRUE,
+        type = "point",
+        maxHeight = "400px",
+        minHeight = "300px",
+        max = "2019-06-01",
+        min = "1990-01-01",
+        showCurrentTime = FALSE,
+        zoomMax = 6.307e+11, # Approx 20 years
+        zoomMin = 1.314e+9 # Approx .5 Month
+      ))
     })
     
     #  draw a plot for murders
     output$n_murders <- renderDygraph({
-      dygraph(n_homicides, xlab = "Year", ylab = "Number of Homicides",main = 'Homicides by Year')
+      dygraph(n_homicides, xlab = "Year", ylab = "Number of Homicides",main = 'Homicides by Year', group = "tline")
     })
 
+    # and for funding
+    output$funding_yr <- renderDygraph({
+      dygraph(vp_funding, xlab = "Year", ylab = "Total Funding ($)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("total", "Total Funding ($)")
+    })
 })
