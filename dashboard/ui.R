@@ -18,7 +18,7 @@ load("copy.rda")
 shinyUI(
   navbarPage("Cardiff STL", fluid = TRUE,
            
-           tabPanel("Map",
+           tabPanel("Map", icon = icon("map"),
                     headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
                     # Add a Row
                     fluidRow(
@@ -59,28 +59,29 @@ shinyUI(
                              sliderTextInput("month", "Select a Month:", month.name, cur_month),
                              submitButton("Update")
                       )
-                    )
+                    ),
+                    dropdownButton(nav, icon = icon("question"), size = "sm")
            ),
-           tabPanel("Timeline",
+           tabPanel("Timeline", icon = icon("clock"),
                     headerPanel(HTML("<h1 class=title>Timeline</h1>")),
                     timevisOutput("time"),
                     dygraphOutput("n_murders"),
                     dygraphOutput("funding_yr")
                     
            ),
-           tabPanel("About",
+           tabPanel("About", value = "about", icon = icon("file-alt"),
                     # This links to the CSS stylesheet
                     tags$head(
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
-                      tags$title("Cardiff Dashboard") # Page Title. Need to Add Favicon Still
-                      
+                      tags$title("Cardiff Dashboard"), # Page Title. Need to Add Favicon Still
+                      tags$script(src = "customHref.js") # And to import the custom href function
                     ),
                     headerPanel(HTML("<h1 class=title>The Cardiff Model</h1>")),
                     cardiff,
                     HTML("<h2>Violence Prevention Programs</h2>"),
                     vp_orgs
            ),
-           tabPanel("Methods",
+           tabPanel("Methods", icon = icon("book"),
                     headerPanel(HTML("<h1 class=title>Data and Methodology</h1>")),
                     methods
            )
