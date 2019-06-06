@@ -47,4 +47,4 @@ vp_orgs <- HTML("<h3 id='wns'>Weed & Seed</h3>
                 ")
 
 
-save(cardiff, methods, vp_orgs, nav, file = "../dashboard/copy.rda")
+save(cardiff, methods, vp_orgs, nav, file = "../dashboard/dashboard/copy.rda")

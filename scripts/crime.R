@@ -171,4 +171,4 @@ assault <- filter(crime_sf, agg_assault) %>% filter(year == 2018) %>% select(mon
 
 
 
-save(rape, homicide, rob, assault, file = "../dashboard/crime.rda")
+save(rape, homicide, rob, assault, file = "../dashboard/dashboard/crime.rda")
