@@ -6,7 +6,7 @@ library(readr)
 library(dplyr)
 library(stringr)
 
-crime <- read_csv("../../../Desktop/slmpd_sept13-feb19.csv")
+crime <- read_csv("~/../Desktop/slmpd_sept13-feb19.csv")
 
 crime <- select(crime, DateOccur, Crime, Description, XCoord, YCoord)
 crime <- filter(crime, XCoord != 0 & YCoord != 0)
@@ -171,4 +171,4 @@ assault <- filter(crime_sf, agg_assault) %>% filter(year == 2018) %>% select(mon
 
 
 
-save(rape, homicide, rob, assault, file = "dashboard/crime.rda")
+save(rape, homicide, rob, assault, file = "../dashboard/crime.rda")

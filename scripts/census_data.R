@@ -1,3 +1,5 @@
+# NOW DEPRECATED IN FAVOR OF RDATA FILE FORMAT
+#
 # get demographic data and save to json for dashboard
 
 library(tidycensus)
@@ -102,4 +104,4 @@ census <- get_acs("tract", vars, year = 2017, output = "wide", state = 29, count
             home_own_pct = B25003_002E/B25003_001E * 100
             )
 
-st_write(census, "dashboard/stl_demog.geojson")
+st_write(census, "../dashboard/stl_demog.geojson")

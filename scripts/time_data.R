@@ -1,5 +1,4 @@
 # timeline for cardiff
-library(xts)
 
 tvis <- data.frame(
   id      = 1:32,
@@ -61,6 +60,6 @@ vp_funding <- data.frame(
   total = c(NA, NA, NA, NA, NA, NA, 498134,287117,324755,NA, 513279,235310,                 1008650,                 1182516,         378036,398123,404727,587792,519642,492740,526830,420366,45023,NA,NA,NA,NA,NA,NA)
 )
 
-save(vp_funding, file = "dashboard/funding.rda")
-save(n_homicides, file = "dashboard/n_murder.rda")
-save(tvis, file = "dashboard/tvis.rda")
+save(vp_funding, file = "../dashboard/funding.rda")
+save(n_homicides, file = "../dashboard/n_murder.rda")
+save(tvis, file = "../dashboard/tvis.rda")
