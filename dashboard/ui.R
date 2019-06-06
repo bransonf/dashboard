@@ -84,6 +84,8 @@ shinyUI(
            tabPanel("Methods", icon = icon("book"),
                     headerPanel(HTML("<h1 class=title>Data and Methodology</h1>")),
                     methods
+           ),
+           tabPanel("Downloads", icon = icon("file-download")
            )
   )
 )
