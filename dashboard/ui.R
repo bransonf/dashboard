@@ -5,8 +5,8 @@ library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
 library(sf)
-library(timevis)
 library(dygraphs)
+library(timevis)
 
 # Get Current Month
 cur_month <- month.name[as.numeric(format(Sys.Date(), "%m"))]
@@ -14,15 +14,20 @@ cur_month <- month.name[as.numeric(format(Sys.Date(), "%m"))]
 # load copy
 load("copy.rda")
 
-# Begin Navbar page
-shinyUI(
-  navbarPage("Cardiff STL", fluid = TRUE,
-           
+# begin page  
+navbarPage("Cardiff STL", fluid = TRUE,
            tabPanel("Map", icon = icon("map"),
+                    
+                    tags$head(
+                      tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
+                      tags$title("Cardiff Dashboard"), # Page Title
+                      tags$script(src = "customHref.js"), # And to import the custom href function
+                      tags$link(rel="shortcut icon", href="favicon.ico") # Import favicon (Not working?)
+                    ),
                     headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
-                    # Add a Row
+                    
                     fluidRow(
-                      # Add Columns Within Row
+                     
                       column(9, leafletOutput("map", height = "600px")),
                       column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
                              selectInput("base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
@@ -60,6 +65,7 @@ shinyUI(
                              submitButton("Update")
                       )
                     ),
+                    br(),
                     dropdownButton(nav, icon = icon("question"), size = "sm")
            ),
            tabPanel("Timeline", icon = icon("clock"),
@@ -70,12 +76,6 @@ shinyUI(
                     
            ),
            tabPanel("About", value = "about", icon = icon("sticky-note"),
-                    # This links to the CSS stylesheet
-                    tags$head(
-                      tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
-                      tags$title("Cardiff Dashboard"), # Page Title. Need to Add Favicon Still
-                      tags$script(src = "customHref.js") # And to import the custom href function
-                    ),
                     headerPanel(HTML("<h1 class=title>The Cardiff Model</h1>")),
                     cardiff,
                     HTML("<h2>Violence Prevention Programs</h2>"),
@@ -85,10 +85,16 @@ shinyUI(
                     headerPanel(HTML("<h1 class=title>Data and Methodology</h1>")),
                     methods
            ),
-           tabPanel("Downloads", icon = icon("file-download")
+           tabPanel("Downloads", icon = icon("file-download"),
+                    headerPanel(HTML("<h1 class=title>Data Downloads</h1>")),
+                      column(12,
+                             fluidRow(align = "center",
+                                downloadBttn("dl_hmc", "Homicide Counts"),
+                                downloadBttn("dl_fund", "Funding")
+                             )
+                      )
            )
   )
-)
 
    
     
