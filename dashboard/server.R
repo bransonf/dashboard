@@ -8,6 +8,9 @@ library(sf)
 library(dygraphs)
 library(timevis)
 
+# source custom functions
+source("functions.R")
+
 # Load data and define palettes
 
 load("cardiff.rda")
@@ -80,15 +83,6 @@ shinyServer(function(input, output) {
         
       }
       #TODO add injury data
-  
-        
-      # function for custom legend
-        # addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.5){
-        #    colorAdditions <- paste0(colors, "; width:", sizes, "px; height:", sizes, "px")
-        #    labelAdditions <- paste0("<div style='display: inline-block;height: ", sizes, "px;margin-top: 4px;line-height: ", sizes, "px;'>", labels, "</div>")
-        #    
-        #    return(addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity))
-        #  }
           
       # add legend
       if(input$legend){
@@ -99,12 +93,23 @@ shinyServer(function(input, output) {
         
         leaf %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leaf
         }
+        
         # draw symbol legend too
-          #if(any(c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools") %in% input$env_chk)){
-          #  labs <- input$env_chk
-          #  cols <- 
-          #leaf %>% addLegendCustom(colors = c("blue", "blue", "red"), labels = c("A", "B", "C"), sizes = c(10, 20, 40)) -> leaf
-          #}
+        if(length(input$crime_chk) > 0 | any(input$env_chk %in% c("ATMs","Bars","Clubs","Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy"))){
+          if(length(input$crime_chk) > 0){syms <- c("Crime"); col <- c("red")}
+          else{syms <- c(); col <- c()}
+          # color dictionary
+          if("ATMs" %in% input$env_chk)          {syms <- c(syms, "ATM");           col <- c(col, "palegreen")}          
+          if("Bars" %in% input$env_chk)          {syms <- c(syms, "Bar");           col <- c(col, "orange")}          
+          if("Clubs" %in% input$env_chk)         {syms <- c(syms, "Club");          col <- c(col, "orange")}         
+          if("Liquor Stores" %in% input$env_chk) {syms <- c(syms, "Liquor Store");  col <- c(col, "orange")}
+          if("Gas Stations" %in% input$env_chk)  {syms <- c(syms, "Gas Station");   col <- c(col, "purple")}
+          if("Grocery Stores" %in% input$env_chk){syms <- c(syms, "Grocery Store"); col <- c(col, "violetred")}
+          if("Bus Stops" %in% input$env_chk)     {syms <- c(syms, "Bus Stop");      col <- c(col, "olive")}
+          if("Schools" %in% input$env_chk)       {syms <- c(syms, "School");        col <- c(col, "deepskyblue")}
+          
+        leaf %>% addCircleLegend(10, syms, col, "topleft") -> leaf  
+        }
       }
       
         
