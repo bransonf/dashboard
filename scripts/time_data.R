@@ -54,10 +54,10 @@ n_homicides <- data.frame(
 
 vp_funding <- data.frame(
   year = c(1990:2018),
-  WS =    c(NA, NA, NA, NA, NA, NA, NA,    287117,324755,NA, 283279,235310,                  361657,                  418500,             NA,292270,343822,389423,377813,374877,402118,420366,45023,NA,NA,NA,NA,NA,NA),
-  PSN =   c(NA, NA, NA, NA, NA, NA, NA,    NA,    NA,    NA,     NA,    NA,170000 + 327141 + 149852,259845 + 204171 + 300000,128536 + 249500,105853, 60905,198369,141829,117863,124712,    NA,   NA,NA,NA,NA,NA,NA,NA),
-  Other = c(NA, NA, NA, NA, NA, NA, 498134,NA,    NA,    NA, 230000,    NA,                      NA,                      NA,             NA,    NA,    NA,    NA,    NA,    NA,    NA,    NA,   NA,NA,NA,NA,NA,NA,NA),
-  total = c(NA, NA, NA, NA, NA, NA, 498134,287117,324755,NA, 513279,235310,                 1008650,                 1182516,         378036,398123,404727,587792,519642,492740,526830,420366,45023,NA,NA,NA,NA,NA,NA)
+  WS =    c(NA, NA, NA, NA, NA, NA, NA,    287.117,324.755,NA, 283.279,235.310,                  361.657,                  418.500,             NA,292.270,343.822,389.423,377.813,374.877,402.118,420.366,45.023,NA,NA,NA,NA,NA,NA),
+  PSN =   c(NA, NA, NA, NA, NA, NA, NA,    NA,    NA,    NA,     NA,    NA,170.000 + 327.141 + 149.852,259.845 + 204.171 + 300.000,128.536 + 249.500,105.853, 60.905,198.369,141.829,117.863,124.712,    NA,   NA,NA,NA,NA,NA,NA,NA),
+  Other = c(NA, NA, NA, NA, NA, NA, 498.134,NA,    NA,    NA, 230.000,    NA,                      NA,                      NA,             NA,    NA,    NA,    NA,    NA,    NA,    NA,    NA,   NA,NA,NA,NA,NA,NA,NA),
+  Total = c(NA, NA, NA, NA, NA, NA, 498.134,287.117,324.755,NA, 513.279,235.310,                 1008.650,                 1182.516,         378.036,398.123,404.727,587.792,519.642,492.740,526.830,420.366,45.023,NA,NA,NA,NA,NA,NA)
 )
 
 save(vp_funding, file = "../dashboard/dashboard/funding.rda")

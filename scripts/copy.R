@@ -2,7 +2,7 @@
 
 cardiff <- HTML("<p class='sans'> The U.S. Department of Justice found that more than half of violent crime in the United States goes unreported to law enforcement. This is a clear limitation to understanding where violence occurs. The Cardiff Model combines police and hospital data on violence. As a result, key stakeholders from policy makers to public health experts can more accurately assess violence in the community. <a href='https://www.cdc.gov/violenceprevention/publichealthissue/fundedprograms/cardiffmodel/whatis.html', target ='_blank'>Read More at the CDC</a></p>")
 methods <- HTML("<p class='sans'>Currently, Demographic data comes from the 2017 American Community Survey 5 Year estimates (2013-2017 ACS5). Poverty was calculated as number of individuals living below the 2017 poverty line out of poverty calculable population. Educational Attainment was calculated for the population above the age of 18. Unemployment rate was calculated as number of individuals reporting unemployment out of total individuals reporting currently being in the workforce. Home ownership was calculated as number of individuals reporting ownership of the home they occupy out of total number of homes.</p>
-                <p class='sans'>Crime data comes from the City of Saint Louis and is only representative of 2018 in this demo. There were no cases of rape in the crime data for 2018. Assaults excluded those against police.</p>
+                <p class='sans'>Crime data comes from the City of Saint Louis and is only representative of 2018-May 2019 in this demo. There were no cases of rape in the crime data for 2018. Assaults excluded those against police. Reports are generated from these data.</p>
                 <p class='sans'>Environmental data for schools, parks and bus stops were provided by the City of Saint Louis. Other environmental data were scraped from various web sources.</p>
                 <p class='sans'>Choropleth maps use Natural Jenks 5 class Breaks.</p>
                 <p class='sans'>Weed & Seed Income from guidestar.org and Project Safe Neighborhood spending from usaspending.gov</p>")
@@ -46,5 +46,6 @@ vp_orgs <- HTML("<h3 id='wns'>Weed & Seed</h3>
                 <p class='sans'>The Brady Handgun Violence Prevention Act mandated background checks for handgun purchases and transfers. <a href='https://www.nytimes.com/1991/03/29/opinion/why-i-m-for-the-brady-bill.html', target ='_blank'>Read More</a></p>
                 ")
 
+rep_info <- HTML('<h4>About the Data:</h4><p>These reports are generated using data from the City of Saint Louis Metropolitan Police department. Unlike the UCR reports which display all crimes recorded in a month, these reports reflect only incidents that occured in a given month. Notably, counts of rape will usually differ from UCR reports. For crimes that do not contain precise address data, they are excluded from heatmaps and point maps. Counts on maps may not always reflect counts in tables due to missing information as well.</p>')
 
-save(cardiff, methods, vp_orgs, nav, file = "../dashboard/dashboard/copy.rda")
+save(cardiff, methods, vp_orgs, nav, rep_info, file = "../dashboard/dashboard/copy.rda")

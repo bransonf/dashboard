@@ -141,6 +141,34 @@ shinyServer(function(input, output) {
 
     # and for funding
     output$funding_yr <- renderDygraph({
-      dygraph(vp_funding, xlab = "Year", ylab = "Total Funding ($)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("total", "Total Funding ($)")
+      dygraph(vp_funding, xlab = "Year", ylab = "Total Funding ($ Thousands)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("Total", "Total Funding ($)")
     })
+    
+    # outputs for downloads
+    
+    output$dlhmc  <- downloadHandler(filename = function(){
+                                      "Stl_Homicides.csv"
+                                      },
+                                      content = function(file){
+                                       write.csv(n_homicides, file = file, row.names = FALSE)
+                                      }
+                      )
+    
+    output$dlfund <- downloadHandler("Stl_ViolenceFunding.csv",
+                                      content = function(file){
+                                       write.csv(vp_funding, file = file, row.names = FALSE)
+                                      }
+                      )
+    
+    # generate custom reports using the crime data
+    
+    # output$report <- downloadHandler(
+    #   filename = function(){
+    #     
+    #   }
+    # )
+    
+    
+    
+    
 })

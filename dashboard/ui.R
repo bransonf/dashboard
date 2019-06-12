@@ -10,6 +10,7 @@ library(timevis)
 
 # Get Current Month
 cur_month <- month.name[as.numeric(format(Sys.Date(), "%m"))]
+rep_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
 
 # load copy
 load("copy.rda")
@@ -62,11 +63,14 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                          selected = "None"),
                              checkboxInput("legend", "Show Legend(s)"),
                              sliderTextInput("month", "Select a Month:", month.name, cur_month),
-                             submitButton("Update")
+                             fluidRow(
+                               column(1, submitButton("Update")),
+                               column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))
+                             )
+                               
                       )
-                    ),
-                    br(),
-                    dropdownButton(nav, icon = icon("question"), size = "sm")
+                    )
+                    
            ),
            tabPanel("Timeline", icon = icon("clock"),
                     headerPanel(HTML("<h1 class=title>Timeline</h1>")),
@@ -89,9 +93,46 @@ navbarPage("Cardiff STL", fluid = TRUE,
                     headerPanel(HTML("<h1 class=title>Data Downloads</h1>")),
                       column(12,
                              fluidRow(align = "center",
-                                downloadBttn("dl_hmc", "Homicide Counts"),
-                                downloadBttn("dl_fund", "Funding")
+                                downloadButton('dlhmc', "Homicide Counts"),
+                                downloadButton('dlfund', "Funding")
                              )
+                      )
+           ),
+           tabPanel("Reports", icon = icon("file-alt"),
+                    headerPanel(HTML("<h1 class=title>Generate a Report</h1>")),
+                      column(12, align = 'center',
+                             HTML("<h4 class=sans>Select Options Below</h4>"),
+                             fluidRow(align = "center",
+                                      pickerInput("rep_table", "Table(s)",
+                                                  choices = c("Summary Table","District Table", "Neighborhood Table"),
+                                                  options = list(
+                                                    `actions-box` = TRUE, 
+                                                    size = 10,
+                                                    `selected-text-format` = "count > 3"
+                                                  ),multiple = TRUE
+                                      ),
+                                      pickerInput("rep_maps", "Map(s)",
+                                                  choices = c("District Map", "Neighborhood Map", "Point Map", "Heat Map"),
+                                                  options = list(
+                                                    `actions-box` = TRUE, 
+                                                    size = 10,
+                                                    `selected-text-format` = "count > 3"
+                                                  ),multiple = TRUE
+                                      ),
+                                      pickerInput("rep_crime", "Crime(s)",
+                                                  choices = c("Homicide","Rape", "Assault", "Robbery", "Non-Violent Crimes"),
+                                                  options = list(
+                                                    `actions-box` = TRUE, 
+                                                    size = 10,
+                                                    `selected-text-format` = "count > 3"
+                                                  ),multiple = TRUE
+                                      ),
+                                      #checkboxInput("rep_", ""),
+                                      sliderTextInput("rep_month", "Select a Month:", month.name, rep_month),
+                                      HTML("<h4 class=sans>Generate Report</h4>"),
+                                      downloadButton('report', "Download")
+                             ),
+                             fluidRow(rep_info)
                       )
            )
   )
