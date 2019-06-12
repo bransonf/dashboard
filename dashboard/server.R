@@ -14,7 +14,7 @@ source("functions.R")
 # Load data and define palettes
 
 load("cardiff.rda")
-load("crime.rda")
+load("crime_bounds.rda")
 load("n_murder.rda")
 load("tvis.rda")
 load("funding.rda")
@@ -162,11 +162,11 @@ shinyServer(function(input, output) {
     
     # generate custom reports using the crime data
     
-    # output$report <- downloadHandler(
-    #   filename = function(){
-    #     
-    #   }
-    # )
+     output$report <- downloadHandler(
+       filename = function(){
+         
+       }
+     )
     
     
     

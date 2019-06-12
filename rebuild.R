@@ -3,6 +3,7 @@
 source("scripts/copy.R")
 source("scripts/crime.R")
 source("scripts/time_data.R")
+source("scripts/crime_clean.R")
 
 # Need to minify custom functions and create file in /dashboard/
 

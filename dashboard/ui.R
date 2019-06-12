@@ -23,7 +23,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
                       tags$title("Cardiff Dashboard"), # Page Title
                       tags$script(src = "customHref.js"), # And to import the custom href function
-                      tags$link(rel="shortcut icon", href="favicon.ico") # Import favicon (Not working?)
+                      tags$link(rel="shortcut icon", href="favicon.ico") # Import favicon
                     ),
                     headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
                     
