@@ -56,7 +56,8 @@ districts <- st_read("../raw_data/STL-Police-Districts-2014-2/STL POLICE DISTRIC
   transmute(district = as.numeric(DISTNO))
 nbhoods <- st_read("../raw_data/nbrhds_wards/nbrhds_wards/BND_Nhd88_cw.shp", crs = 102696) %>%
   st_transform(4326) %>%
-  transmute(neighborhood = NHD_NUM)
+  transmute(neighborhood = NHD_NUM,
+            name = as.character(NHD_NAME))
 
 rape     <- filter(crime_sf, crime_code >= 20000 & crime_code < 30000)
 homicide <- filter(crime_sf, crime_code >= 10000 & crime_code < 20000)
