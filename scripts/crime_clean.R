@@ -58,7 +58,14 @@ nbhoods <- st_read("../raw_data/nbrhds_wards/nbrhds_wards/BND_Nhd88_cw.shp", crs
   st_transform(4326) %>%
   transmute(neighborhood = NHD_NUM)
 
+rape     <- filter(crime_sf, crime_code >= 20000 & crime_code < 30000)
+homicide <- filter(crime_sf, crime_code >= 10000 & crime_code < 20000)
+rob      <- filter(crime_sf, crime_code >= 30000 & crime_code < 40000)
+assault  <- filter(crime_sf, crime_code >= 40000 & crime_code < 50000)
+
+
+
 # point and heat map will use sf, hood/district will use crime obj
 
-save(crimes, crime_sf, districts, nbhoods, file = "../dashboard/dashboard/crime_bounds.rda")
-
+save(districts, nbhoods, file = "../dashboard/bounds.rda")
+save(crimes, crime_sf, rape, homicide, rob, assault, file = "../dashboard/crimes.rda")

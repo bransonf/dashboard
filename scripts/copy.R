@@ -6,7 +6,7 @@ methods <- HTML("<p class='sans'>Currently, Demographic data comes from the 2017
                 <p class='sans'>Environmental data for schools, parks and bus stops were provided by the City of Saint Louis. Other environmental data were scraped from various web sources.</p>
                 <p class='sans'>Choropleth maps use Natural Jenks 5 class Breaks.</p>
                 <p class='sans'>Weed & Seed Income from guidestar.org and Project Safe Neighborhood spending from usaspending.gov</p>")
-nav <- HTML("<p class='sans'>Begin by selecting data on the right, and click update when you're ready. You can zoom in the map using the buttons in the top left or by scrolling. You can view the map fullscreen by clicking the square button in the upper left of the map.</p>")
+nav <- HTML("<p class='sans'>Begin by selecting data and click update when you're ready. You can zoom in the map using the buttons in the top left or by scrolling. You can view the map fullscreen by clicking the square button in the upper left of the map.</p>")
 # https://www.tiki-toki.com/timeline/entry/1015170/Gun-Violence-Initiative-St.-Louis-MO/
 vp_orgs <- HTML("<h3 id='wns'>Weed & Seed</h3>
                 <p class='sans'>Weed & Seed was a federally funded crime prevention inititative which encouraged a two-pronged approach:'weeding' - an increased policing effort, and 'seeding' - an increased community development investment.  The initial evaluations highlighted the lack of prosecution as weak link in the program's success, noting that increasing funding for police activities without also increasing funding for prosecution is non-sustainable and reduces long term impact effectiveness. <a href = 'https://www.ncjrs.gov/pdffiles1/176358.pdf', target ='_blank'>Read More</a></p>
@@ -48,4 +48,4 @@ vp_orgs <- HTML("<h3 id='wns'>Weed & Seed</h3>
 
 rep_info <- HTML('<h4>About the Data:</h4><p>These reports are generated using data from the City of Saint Louis Metropolitan Police department. Unlike the UCR reports which display all crimes recorded in a month, these reports reflect only incidents that occured in a given month. Notably, counts of rape will usually differ from UCR reports. For crimes that do not contain precise address data, they are excluded from heatmaps and point maps. Counts on maps may not always reflect counts in tables due to missing information as well.</p>')
 
-save(cardiff, methods, vp_orgs, nav, rep_info, file = "../dashboard/dashboard/copy.rda")
+save(cardiff, methods, vp_orgs, nav, rep_info, file = "../dashboard/copy.rda")

@@ -8,9 +8,8 @@ library(sf)
 library(dygraphs)
 library(timevis)
 
-# Get Current Month
-cur_month <- month.name[as.numeric(format(Sys.Date(), "%m"))]
-rep_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
+# Get Current Month (Which is last month for this dashboard)
+cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
 
 # load copy
 load("copy.rda")
@@ -29,7 +28,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                     
                     fluidRow(
                      
-                      column(9, leafletOutput("map", height = "600px")),
+                      column(9, leafletOutput("map", height = "650px")),
                       column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
                              selectInput("base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
                              pickerInput("crime_chk", "Crime",
@@ -62,6 +61,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                          choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                                          selected = "None"),
                              checkboxInput("legend", "Show Legend(s)"),
+                             radioButtons("year", "Select a Year:", c(2018, 2019), 2019),
                              sliderTextInput("month", "Select a Month:", month.name, cur_month),
                              fluidRow(
                                column(1, submitButton("Update")),
@@ -128,7 +128,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                                   ),multiple = TRUE
                                       ),
                                       #checkboxInput("rep_", ""),
-                                      sliderTextInput("rep_month", "Select a Month:", month.name, rep_month),
+                                      sliderTextInput("rep_month", "Select a Month:", month.name, cur_month),
                                       HTML("<h4 class=sans>Generate Report</h4>"),
                                       downloadButton('report', "Download")
                              ),

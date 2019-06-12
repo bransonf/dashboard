@@ -14,7 +14,8 @@ source("functions.R")
 # Load data and define palettes
 
 load("cardiff.rda")
-load("crime_bounds.rda")
+load("crimes.rda")
+load("bounds.rda")
 load("n_murder.rda")
 load("tvis.rda")
 load("funding.rda")
@@ -71,14 +72,15 @@ shinyServer(function(input, output) {
       if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$crime_chk)){
         
           fmonth <- which(month.name == input$month)
+          fyear <- input$year
         # add to map
-          if("Homicide" %in% input$crime_chk){homicide <- homicide[which(homicide$month == fmonth),]
+          if("Homicide" %in% input$crime_chk){homicide <- homicide[which(homicide$month == fmonth & homicide$year == fyear),]
             leaf %>% addCircleMarkers(data = homicide, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
-          if("Rape" %in% input$crime_chk)    {rape <- rape[which(rape$month == fmonth),]
+          if("Rape" %in% input$crime_chk)    {rape <- rape[which(rape$month == fmonth & rape$year == fyear),]
             leaf %>% addCircleMarkers(data = rape, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
-          if("Robbery" %in% input$crime_chk) {rob <- rob[which(rob$month == fmonth),]
+          if("Robbery" %in% input$crime_chk) {rob <- rob[which(rob$month == fmonth & rob$year == fyear),]
             leaf %>% addCircleMarkers(data = rob, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
-          if("Assault" %in% input$crime_chk) {assault <- assault[which(assault$month == fmonth),]
+          if("Assault" %in% input$crime_chk) {assault <- assault[which(assault$month == fmonth & assault$year == fyear),]
             leaf %>% addCircleMarkers(data = assault, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
         
       }
@@ -162,11 +164,11 @@ shinyServer(function(input, output) {
     
     # generate custom reports using the crime data
     
-     output$report <- downloadHandler(
-       filename = function(){
-         
-       }
-     )
+     # output$report <- downloadHandler(
+     #   filename = function(){
+     #     
+     #   }
+     # )
     
     
     
