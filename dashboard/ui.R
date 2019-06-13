@@ -40,7 +40,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                          ), 
                                          multiple = TRUE),
                              pickerInput("inj_chk", "Violent Injury",
-                                         choices = c("Gun Shot", "Stabbing", "Rape"),
+                                         choices = c("Gun Shot *", "Stabbing *", "Rape *"),
                                          options = list(
                                            `actions-box` = TRUE, 
                                            size = 10,
@@ -49,7 +49,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                          multiple = TRUE
                              ),
                              pickerInput("env_chk", "Environment",
-                                         choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy", "Venues", "Parks"),
+                                         choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
                                          options = list(
                                            `actions-box` = TRUE, 
                                            size = 10,
@@ -61,11 +61,11 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                          choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                                          selected = "None"),
                              checkboxInput("legend", "Show Legend(s)"),
-                             radioButtons("year", "Select a Year:", c(2018, 2019), 2019),
+                             radioButtons("year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
                              sliderTextInput("month", "Select a Month:", month.name, cur_month),
                              fluidRow(
                                #column(1, submitButton("Update")),
-                               column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))
+                               #column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))
                              )
                                
                       )
@@ -128,7 +128,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                                   ),multiple = TRUE
                                       ),
                                       #checkboxInput("rep_", ""),
-                                      radioButtons("rep_year", "Select a Year:", c(2018, 2019), 2019),
+                                      radioButtons("rep_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
                                       sliderTextInput("rep_month", "Select a Month:", month.name, cur_month),
                                       HTML("<h4 class=sans>Generate Report</h4>"),
                                       downloadButton('report', "Download")

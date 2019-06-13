@@ -29,12 +29,33 @@ ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
 unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
 home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
 
+r <- 7 # define radius
+colorDict <- function(key){ # define color dictionary, using https://carto.com/carto-colors/
+  return(
+    switch (key,
+            "atm" = "#44AA99",
+            "bar" = "#882255",
+            "clb" = "#DDCC77",
+            "liq" = "#117733",
+            "gas" = "#332288",
+            "grc" = "#AA4499",
+            "bus" = "#88CCEE",
+            "scl" = "#999933",
+            "mrd" = "#CC6677",
+            "rap" = "#661100",
+            "rob" = "#6699CC",
+            "ast" = "#888888"
+    )
+  )
+}
+
 
 
 # Define server logic
 shinyServer(function(input, output) {
   
     # draw a map
+  ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy)
     output$map <- renderLeaflet({
         # basemap and attribution case
         bm <- switch(input$base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
@@ -59,14 +80,14 @@ shinyServer(function(input, output) {
       if("Venues" %in% input$env_chk){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
       if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
       
-      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = 6,stroke = NA, popup = atm$name, fillColor = "palegreen") -> leaf}
-      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = 6,stroke = NA, popup = bar$name, fillColor = "orange") -> leaf}
-      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = 6,stroke = NA, popup = club$name, fillColor = "orange") -> leaf}
-      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = 6,stroke = NA, popup = liquor$name, fillColor = "orange") -> leaf}
-      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = 6,stroke = NA, popup = gas$name, fillColor = "purple") -> leaf}
-      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = 6,stroke = NA, popup = food$name, fillColor = "violetred") -> leaf}
-      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = 6,stroke = NA, fillColor = "olive", fillOpacity = .1) -> leaf}
-      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = 6,stroke = NA, popup = school$name, fillColor = "deepskyblue", fillOpacity = .45) -> leaf}
+      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm")) -> leaf}
+      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar")) -> leaf}
+      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb")) -> leaf}
+      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq")) -> leaf}
+      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas")) -> leaf}
+      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc")) -> leaf}
+      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .1) -> leaf}
+      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45) -> leaf}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
     
       # add crime Data
@@ -76,13 +97,13 @@ shinyServer(function(input, output) {
           fyear <- input$year
         # add to map
           if("Homicide" %in% input$crime_chk){homicide <- homicide[which(homicide$month == fmonth & homicide$year == fyear),]
-            leaf %>% addCircleMarkers(data = homicide, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
+            leaf %>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5) -> leaf}
           if("Rape" %in% input$crime_chk)    {rape <- rape[which(rape$month == fmonth & rape$year == fyear),]
-            leaf %>% addCircleMarkers(data = rape, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
+            leaf %>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5) -> leaf}
           if("Robbery" %in% input$crime_chk) {rob <- rob[which(rob$month == fmonth & rob$year == fyear),]
-            leaf %>% addCircleMarkers(data = rob, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
+            leaf %>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5) -> leaf}
           if("Assault" %in% input$crime_chk) {assault <- assault[which(assault$month == fmonth & assault$year == fyear),]
-            leaf %>% addCircleMarkers(data = assault, radius = 6,stroke = NA, fillColor = "red", fillOpacity = .5) -> leaf}
+            leaf %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leaf}
         
       }
       #TODO add injury data
@@ -98,21 +119,22 @@ shinyServer(function(input, output) {
         }
         
         # draw symbol legend too
-        if(length(input$crime_chk) > 0 | any(input$env_chk %in% c("ATMs","Bars","Clubs","Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy"))){
-          if(length(input$crime_chk) > 0){syms <- c("Crime"); col <- c("red")}
-          else{syms <- c(); col <- c()}
-          # color dictionary
-          if("ATMs" %in% input$env_chk)          {syms <- c(syms, "ATM");           col <- c(col, "palegreen")}          
-          if("Bars" %in% input$env_chk)          {syms <- c(syms, "Bar");           col <- c(col, "orange")}          
-          if("Clubs" %in% input$env_chk)         {syms <- c(syms, "Club");          col <- c(col, "orange")}         
-          if("Liquor Stores" %in% input$env_chk) {syms <- c(syms, "Liquor Store");  col <- c(col, "orange")}
-          if("Gas Stations" %in% input$env_chk)  {syms <- c(syms, "Gas Station");   col <- c(col, "purple")}
-          if("Grocery Stores" %in% input$env_chk){syms <- c(syms, "Grocery Store"); col <- c(col, "violetred")}
-          if("Bus Stops" %in% input$env_chk)     {syms <- c(syms, "Bus Stop");      col <- c(col, "olive")}
-          if("Schools" %in% input$env_chk)       {syms <- c(syms, "School");        col <- c(col, "deepskyblue")}
+          syms <- c(); col <- c()
+          if("Homicide" %in% input$crime_chk)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
+          if("Rape" %in% input$crime_chk)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
+          if("Robbery" %in% input$crime_chk)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
+          if("Assault" %in% input$crime_chk)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}          
+          if("ATMs" %in% input$env_chk)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
+          if("Bars" %in% input$env_chk)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
+          if("Clubs" %in% input$env_chk)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
+          if("Liquor Stores" %in% input$env_chk) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
+          if("Gas Stations" %in% input$env_chk)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
+          if("Grocery Stores" %in% input$env_chk){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
+          if("Bus Stops" %in% input$env_chk)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
+          if("Schools" %in% input$env_chk)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
           
         leaf %>% addCircleLegend(10, syms, col, "topleft") -> leaf  
-        }
+        
       }
       
         
@@ -165,39 +187,37 @@ shinyServer(function(input, output) {
     
     # generate custom reports using the crime data
     
-
-    
-     output$report <- downloadHandler(
-       filename = function(){
-          paste0("cardiff_Report_", substr(Sys.Date(),6,10),".html") # once LaTeX is available, PDF
-       },
-       content = function(file){
-         # store in a temp dir because of dir privledges on server
-         tempReport <- file.path(tempdir(), "report.Rmd")
-         file.copy("report.Rmd",  tempReport, overwrite = TRUE)
-         
-         
-         # store and send params to be rendered
-         params <- list(
-                    maps =  input$rep_maps,
-                    tables = input$rep_table,
-                    crimes = input$rep_crime,
-                    month = input$rep_month,
-                    yr = input$rep_year,
-                    crimedata = crimes,
-                    crimesf = crime_sf,
-                    stlbound = boundary,
-                    dist = districts,
-                    hood = nbhoods
-                    )
-         
-         rmarkdown::render(tempReport, output_file = file,
-                           params = params,
-                           envir = new.env(parent = globalenv())
-                           )
-         
-       }
-     )
+   output$report <- downloadHandler(
+     filename = function(){
+        paste0("cardiff_Report_", substr(Sys.Date(),6,10),".html") # once LaTeX is available, PDF
+     },
+     content = function(file){
+       # store in a temp dir because of dir privledges on server
+       tempReport <- file.path(tempdir(), "report.Rmd")
+       file.copy("report.Rmd",  tempReport, overwrite = TRUE)
+       
+       
+       # store and send params to be rendered
+       params <- list(
+                  maps =  input$rep_maps,
+                  tables = input$rep_table,
+                  crimes = input$rep_crime,
+                  month = input$rep_month,
+                  yr = input$rep_year,
+                  crimedata = crimes,
+                  crimesf = crime_sf,
+                  stlbound = boundary,
+                  dist = districts,
+                  hood = nbhoods
+                  )
+       
+       rmarkdown::render(tempReport, output_file = file,
+                         params = params,
+                         envir = new.env(parent = globalenv())
+                         )
+       
+     }
+   )
     
     
     
