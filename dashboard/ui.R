@@ -64,7 +64,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                              radioButtons("year", "Select a Year:", c(2018, 2019), 2019),
                              sliderTextInput("month", "Select a Month:", month.name, cur_month),
                              fluidRow(
-                               column(1, submitButton("Update")),
+                               #column(1, submitButton("Update")),
                                column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))
                              )
                                
@@ -128,6 +128,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                                   ),multiple = TRUE
                                       ),
                                       #checkboxInput("rep_", ""),
+                                      radioButtons("rep_year", "Select a Year:", c(2018, 2019), 2019),
                                       sliderTextInput("rep_month", "Select a Month:", month.name, cur_month),
                                       HTML("<h4 class=sans>Generate Report</h4>"),
                                       downloadButton('report', "Download")

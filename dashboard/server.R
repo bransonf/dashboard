@@ -7,6 +7,7 @@ library(leaflet.extras)
 library(sf)
 library(dygraphs)
 library(timevis)
+library(rmarkdown)
 
 # source custom functions
 source("functions.R")
@@ -164,11 +165,39 @@ shinyServer(function(input, output) {
     
     # generate custom reports using the crime data
     
-     # output$report <- downloadHandler(
-     #   filename = function(){
-     #     
-     #   }
-     # )
+
+    
+     output$report <- downloadHandler(
+       filename = function(){
+          paste0("cardiff_Report_", substr(Sys.Date(),6,10),".html") # once LaTeX is available, PDF
+       },
+       content = function(file){
+         # store in a temp dir because of dir privledges on server
+         tempReport <- file.path(tempdir(), "report.Rmd")
+         file.copy("report.Rmd",  tempReport, overwrite = TRUE)
+         
+         
+         # store and send params to be rendered
+         params <- list(
+                    maps =  input$rep_maps,
+                    tables = input$rep_table,
+                    crimes = input$rep_crime,
+                    month = input$rep_month,
+                    yr = input$rep_year,
+                    crimedata = crimes,
+                    crimesf = crime_sf,
+                    stlbound = boundary,
+                    dist = districts,
+                    hood = nbhoods
+                    )
+         
+         rmarkdown::render(tempReport, output_file = file,
+                           params = params,
+                           envir = new.env(parent = globalenv())
+                           )
+         
+       }
+     )
     
     
     

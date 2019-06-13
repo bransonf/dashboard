@@ -1,0 +1,80 @@
+---
+title: "Cardiff STL Report"
+output: html_document
+params:
+  tables: NA
+  maps: NA
+  crimes: NA
+  month: NA
+  yr: NA
+  crimedata: NA
+  crimesf: NA
+  stlbound: NA
+  dist: NA
+  hood: NA
+---
+
+```{r include=FALSE}
+# load dependencies
+library(ggplot2)
+library(dplyr)
+# filter data
+m <- which(month.name == params$month)
+crimedata <- filter(params$crimedata, year == params$yr & month == m)
+crimesf <- filter(params$crimesf, year == params$yr & month == m)
+```
+
+
+```{r tables, echo=FALSE}
+# making tables
+if("Summary Table" %in% params$tables){
+  print("Summary Table")
+}
+if("District Table" %in% params$tables){
+  print("District Table")
+}
+if("Neighborhood Table" %in% params$tables){
+  print("Neighborhood Table")
+}
+```
+ 
+```{r maps, echo=FALSE}
+# making maps
+if("District Map" %in% params$maps){
+  dis <- group_by(crimedata, district) %>%
+    summarise(crimes = n()) %>%
+    left_join(params$dist, by = "district")
+  
+  ggplot() +
+    geom_sf(data = dis, mapping = aes(fill = crimes)) +
+    scale_fill_viridis_c(name = "Number\nof Crimes") +
+    labs(title = "Crimes by District",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme(axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank())
+    
+}
+if("Neighborhood Map" %in% params$maps){
+  nhood <- group_by(crimedata, neighborhood) %>%
+    summarise(crimes = n()) %>%
+    left_join(params$hood, by = "neighborhood")
+  
+  ggplot() +
+    geom_sf(data = nhood, mapping = aes(fill = crimes)) +
+    scale_fill_viridis_c(name = "Number\nof Crimes") +
+    labs(title = "Crimes by Neighborhood",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme(axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank())
+}
+if("Point Map" %in% params$maps){
+  print("Point Map")
+}
+if("Heat Map" %in% params$maps){
+  print("Heat Map")
+}
+```
+ 
+ 
