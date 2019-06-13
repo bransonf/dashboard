@@ -60,9 +60,10 @@ navbarPage("Cardiff STL", fluid = TRUE,
                              selectInput("demog_select", "Demographic",
                                          choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                                          selected = "None"),
+                             checkboxInput("heatmap", "Draw Heatmap"),
                              checkboxInput("legend", "Show Legend(s)"),
                              radioButtons("year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-                             sliderTextInput("month", "Select a Month:", month.name, cur_month),
+                             sliderTextInput("month", "Select a Month:", month.name, cur_month, animate = TRUE),
                              fluidRow(
                                #column(1, submitButton("Update")),
                                #column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))

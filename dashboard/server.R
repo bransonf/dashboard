@@ -55,7 +55,7 @@ colorDict <- function(key){ # define color dictionary, using https://carto.com/c
 shinyServer(function(input, output) {
   
     # draw a map
-  ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy)
+  ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy) #https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/server.R
     output$map <- renderLeaflet({
         # basemap and attribution case
         bm <- switch(input$base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
@@ -75,7 +75,7 @@ shinyServer(function(input, output) {
       else if(input$demog_select == "Bachelors Attainment"){  leaf %>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
       else if(input$demog_select == "Unemployment Rate"){     leaf %>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
       else if(input$demog_select == "Home Ownership"){        leaf %>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-            
+         
       # add environment variables
       if("Venues" %in% input$env_chk){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
       if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
@@ -92,20 +92,50 @@ shinyServer(function(input, output) {
     
       # add crime Data
       if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$crime_chk)){
-        
+        # filter for month and year
           fmonth <- which(month.name == input$month)
           fyear <- input$year
-        # add to map
-          if("Homicide" %in% input$crime_chk){homicide <- homicide[which(homicide$month == fmonth & homicide$year == fyear),]
+          homicide <- homicide[which(homicide$month == fmonth & homicide$year == fyear),]
+          rape <- rape[which(rape$month == fmonth & rape$year == fyear),]
+          rob <- rob[which(rob$month == fmonth & rob$year == fyear),]
+          assault <- assault[which(assault$month == fmonth & assault$year == fyear),]
+          
+        # add heatmap layer
+        if(input$heatmap){
+          # init empty vector and build
+          crm <- list(lon=NULL, lat=NULL)
+          if("Homicide" %in% input$crime_chk){
+            crm$lon <- append(crm$lon, st_coordinates(homicide)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(homicide)[,2])}
+          if("Rape" %in% input$crime_chk)    {
+            crm$lon <- append(crm$lon, st_coordinates(rape)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(rape)[,2])}
+          if("Robbery" %in% input$crime_chk) {
+            crm$lon <- append(crm$lon, st_coordinates(rob)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(rob)[,2])}
+          if("Assault" %in% input$crime_chk) {
+            crm$lon <- append(crm$lon, st_coordinates(assault)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(assault)[,2])}
+          
+          leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = 90, units = "px") -> leaf
+        }
+        else{
+        # add points to map
+          if("Homicide" %in% input$crime_chk){
             leaf %>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5) -> leaf}
-          if("Rape" %in% input$crime_chk)    {rape <- rape[which(rape$month == fmonth & rape$year == fyear),]
+          if("Rape" %in% input$crime_chk)    {
             leaf %>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5) -> leaf}
-          if("Robbery" %in% input$crime_chk) {rob <- rob[which(rob$month == fmonth & rob$year == fyear),]
+          if("Robbery" %in% input$crime_chk) {
             leaf %>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5) -> leaf}
-          if("Assault" %in% input$crime_chk) {assault <- assault[which(assault$month == fmonth & assault$year == fyear),]
+          if("Assault" %in% input$crime_chk) {
             leaf %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leaf}
+        }
+          
         
       }
+        
+      
+        
       #TODO add injury data
           
       # add legend
