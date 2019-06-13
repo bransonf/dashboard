@@ -70,3 +70,10 @@ assault  <- filter(crime_sf, crime_code >= 40000 & crime_code < 50000)
 
 save(districts, nbhoods, file = "../dashboard/bounds.rda")
 save(crimes, crime_sf, rape, homicide, rob, assault, file = "../dashboard/crimes.rda")
+
+
+# 01 Homicides
+# 02 Rape
+# 03 Robbery
+# 04 Aggravated Assault
+
