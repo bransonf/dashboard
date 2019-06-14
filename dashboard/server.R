@@ -86,7 +86,7 @@ shinyServer(function(input, output) {
       if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq")) -> leaf}
       if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas")) -> leaf}
       if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc")) -> leaf}
-      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .1) -> leaf}
+      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25) -> leaf}
       if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45) -> leaf}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
     
@@ -95,10 +95,16 @@ shinyServer(function(input, output) {
         # filter for month and year
           fmonth <- which(month.name == input$month)
           fyear <- input$year
-          homicide <- homicide[which(homicide$month == fmonth & homicide$year == fyear),]
-          rape <- rape[which(rape$month == fmonth & rape$year == fyear),]
-          rob <- rob[which(rob$month == fmonth & rob$year == fyear),]
-          assault <- assault[which(assault$month == fmonth & assault$year == fyear),]
+          crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
+          
+          if(input$gun){
+            crime_sf <- crime_sf[which(crime_sf$gun),]
+          }
+          
+          homicide <- crime_sf[which(crime_sf$homicide),]
+          rape     <- crime_sf[which(crime_sf$rape),]
+          rob      <- crime_sf[which(crime_sf$robbery),]
+          assault  <- crime_sf[which(crime_sf$assault),]
           
         # add heatmap layer
         if(input$heatmap){
@@ -130,11 +136,8 @@ shinyServer(function(input, output) {
           if("Assault" %in% input$crime_chk) {
             leaf %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leaf}
         }
-          
         
       }
-        
-      
         
       #TODO add injury data
           

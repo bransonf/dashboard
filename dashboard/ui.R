@@ -39,6 +39,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                            `selected-text-format` = "count > 3"
                                          ), 
                                          multiple = TRUE),
+                             checkboxInput("gun", "Filter for Gun Crimes"),
                              pickerInput("inj_chk", "Violent Injury",
                                          choices = c("Gun Shot *", "Stabbing *", "Rape *"),
                                          options = list(

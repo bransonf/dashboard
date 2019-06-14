@@ -3,6 +3,12 @@
 library(readr)
 library(dplyr)
 
+# reproducible way
+# wd = getwd()
+# setwd("../raw_data/crime_data")
+# all_files <- Reduce(rbind, lapply(list.files(), read_csv))
+# setwd(wd)
+
 crimes <- vector("list", 17)
 
 crimes[[1]] <- read_csv("../raw_data/crime_data/January2018.CSV")
@@ -33,7 +39,12 @@ crimes <- transmute(crimes,
                     district = District,
                     crime_code = Crime,
                     lon = XCoord,
-                    lat = YCoord
+                    lat = YCoord,
+                    homicide = ifelse(Crime >= 10000 & Crime < 20000, TRUE, FALSE),
+                    rape = ifelse(Crime >= 20000 & Crime < 30000, TRUE, FALSE),
+                    robbery = ifelse(Crime >= 30000 & Crime < 40000, TRUE, FALSE),
+                    assault = ifelse(Crime >= 40000 & Crime < 50000, TRUE, FALSE),
+                    gun = ifelse(Crime == 10000 | (Crime > 41000 & Crime < 42000) | Crime %in% c(31111, 31112,32111,32112,33111,34111,35111,35112,36112,37111,37112,38111,38112), TRUE, FALSE)
 ) %>%
   filter(year %in% c(2018, 2019))
 
@@ -59,17 +70,13 @@ nbhoods <- st_read("../raw_data/nbrhds_wards/nbrhds_wards/BND_Nhd88_cw.shp", crs
   transmute(neighborhood = NHD_NUM,
             name = as.character(NHD_NAME))
 
-rape     <- filter(crime_sf, crime_code >= 20000 & crime_code < 30000)
-homicide <- filter(crime_sf, crime_code >= 10000 & crime_code < 20000)
-rob      <- filter(crime_sf, crime_code >= 30000 & crime_code < 40000)
-assault  <- filter(crime_sf, crime_code >= 40000 & crime_code < 50000)
 
 
 
 # point and heat map will use sf, hood/district will use crime obj
 
 save(districts, nbhoods, file = "../dashboard/bounds.rda")
-save(crimes, crime_sf, rape, homicide, rob, assault, file = "../dashboard/crimes.rda")
+save(crimes, crime_sf, file = "../dashboard/crimes.rda")
 
 
 # 01 Homicides
