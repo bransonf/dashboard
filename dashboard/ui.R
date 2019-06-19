@@ -29,8 +29,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                     tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
                                 tabPanel("Basic",
                                          fluidRow(
-                                           column(9#, leafletOutput("bas_map", height = "650px")
-                                                  ),
+                                           column(9, leafletOutput("bas_map", height = "650px")),
                                            basMapUI(cur_month)
                                          )),
                                 tabPanel("Advanced",

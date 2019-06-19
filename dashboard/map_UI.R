@@ -11,7 +11,7 @@ basMapUI <- function(cur_month){
                        size = 10,
                        `selected-text-format` = "count > 3"
                      ), 
-                     multiple = TRUE),
+                     multiple = FALSE),
          checkboxInput("bas_gun", "Filter for Gun Crimes"),
          pickerInput("bas_inj", "Violent Injury",
                      choices = c("Gun Shot *", "Stabbing *", "Rape *"),

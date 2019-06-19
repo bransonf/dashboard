@@ -8,6 +8,8 @@ library(sf)
 library(dygraphs)
 library(timevis)
 library(rmarkdown)
+library(dplyr)
+library(htmltools)
 
 # source custom functions
 source("functions.R")
@@ -20,6 +22,7 @@ load("bounds.rda")
 load("n_murder.rda")
 load("tvis.rda")
 load("funding.rda")
+
 
 # using Jenks Natural Breaks
 inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
@@ -54,8 +57,121 @@ colorDict <- function(key){ # define color dictionary, using https://carto.com/c
 # Define server logic
 shinyServer(function(input, output) {
   
+  ## Basic Map
+    region_crime <- reactive({
+      # filter for crimes, gun, year, date
+      fmonth <- which(month.name == input$bas_month)
+      fyear <- input$bas_year
+      crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
+      crimes <- crimes[which(crimes$month == fmonth & crimes$year == fyear),]
+      
+      if(input$bas_gun){
+        crime_sf <- crime_sf[which(crime_sf$gun),]
+        crimes <- crimes[which(crimes$gun),]
+      }
+      
+      # join to region
+      if(input$bas_region == "Police Districts"){
+        crimes <- group_by(crimes, district) %>%
+          summarise(
+            homicide = sum(homicide),
+            rape = sum(rape),
+            robbery = sum(robbery),
+            assault = sum (assault)
+          )
+        dplyr::left_join(districts, crimes, by = "district")
+      }
+      else if(input$bas_region == "Neighborhoods"){
+        crimes <- group_by(crimes, neighborhood) %>%
+          summarise(
+            homicide = sum(homicide),
+            rape = sum(rape),
+            robbery = sum(robbery),
+            assault = sum (assault)
+          )
+        return(dplyr::left_join(nbhoods, crimes, by = "neighborhood"))
+      }
+      # else if(input$bas_region == "Wards"){
+      #   
+      # }
+      
+      
+      })
+    
+      # define pallete based on selection of crime
+    region_pal <- reactive({
+
+      if(input$bas_region == "Neighborhoods"){
+        bins <- switch (input$bas_crime,
+                      "Homicide" = c(0,1,2,5,10),
+                      "Rape" = c(0,1,2),
+                      "Robbery" = c(0,2,5,10,15),
+                      "Assault" = c(0,5,10,15,30)
+                      )
+      }
+      else if(input$bas_region == "Police Districts"){
+        bins <- switch (input$bas_crime,
+                      "Homicide" = c(0,1,5,10,20),
+                      "Rape" = c(0,1,2,5),
+                      "Robbery" = c(0,10,20,30,50),
+                      "Assault" = c(0,25,50,75,100)
+                      )
+      }
+
+      pal <- colorBin("YlGnBu", bins = bins, domain = switch (input$bas_crime,
+                                                 "Homicide" = region_crime()$homicide,
+                                                 "Rape" = region_crime()$rape,
+                                                 "Robbery" = region_crime()$robbery,
+                                                 "Assault" = region_crime()$assault))
+      return(pal)
+    })
+    
+    output$bas_map <- renderLeaflet({
+      # basemap and attribution case
+      bm <- switch(input$bas_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+      at <- switch(input$bas_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      
+      leaflet() %>%
+        enableTileCaching() %>%
+        addFullscreenControl() %>%
+        addTiles(bm, attribution = at) %>%
+        setView(-90.2594, 38.6530, zoom = 11) -> leaf
+      
+      labs <- paste0("<b>Homicides: </b>", region_crime()$homicide, "</br>",
+                     "<b>Rapes: </b>", region_crime()$rape, "</br>",
+                     "<b>Robbery: </b>", region_crime()$robbery, "</br>",
+                     "<b>Assault: </b>", region_crime()$assault) %>% lapply(htmltools::HTML)
+      
+      leaf %>% addPolygons(data = region_crime(), label = labs,
+      fillColor = ~region_pal()(switch (input$bas_crime,
+                               "Homicide" = region_crime()$homicide,
+                               "Rape" = region_crime()$rape,
+                               "Robbery" = region_crime()$robbery,
+                               "Assault" = region_crime()$assault)),
+      weight = 2,
+      opacity = 1,
+      color = "white",
+      dashArray = "3",
+      fillOpacity = 0.7,
+      highlight = highlightOptions(
+        weight = 5,
+        color = "#666",
+        dashArray = "",
+        fillOpacity = 0.7,
+        bringToFront = TRUE),
+      labelOptions = labelOptions(
+        style = list("font-weight" = "normal", padding = "3px 8px"),
+        textsize = "15px",
+        direction = "auto"),
+      popup = "Detailed Popup") -> leaf
+      
+      # add a legend
+      
+      
+      return(leaf)
+    })
+  
   ## Advanced Map
-    # draw a map
   ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy) #https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/server.R
     output$adv_map <- renderLeaflet({
         # basemap and attribution case
@@ -175,7 +291,7 @@ shinyServer(function(input, output) {
       # print map
       return(leaf)
     })
-
+    
     # draw a timeline # https://visjs.org/docs/timeline/#Configuration_Options
     output$time <- renderTimevis({
       timevis(tvis, options = list(
