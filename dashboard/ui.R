@@ -13,11 +13,12 @@ cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
 
 # load copy
 load("copy.rda")
+# load Map UI
+source("map_UI.R")
 
 # begin page  
 navbarPage("Cardiff STL", fluid = TRUE,
            tabPanel("Map", icon = icon("map"),
-                    
                     tags$head(
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
                       tags$title("Cardiff Dashboard"), # Page Title
@@ -25,54 +26,31 @@ navbarPage("Cardiff STL", fluid = TRUE,
                       tags$link(rel="shortcut icon", href="favicon.ico") # Import favicon
                     ),
                     headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
-                    
-                    fluidRow(
-                     
-                      column(9, leafletOutput("map", height = "650px")),
-                      column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
-                             selectInput("base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
-                             pickerInput("crime_chk", "Crime",
-                                         choices = c("Homicide", "Rape", "Robbery", "Assault"),
-                                         options = list(
-                                           `actions-box` = TRUE, 
-                                           size = 10,
-                                           `selected-text-format` = "count > 3"
-                                         ), 
-                                         multiple = TRUE),
-                             checkboxInput("gun", "Filter for Gun Crimes"),
-                             pickerInput("inj_chk", "Violent Injury",
-                                         choices = c("Gun Shot *", "Stabbing *", "Rape *"),
-                                         options = list(
-                                           `actions-box` = TRUE, 
-                                           size = 10,
-                                           `selected-text-format` = "count > 3"
-                                         ), 
-                                         multiple = TRUE
-                             ),
-                             pickerInput("env_chk", "Environment",
-                                         choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
-                                         options = list(
-                                           `actions-box` = TRUE, 
-                                           size = 10,
-                                           `selected-text-format` = "count > 3"
-                                         ), 
-                                         multiple = TRUE
-                             ),
-                             selectInput("demog_select", "Demographic",
-                                         choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
-                                         selected = "None"),
-                             checkboxInput("heatmap", "Draw Heatmap"),
-                             checkboxInput("legend", "Show Legend(s)"),
-                             radioButtons("year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-                             sliderTextInput("month", "Select a Month:", month.name, cur_month, animate = TRUE),
-                             fluidRow(
-                               #column(1, submitButton("Update")),
-                               #column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))
-                             )
-                               
-                      )
-                    )
-                    
+                    tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
+                                tabPanel("Basic",
+                                         fluidRow(
+                                           column(9#, leafletOutput("bas_map", height = "650px")
+                                                  ),
+                                           basMapUI(cur_month)
+                                         )),
+                                tabPanel("Advanced",
+                                         fluidRow(
+                                           column(9, leafletOutput("adv_map", height = "650px")),
+                                           advMapUI(cur_month)
+                                         )),
+                                tabPanel("Density",
+                                         fluidRow(
+                                           column(9#, leafletOutput("dns_map", height = "650px")
+                                                  ),
+                                           dnsMapUI(cur_month)
+                                         )),
+                                tabPanel("Comparison",
+                                         fluidRow(
+                                           column(9#, leafletOutput("sbs_map", height = "650px")
+                                                  ),
+                                           sbsMapUI(cur_month)
+                                         ))
+                                )
            ),
            tabPanel("Timeline", icon = icon("clock"),
                     headerPanel(HTML("<h1 class=title>Timeline</h1>")),

@@ -54,12 +54,13 @@ colorDict <- function(key){ # define color dictionary, using https://carto.com/c
 # Define server logic
 shinyServer(function(input, output) {
   
+  ## Advanced Map
     # draw a map
   ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy) #https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/server.R
-    output$map <- renderLeaflet({
+    output$adv_map <- renderLeaflet({
         # basemap and attribution case
-        bm <- switch(input$base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-        at <- switch(input$base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+        bm <- switch(input$adv_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+        at <- switch(input$adv_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
       
         leaflet() %>%
             enableTileCaching() %>%
@@ -68,36 +69,36 @@ shinyServer(function(input, output) {
             setView(-90.2594, 38.6530, zoom = 11) -> leaf
             
       # add demographic layer
-      if(input$demog_select == "None"){                       leaf %>% addPolygons(data = boundary, fill = NA) -> leaf}
-      else if(input$demog_select == "Median Income"){         leaf %>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$demog_select == "Poverty Rate"){          leaf %>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$demog_select == "High School Attainment"){leaf %>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$demog_select == "Bachelors Attainment"){  leaf %>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$demog_select == "Unemployment Rate"){     leaf %>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$demog_select == "Home Ownership"){        leaf %>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
+      if(input$adv_demog == "None"){                       leaf %>% addPolygons(data = boundary, fill = NA) -> leaf}
+      else if(input$adv_demog == "Median Income"){         leaf %>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
+      else if(input$adv_demog == "Poverty Rate"){          leaf %>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
+      else if(input$adv_demog == "High School Attainment"){leaf %>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
+      else if(input$adv_demog == "Bachelors Attainment"){  leaf %>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
+      else if(input$adv_demog == "Unemployment Rate"){     leaf %>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
+      else if(input$adv_demog == "Home Ownership"){        leaf %>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
          
       # add environment variables
-      if("Venues" %in% input$env_chk){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
-      if("Parks" %in% input$env_chk){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
+      if("Venues" %in% input$adv_env){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
+      if("Parks" %in% input$adv_env){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
       
-      if("ATMs" %in% input$env_chk){          leaf %>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm")) -> leaf}
-      if("Bars" %in% input$env_chk){          leaf %>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar")) -> leaf}
-      if("Clubs" %in% input$env_chk){         leaf %>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb")) -> leaf}
-      if("Liquor Stores" %in% input$env_chk){ leaf %>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq")) -> leaf}
-      if("Gas Stations" %in% input$env_chk){  leaf %>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas")) -> leaf}
-      if("Grocery Stores" %in% input$env_chk){leaf %>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc")) -> leaf}
-      if("Bus Stops" %in% input$env_chk){     leaf %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25) -> leaf}
-      if("Schools" %in% input$env_chk){       leaf %>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45) -> leaf}
+      if("ATMs" %in% input$adv_env){          leaf %>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm")) -> leaf}
+      if("Bars" %in% input$adv_env){          leaf %>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar")) -> leaf}
+      if("Clubs" %in% input$adv_env){         leaf %>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb")) -> leaf}
+      if("Liquor Stores" %in% input$adv_env){ leaf %>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq")) -> leaf}
+      if("Gas Stations" %in% input$adv_env){  leaf %>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas")) -> leaf}
+      if("Grocery Stores" %in% input$adv_env){leaf %>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc")) -> leaf}
+      if("Bus Stops" %in% input$adv_env){     leaf %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25) -> leaf}
+      if("Schools" %in% input$adv_env){       leaf %>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45) -> leaf}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
     
       # add crime Data
-      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$crime_chk)){
+      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$adv_crime)){
         # filter for month and year
-          fmonth <- which(month.name == input$month)
-          fyear <- input$year
+          fmonth <- which(month.name == input$adv_month)
+          fyear <- input$adv_year
           crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
           
-          if(input$gun){
+          if(input$adv_gun){
             crime_sf <- crime_sf[which(crime_sf$gun),]
           }
           
@@ -107,64 +108,64 @@ shinyServer(function(input, output) {
           assault  <- crime_sf[which(crime_sf$assault),]
           
         # add heatmap layer
-        if(input$heatmap){
-          # init empty vector and build
-          crm <- list(lon=NULL, lat=NULL)
-          if("Homicide" %in% input$crime_chk){
-            crm$lon <- append(crm$lon, st_coordinates(homicide)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(homicide)[,2])}
-          if("Rape" %in% input$crime_chk)    {
-            crm$lon <- append(crm$lon, st_coordinates(rape)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(rape)[,2])}
-          if("Robbery" %in% input$crime_chk) {
-            crm$lon <- append(crm$lon, st_coordinates(rob)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(rob)[,2])}
-          if("Assault" %in% input$crime_chk) {
-            crm$lon <- append(crm$lon, st_coordinates(assault)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(assault)[,2])}
-          
-          leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = 90, units = "px") -> leaf
-        }
-        else{
+        # if(input$heatmap){
+        #   # init empty vector and build
+        #   crm <- list(lon=NULL, lat=NULL)
+        #   if("Homicide" %in% input$crime_chk){
+        #     crm$lon <- append(crm$lon, st_coordinates(homicide)[,1])
+        #     crm$lat <- append(crm$lat, st_coordinates(homicide)[,2])}
+        #   if("Rape" %in% input$crime_chk)    {
+        #     crm$lon <- append(crm$lon, st_coordinates(rape)[,1])
+        #     crm$lat <- append(crm$lat, st_coordinates(rape)[,2])}
+        #   if("Robbery" %in% input$crime_chk) {
+        #     crm$lon <- append(crm$lon, st_coordinates(rob)[,1])
+        #     crm$lat <- append(crm$lat, st_coordinates(rob)[,2])}
+        #   if("Assault" %in% input$crime_chk) {
+        #     crm$lon <- append(crm$lon, st_coordinates(assault)[,1])
+        #     crm$lat <- append(crm$lat, st_coordinates(assault)[,2])}
+        #   
+        #   leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = 90, units = "px") -> leaf
+        # }
+        #else{
         # add points to map
-          if("Homicide" %in% input$crime_chk){
+          if("Homicide" %in% input$adv_crime){
             leaf %>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5) -> leaf}
-          if("Rape" %in% input$crime_chk)    {
+          if("Rape" %in% input$adv_crime)    {
             leaf %>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5) -> leaf}
-          if("Robbery" %in% input$crime_chk) {
+          if("Robbery" %in% input$adv_crime) {
             leaf %>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5) -> leaf}
-          if("Assault" %in% input$crime_chk) {
+          if("Assault" %in% input$adv_crime) {
             leaf %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leaf}
-        }
+        #}
         
       }
         
       #TODO add injury data
           
       # add legend
-      if(input$legend){
-        if(input$demog_select != "None"){
-        p <- switch (input$demog_select, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
-        v <- switch (input$demog_select, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
-        t <- switch (input$demog_select, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
+      if(input$adv_legend){
+        if(input$adv_demog != "None"){
+        p <- switch (input$adv_demog, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
+        v <- switch (input$adv_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
+        t <- switch (input$adv_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
         
         leaf %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leaf
         }
         
         # draw symbol legend too
           syms <- c(); col <- c()
-          if("Homicide" %in% input$crime_chk)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
-          if("Rape" %in% input$crime_chk)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
-          if("Robbery" %in% input$crime_chk)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
-          if("Assault" %in% input$crime_chk)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}          
-          if("ATMs" %in% input$env_chk)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
-          if("Bars" %in% input$env_chk)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
-          if("Clubs" %in% input$env_chk)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
-          if("Liquor Stores" %in% input$env_chk) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
-          if("Gas Stations" %in% input$env_chk)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
-          if("Grocery Stores" %in% input$env_chk){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
-          if("Bus Stops" %in% input$env_chk)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
-          if("Schools" %in% input$env_chk)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
+          if("Homicide" %in% input$adv_crime)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
+          if("Rape" %in% input$adv_crime)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
+          if("Robbery" %in% input$adv_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
+          if("Assault" %in% input$adv_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}          
+          if("ATMs" %in% input$adv_env)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
+          if("Bars" %in% input$adv_env)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
+          if("Clubs" %in% input$adv_env)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
+          if("Liquor Stores" %in% input$adv_env) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
+          if("Gas Stations" %in% input$adv_env)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
+          if("Grocery Stores" %in% input$adv_env){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
+          if("Bus Stops" %in% input$adv_env)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
+          if("Schools" %in% input$adv_env)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
           
         leaf %>% addCircleLegend(10, syms, col, "topleft") -> leaf  
         
