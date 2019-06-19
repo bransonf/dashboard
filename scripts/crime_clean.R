@@ -69,13 +69,16 @@ nbhoods <- st_read("../raw_data/nbrhds_wards/nbrhds_wards/BND_Nhd88_cw.shp", crs
   st_transform(4326) %>%
   transmute(neighborhood = NHD_NUM,
             name = as.character(NHD_NAME))
-
+wards <- st_read("../raw_data/nbrhds_wards/nbrhds_wards/POL_WRD_2010_Prec.shp", crs = 102696) %>%
+  st_transform(4326) %>%
+  transmute(ward = WARD10,
+            precinct = PREC10)
 
 
 
 # point and heat map will use sf, hood/district will use crime obj
 
-save(districts, nbhoods, file = "../dashboard/bounds.rda")
+save(districts, nbhoods, wards, file = "../dashboard/bounds.rda")
 save(crimes, crime_sf, file = "../dashboard/crimes.rda")
 
 
