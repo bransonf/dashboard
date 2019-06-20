@@ -17,7 +17,7 @@ load("copy.rda")
 source("map_UI.R")
 
 # begin page  
-navbarPage("Cardiff STL", fluid = TRUE,
+navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
            tabPanel("Map", icon = icon("map"),
                     tags$head(
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
@@ -25,6 +25,7 @@ navbarPage("Cardiff STL", fluid = TRUE,
                       tags$script(src = "customHref.js"), # And to import the custom href function
                       tags$link(rel="shortcut icon", href="favicon.ico") # Import favicon
                     ),
+                    shinyjs::useShinyjs(), # enable js for debugging
                     headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
                     tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
                                 tabPanel("Basic",

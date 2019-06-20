@@ -11,6 +11,9 @@ library(rmarkdown)
 library(dplyr)
 library(htmltools)
 library(leafsync)
+library(leafpop)
+library(ggplot2)
+library(shinyjs)
 
 # source custom functions
 source("functions.R")
@@ -129,6 +132,18 @@ shinyServer(function(input, output) {
       return(pal)
     })
     
+    # popg <- reactive({
+    #   if(input$bas_popups){
+    #     sf <- filter(crime_sf, year == input$bas_year & month == input$bas_month)
+    #     
+    #     gg = ggplot() +
+    #       geom_sf(data = sf)
+    #       
+    #       
+    #     return(gg)
+    #   }
+    # })
+    
     output$bas_map <- renderLeaflet({
       # basemap and attribution case
       bm <- switch(input$bas_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
@@ -166,7 +181,8 @@ shinyServer(function(input, output) {
         style = list("font-weight" = "normal", padding = "3px 8px"),
         textsize = "15px",
         direction = "auto"),
-      popup = region_crime()$name) -> leaf
+      popup = #switch(input$bas_popups, TRUE = popupGraph(popg()), FALSE = ) # Maybe Implement Popup graphs, switch logic invalid
+        region_crime()$name) -> leaf
       
       # add a legend
       if(input$bas_legend){
@@ -438,6 +454,7 @@ shinyServer(function(input, output) {
    )
     
     
-    
+    # JS LOG for DEBUGGING
+   observe({shinyjs::logjs(input$bas_map_shape_click)})
     
 })

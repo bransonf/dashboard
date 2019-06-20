@@ -26,7 +26,7 @@ basMapUI <- function(cur_month){
          sliderTextInput("bas_month", "Select a Month:", month.name, cur_month),
          
          selectInput("bas_region", "Region",
-                     choices = c("Police Districts", "Wards", "Neighborhoods"),
+                     choices = c("Police Districts", "Neighborhoods"), # Maybe add wards later...
                      selected = "Neighborhoods"),
          checkboxInput("bas_legend", "Show Legend"),
          checkboxInput("bas_popups", "Advanced Popups")
@@ -105,7 +105,12 @@ dnsMapUI <- function(cur_month){
 
 # Side by Side Map
 sbsMapUI <- function(cur_month){
-  column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
+  column(3,
+         
+         radioButtons("year4", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
+         sliderTextInput("month4", "Select a Month:", month.name, cur_month),
+         checkboxInput("legend4", "Show Legend(s)"),
+         HTML("<h5 class=heading>Left Map:</h5>"),
          selectInput("sbs_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("crime_chk4", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Assault"),
@@ -115,7 +120,6 @@ sbsMapUI <- function(cur_month){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         checkboxInput("gun4", "Filter for Gun Crimes"),
          pickerInput("inj_chk4", "Violent Injury",
                      choices = c("Gun Shot *", "Stabbing *", "Rape *"),
                      options = list(
@@ -125,6 +129,9 @@ sbsMapUI <- function(cur_month){
                      ), 
                      multiple = TRUE
          ),
+         checkboxInput("gun4", "Filter for Gun Crimes"),
+         HTML("<h5 class=heading>Right Map:</h5>"),
+         selectInput("sbs_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("env_chk4", "Environment",
                      choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
                      options = list(
@@ -137,10 +144,6 @@ sbsMapUI <- function(cur_month){
          selectInput("demog_select4", "Demographic",
                      choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                      selected = "None"),
-         checkboxInput("heatmap4", "Draw Heatmap"),
-         checkboxInput("legend4", "Show Legend(s)"),
-         radioButtons("year4", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-         sliderTextInput("month4", "Select a Month:", month.name, cur_month, animate = TRUE),
          fluidRow(
            #column(1, submitButton("Update")),
            #column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))
