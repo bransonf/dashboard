@@ -39,14 +39,12 @@ navbarPage("Cardiff STL", fluid = TRUE,
                                          )),
                                 tabPanel("Density",
                                          fluidRow(
-                                           column(9#, leafletOutput("dns_map", height = "650px")
-                                                  ),
+                                           column(9, leafletOutput("dns_map", height = "650px")),
                                            dnsMapUI(cur_month)
                                          )),
                                 tabPanel("Comparison",
                                          fluidRow(
-                                           column(9#, leafletOutput("sbs_map", height = "650px")
-                                                  ),
+                                           column(9, htmlOutput("sbs_map", height = "650px")),
                                            sbsMapUI(cur_month)
                                          ))
                                 )

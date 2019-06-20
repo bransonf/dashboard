@@ -98,14 +98,15 @@ dnsMapUI <- function(cur_month){
                      multiple = TRUE
          ),
          radioButtons("dns_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-         sliderTextInput("dns_month", "Select a Month:", month.name, cur_month)
+         sliderTextInput("dns_month", "Select a Month:", month.name, cur_month),
+         sliderInput("dns_size", "Heat Size", 30, 120, 90, 5)
   )
 }
 
 # Side by Side Map
 sbsMapUI <- function(cur_month){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
-         selectInput("base4", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         selectInput("sbs_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("crime_chk4", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Assault"),
                      options = list(

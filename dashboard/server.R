@@ -10,6 +10,7 @@ library(timevis)
 library(rmarkdown)
 library(dplyr)
 library(htmltools)
+library(leafsync)
 
 # source custom functions
 source("functions.R")
@@ -98,27 +99,29 @@ shinyServer(function(input, output) {
       
       })
     
-      # define pallete based on selection of crime
-    region_pal <- reactive({
-
+      # define bin and pallete based on selection of crime and region
+    region_bins <- reactive({
       if(input$bas_region == "Neighborhoods"){
         bins <- switch (input$bas_crime,
-                      "Homicide" = c(0,1,2,5,10),
-                      "Rape" = c(0,1,2),
-                      "Robbery" = c(0,2,5,10,15),
-                      "Assault" = c(0,5,10,15,30)
-                      )
+                        "Homicide" = c(0,1,2,5,10),
+                        "Rape" = c(0,1,2),
+                        "Robbery" = c(0,2,5,10,15),
+                        "Assault" = c(0,5,10,15,30)
+        )
       }
       else if(input$bas_region == "Police Districts"){
         bins <- switch (input$bas_crime,
-                      "Homicide" = c(0,1,5,10,20),
-                      "Rape" = c(0,1,2,5),
-                      "Robbery" = c(0,10,20,30,50),
-                      "Assault" = c(0,25,50,75,100)
-                      )
+                        "Homicide" = c(0,1,5,10,20),
+                        "Rape" = c(0,1,2,5,10),
+                        "Robbery" = c(0,10,20,30,50),
+                        "Assault" = c(0,25,50,75,100)
+        )
       }
-
-      pal <- colorBin("YlGnBu", bins = bins, domain = switch (input$bas_crime,
+      return(bins)
+    })
+    
+    region_pal <- reactive({
+      pal <- colorBin("YlGnBu", bins = region_bins(), domain = switch (input$bas_crime,
                                                  "Homicide" = region_crime()$homicide,
                                                  "Rape" = region_crime()$rape,
                                                  "Robbery" = region_crime()$robbery,
@@ -163,10 +166,16 @@ shinyServer(function(input, output) {
         style = list("font-weight" = "normal", padding = "3px 8px"),
         textsize = "15px",
         direction = "auto"),
-      popup = "Detailed Popup") -> leaf
+      popup = region_crime()$name) -> leaf
       
       # add a legend
-      
+      if(input$bas_legend){
+        leaf %>% addLegend("topleft", region_pal(), values = switch (input$bas_crime,
+                                                                     "Homicide" = region_crime()$homicide,
+                                                                     "Rape" = region_crime()$rape,
+                                                                     "Robbery" = region_crime()$robbery,
+                                                                     "Assault" = region_crime()$assault)) -> leaf
+      }
       
       return(leaf)
     })
@@ -223,26 +232,7 @@ shinyServer(function(input, output) {
           rob      <- crime_sf[which(crime_sf$robbery),]
           assault  <- crime_sf[which(crime_sf$assault),]
           
-        # add heatmap layer
-        # if(input$heatmap){
-        #   # init empty vector and build
-        #   crm <- list(lon=NULL, lat=NULL)
-        #   if("Homicide" %in% input$crime_chk){
-        #     crm$lon <- append(crm$lon, st_coordinates(homicide)[,1])
-        #     crm$lat <- append(crm$lat, st_coordinates(homicide)[,2])}
-        #   if("Rape" %in% input$crime_chk)    {
-        #     crm$lon <- append(crm$lon, st_coordinates(rape)[,1])
-        #     crm$lat <- append(crm$lat, st_coordinates(rape)[,2])}
-        #   if("Robbery" %in% input$crime_chk) {
-        #     crm$lon <- append(crm$lon, st_coordinates(rob)[,1])
-        #     crm$lat <- append(crm$lat, st_coordinates(rob)[,2])}
-        #   if("Assault" %in% input$crime_chk) {
-        #     crm$lon <- append(crm$lon, st_coordinates(assault)[,1])
-        #     crm$lat <- append(crm$lat, st_coordinates(assault)[,2])}
-        #   
-        #   leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = 90, units = "px") -> leaf
-        # }
-        #else{
+        
         # add points to map
           if("Homicide" %in% input$adv_crime){
             leaf %>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5) -> leaf}
@@ -252,7 +242,7 @@ shinyServer(function(input, output) {
             leaf %>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5) -> leaf}
           if("Assault" %in% input$adv_crime) {
             leaf %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leaf}
-        #}
+        
         
       }
         
@@ -290,6 +280,84 @@ shinyServer(function(input, output) {
         
       # print map
       return(leaf)
+    })
+    
+  ## Density Map
+    output$dns_map <- renderLeaflet({
+      # basemap and attribution case
+      bm <- switch(input$dns_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+      at <- switch(input$dns_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      
+      leaflet() %>%
+        enableTileCaching() %>%
+        addFullscreenControl() %>%
+        addTiles(bm, attribution = at) %>%
+        setView(-90.2594, 38.6530, zoom = 11) -> leaf
+      
+      # add crime Data
+      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$dns_crime)){
+        # filter for month and year
+        fmonth <- which(month.name == input$dns_month)
+        fyear <- input$dns_year
+        crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
+        
+        if(input$dns_gun){
+          crime_sf <- crime_sf[which(crime_sf$gun),]
+        }
+        
+        homicide <- crime_sf[which(crime_sf$homicide),]
+        rape     <- crime_sf[which(crime_sf$rape),]
+        rob      <- crime_sf[which(crime_sf$robbery),]
+        assault  <- crime_sf[which(crime_sf$assault),]
+        
+        # add heatmap layer
+          # init empty vector and build
+          crm <- list(lon=NULL, lat=NULL)
+          if("Homicide" %in% input$dns_crime){
+            crm$lon <- append(crm$lon, st_coordinates(homicide)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(homicide)[,2])}
+          if("Rape" %in% input$dns_crime)    {
+            crm$lon <- append(crm$lon, st_coordinates(rape)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(rape)[,2])}
+          if("Robbery" %in% input$dns_crime) {
+            crm$lon <- append(crm$lon, st_coordinates(rob)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(rob)[,2])}
+          if("Assault" %in% input$dns_crime) {
+            crm$lon <- append(crm$lon, st_coordinates(assault)[,1])
+            crm$lat <- append(crm$lat, st_coordinates(assault)[,2])}
+
+          leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = input$dns_size, units = "px") -> leaf
+      }
+        return(leaf)
+    })
+  ## Side by Side Map
+    output$sbs_map <- renderUI({
+      # basemap and attribution case
+      bm <- switch(input$sbs_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+      at <- switch(input$sbs_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      
+      # left
+      leaflet() %>%
+        enableTileCaching() %>%
+        addFullscreenControl() %>%
+        addTiles(bm, attribution = at) %>%
+        setView(-90.2594, 38.6530, zoom = 11) -> leaf1
+      
+      # right
+      leaflet() %>%
+        enableTileCaching() %>%
+        addFullscreenControl() %>%
+        addTiles(bm, attribution = at) %>%
+        setView(-90.2594, 38.6530, zoom = 11) -> leaf2
+      
+      s = sync(leaf1, leaf2)
+      
+      # set height
+      h = 650
+      s[[1]][[1]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
+      s[[1]][[2]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
+      
+      return(s)
     })
     
     # draw a timeline # https://visjs.org/docs/timeline/#Configuration_Options
