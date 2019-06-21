@@ -1,7 +1,7 @@
 ## Map Component UI
 ##TODO Add better isolation (Independent Namespaces per https://shiny.rstudio.com/articles/modules.html)
 # Basic Map (Choropleth)
-basMapUI <- function(cur_month){
+basMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
          selectInput("bas_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("bas_crime", "Crime",
@@ -23,8 +23,7 @@ basMapUI <- function(cur_month){
                      multiple = TRUE
          ),
          radioButtons("bas_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-         sliderTextInput("bas_month", "Select a Month:", month.name, cur_month),
-         
+         uiOutput("bas_month"),
          selectInput("bas_region", "Region",
                      choices = c("Police Districts", "Neighborhoods"), # Maybe add wards later...
                      selected = "Neighborhoods"),
@@ -34,7 +33,7 @@ basMapUI <- function(cur_month){
 }
 
 # Advanced Map (Point)
-advMapUI <- function(cur_month){
+advMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
          selectInput("adv_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("adv_crime", "Crime",
@@ -56,8 +55,7 @@ advMapUI <- function(cur_month){
                      multiple = TRUE
          ),
          radioButtons("adv_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-         sliderTextInput("adv_month", "Select a Month:", month.name, cur_month),
-         
+         uiOutput("adv_month"),
          pickerInput("adv_env", "Environment",
                      choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
                      options = list(
@@ -76,7 +74,7 @@ advMapUI <- function(cur_month){
 }
 
 # Density Map
-dnsMapUI <- function(cur_month){
+dnsMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
          selectInput("dns_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("dns_crime", "Crime",
@@ -98,21 +96,21 @@ dnsMapUI <- function(cur_month){
                      multiple = TRUE
          ),
          radioButtons("dns_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-         sliderTextInput("dns_month", "Select a Month:", month.name, cur_month),
+         uiOutput("dns_month"),
          sliderInput("dns_size", "Heat Size", 30, 120, 90, 5)
   )
 }
 
 # Side by Side Map
-sbsMapUI <- function(cur_month){
+sbsMapUI <- function(){
   column(3,
          
-         radioButtons("year4", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-         sliderTextInput("month4", "Select a Month:", month.name, cur_month),
-         checkboxInput("legend4", "Show Legend(s)"),
+         radioButtons("sbs_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
+         uiOutput("sbs_month"),
+         checkboxInput("sbs_legend", "Show Legend(s)"),
          HTML("<h5 class=heading>Left Map:</h5>"),
-         selectInput("sbs_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
-         pickerInput("crime_chk4", "Crime",
+         selectInput("sbs_baseL", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         pickerInput("sbs_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Assault"),
                      options = list(
                        `actions-box` = TRUE, 
@@ -120,7 +118,7 @@ sbsMapUI <- function(cur_month){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         pickerInput("inj_chk4", "Violent Injury",
+         pickerInput("sbs_inj", "Violent Injury",
                      choices = c("Gun Shot *", "Stabbing *", "Rape *"),
                      options = list(
                        `actions-box` = TRUE, 
@@ -129,10 +127,10 @@ sbsMapUI <- function(cur_month){
                      ), 
                      multiple = TRUE
          ),
-         checkboxInput("gun4", "Filter for Gun Crimes"),
+         checkboxInput("sbs_gun", "Filter for Gun Crimes"),
          HTML("<h5 class=heading>Right Map:</h5>"),
-         selectInput("sbs_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
-         pickerInput("env_chk4", "Environment",
+         selectInput("sbs_baseR", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         pickerInput("sbs_env", "Environment",
                      choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
                      options = list(
                        `actions-box` = TRUE, 
@@ -141,7 +139,7 @@ sbsMapUI <- function(cur_month){
                      ), 
                      multiple = TRUE
          ),
-         selectInput("demog_select4", "Demographic",
+         selectInput("sbs_demog", "Demographic",
                      choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                      selected = "None"),
          fluidRow(
