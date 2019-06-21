@@ -19,3 +19,21 @@ addCircleLegend <- function(map, size, text, color, position){
 }
 
 
+colorDict <- function(key){ # define color dictionary, using https://carto.com/carto-colors/
+  return(
+    switch (key,
+            "atm" = "#44AA99",
+            "bar" = "#882255",
+            "clb" = "#DDCC77",
+            "liq" = "#117733",
+            "gas" = "#332288",
+            "grc" = "#AA4499",
+            "bus" = "#88CCEE",
+            "scl" = "#999933",
+            "mrd" = "#CC6677",
+            "rap" = "#661100",
+            "rob" = "#6699CC",
+            "ast" = "#888888"
+    )
+  )
+}
