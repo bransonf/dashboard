@@ -21,9 +21,9 @@ reportUI <- function(rep_info){
                               ),multiple = TRUE
                   ),
                   pickerInput("rep_crime", "Crime(s)",
-                              choices = c("Homicide","Rape", "Assault", "Robbery", "Non-Violent Crimes"),
+                              choices = c("Homicide","Rape", "Assault", "Robbery"),#, "Non-Violent Crimes"
                               options = list(
-                                `actions-box` = TRUE, 
+                                `actions-box` = TRUE,
                                 size = 10,
                                 `selected-text-format` = "count > 3"
                               ),multiple = TRUE
