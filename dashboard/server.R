@@ -5,15 +5,15 @@ library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
 library(sf)
-library(dygraphs)
-library(timevis)
-library(rmarkdown)
-library(dplyr)
-library(htmltools)
-library(leafsync)
-library(leafpop)
-library(ggplot2)
-library(shinyjs)
+library(dygraphs) # time-series line graphs
+library(timevis) # timeline
+library(rmarkdown) # report gen
+library(dplyr) # data manipulation and summary
+library(htmltools) # forced EVAl of HTML
+library(leafsync) # side by side
+library(leafpop) # popups, optional
+library(ggplot2) # report generation and leafpop
+library(shinyjs) # optional, for debugging
 
 # source custom functions
 source("functions.R")
@@ -37,29 +37,77 @@ unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
 home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
 
 r <- 7 # define radius
-colorDict <- function(key){ # define color dictionary, using https://carto.com/carto-colors/
-  return(
-    switch (key,
-            "atm" = "#44AA99",
-            "bar" = "#882255",
-            "clb" = "#DDCC77",
-            "liq" = "#117733",
-            "gas" = "#332288",
-            "grc" = "#AA4499",
-            "bus" = "#88CCEE",
-            "scl" = "#999933",
-            "mrd" = "#CC6677",
-            "rap" = "#661100",
-            "rob" = "#6699CC",
-            "ast" = "#888888"
-    )
-  )
-}
-
-
 
 # Define server logic
 shinyServer(function(input, output) {
+  
+  ## Dynamic Month Slider based on year
+    output$bas_month <- renderUI({
+      # Get Current Month (Which is last month for this dashboard)
+      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
+      
+      # if this year, max is month - 1
+      if(input$bas_year == as.numeric(format(Sys.Date(), "%Y"))){
+        sliderTextInput("bas_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+      }
+      # else all months
+      else{
+        sliderTextInput("bas_month", "Select a Month:", month.name, cur_month)
+      }
+    })
+    output$adv_month <- renderUI({
+      # Get Current Month (Which is last month for this dashboard)
+      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
+      
+      # if this year, max is month - 1
+      if(input$adv_year == as.numeric(format(Sys.Date(), "%Y"))){
+        sliderTextInput("adv_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+      }
+      # else all months
+      else{
+        sliderTextInput("adv_month", "Select a Month:", month.name, cur_month)
+      }
+    })
+    output$dns_month <- renderUI({
+      # Get Current Month (Which is last month for this dashboard)
+      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
+      
+      # if this year, max is month - 1
+      if(input$dns_year == as.numeric(format(Sys.Date(), "%Y"))){
+        sliderTextInput("dns_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+      }
+      # else all months
+      else{
+        sliderTextInput("dns_month", "Select a Month:", month.name, cur_month)
+      }
+    })
+    output$sbs_month <- renderUI({
+      # Get Current Month (Which is last month for this dashboard)
+      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
+      
+      # if this year, max is month - 1
+      if(input$sbs_year == as.numeric(format(Sys.Date(), "%Y"))){
+        sliderTextInput("sbs_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+      }
+      # else all months
+      else{
+        sliderTextInput("sbs_month", "Select a Month:", month.name, cur_month)
+      }
+    })
+    output$rep_month <- renderUI({
+      # Get Current Month (Which is last month for this dashboard)
+      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
+      
+      # if this year, max is month - 1
+      if(input$rep_year == as.numeric(format(Sys.Date(), "%Y"))){
+        sliderTextInput("rep_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+      }
+      # else all months
+      else{
+        sliderTextInput("rep_month", "Select a Month:", month.name, cur_month)
+      }
+    })
+  
   
   ## Basic Map
     region_crime <- reactive({
@@ -83,7 +131,11 @@ shinyServer(function(input, output) {
             robbery = sum(robbery),
             assault = sum (assault)
           )
-        dplyr::left_join(districts, crimes, by = "district")
+        dplyr::left_join(districts, crimes, by = "district") %>%
+           mutate(homicide = ifelse(is.na(homicide),0,homicide),
+                  rape = ifelse(is.na(rape),0,rape),
+                  robbery = ifelse(is.na(robbery),0,robbery),
+                  assault = ifelse(is.na(assault),0,assault))
       }
       else if(input$bas_region == "Neighborhoods"){
         crimes <- group_by(crimes, neighborhood) %>%
@@ -93,16 +145,18 @@ shinyServer(function(input, output) {
             robbery = sum(robbery),
             assault = sum (assault)
           )
-        return(dplyr::left_join(nbhoods, crimes, by = "neighborhood"))
+        dplyr::left_join(nbhoods, crimes, by = "neighborhood") %>%
+           mutate(homicide = ifelse(is.na(homicide),0,homicide),
+                  rape = ifelse(is.na(rape),0,rape),
+                  robbery = ifelse(is.na(robbery),0,robbery),
+                  assault = ifelse(is.na(assault),0,assault))
       }
-      # else if(input$bas_region == "Wards"){
-      #   
-      # }
+
       
       
       })
     
-      # define bin and pallete based on selection of crime and region
+      # define bin and pallete based on selection of crime and region (Not routinely generated, point of possible failure)
     region_bins <- reactive({
       if(input$bas_region == "Neighborhoods"){
         bins <- switch (input$bas_crime,
@@ -349,8 +403,8 @@ shinyServer(function(input, output) {
   ## Side by Side Map
     output$sbs_map <- renderUI({
       # basemap and attribution case
-      bm <- switch(input$sbs_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-      at <- switch(input$sbs_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      bm <- switch(input$sbs_baseL, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+      at <- switch(input$sbs_baseL, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
       
       # left
       leaflet() %>%
