@@ -17,61 +17,194 @@ params:
 ```{r include=FALSE}
 # load dependencies
 library(ggplot2)
+library(gt) # requires GITHUB VERSION!
 library(dplyr)
+library(sf)
+library(gridExtra)
 # filter data
 m <- which(month.name == params$month)
 crimedata <- filter(params$crimedata, year == params$yr & month == m)
 crimesf <- filter(params$crimesf, year == params$yr & month == m)
+
+# reproject shapes
+stl <- st_transform(params$stlbound, 102696)
+dist <- st_transform(params$dist, 102696)
+hood <- st_transform(params$hood, 102696)
+
+#define map theme
+theme_map <- function(){
+  theme(axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank())
+}
 ```
 
 
 ```{r tables, echo=FALSE}
-# making tables
 if("Summary Table" %in% params$tables){
-  print("Summary Table")
+  stb <- data.frame(Homicides = sum(crimedata$homicide),
+                    Rapes =     sum(crimedata$rape),
+                    Robberies = sum(crimedata$robbery),
+                    Assaults =  sum(crimedata$assault))
+  stb %>% gt() %>% tab_header(title = "Violent Crime in St. Louis",
+                              subtitle = paste0(params$month, ", ", params$yr))
 }
+```
+
+```{r echo=FALSE}
 if("District Table" %in% params$tables){
-  print("District Table")
+  dtb <- crimedata %>% group_by(district) %>% summarise(
+              Homicides = sum(homicide),
+              Rapes = sum(rape),
+              Robbery = sum(robbery),
+              Assault = sum(assault)
+              ) %>% rename(District = district) %>% arrange(District)
+  dtb %>% gt() %>% tab_header(title = "Crime by District",
+                              subtitle = paste0(params$month, ", ", params$yr) )#%>%
+    #tab_style(style = cell_styles(bkgd_color = "#a01506"), locations = cells_data(vars(District)))
 }
+```
+
+```{r echo=FALSE}
 if("Neighborhood Table" %in% params$tables){
-  print("Neighborhood Table")
+  hoodname <- dplyr::select(hood, neighborhood, name)
+  st_geometry(hoodname) <- NULL
+  ntb <- crimedata %>% group_by(neighborhood) %>% summarise(
+              Homicides = sum(homicide),
+              Rapes = sum(rape),
+              Robbery = sum(robbery),
+              Assault = sum(assault)
+              )
+  ntb <- left_join(hoodname, ntb, by = "neighborhood") %>% rename(Neighborhood = name) %>% dplyr::select(-neighborhood) %>%
+    dplyr::filter(!is.na(Neighborhood)) %>% mutate(Homicides = ifelse(is.na(Homicides),0,Homicides),
+              Rapes = ifelse(is.na(Rapes),0,Rapes),
+              Robbery = ifelse(is.na(Robbery),0,Robbery),
+              Assault = ifelse(is.na(Assault),0,Assault)) %>%
+  arrange(desc(Homicides), desc(Rapes), desc(Robbery), desc(Assault))
+  
+  ntb %>% gt() %>% tab_header(title = "Crime by Neighborhood",
+                              subtitle = paste0(params$month, ", ", params$yr))
 }
 ```
  
 ```{r maps, echo=FALSE}
-# making maps
+# District maps
 if("District Map" %in% params$maps){
   dis <- group_by(crimedata, district) %>%
-    summarise(crimes = n()) %>%
-    left_join(params$dist, by = "district")
-  
-  ggplot() +
-    geom_sf(data = dis, mapping = aes(fill = crimes)) +
-    scale_fill_viridis_c(name = "Number\nof Crimes") +
-    labs(title = "Crimes by District",
+    summarise(crimes = n(),
+              homicides = sum(homicide),
+              rapes = sum(rape),
+              robbery = sum(robbery),
+              assault = sum(assault)
+              ) %>%
+    left_join(dist, by = "district")  %>%
+       mutate(homicides = ifelse(is.na(homicides),0,homicides),
+              rape = ifelse(is.na(rapes),0,rapes),
+              robbery = ifelse(is.na(robbery),0,robbery),
+              assault = ifelse(is.na(assault),0,assault))
+  #tx <- paste0()
+  if("Homcide" %in% params$crimes){
+    dh_map = ggplot() +
+    geom_sf(data = dis, mapping = aes(fill = homicides)) +
+    scale_fill_viridis_c(name = "Number\nof Homicides") +
+    labs(title = "Homicides by District",
          subtitle = paste0(params$month, ", ", params$yr)) +
-    theme(axis.title = element_blank(),
-          axis.ticks = element_blank(),
-          axis.text = element_blank())
-    
+    theme_map()
+    #tx <- paste0(tx, "dh_map")
+  }
+  
+  if("Rape" %in% params$crimes){
+    dr_map = ggplot() +
+    geom_sf(data = dis, mapping = aes(fill = rape)) +
+    scale_fill_viridis_c(name = "Number\nof Rapes") +
+    labs(title = "Rapes by District",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme_map()
+  }
+  if("Assault" %in% params$crimes){
+    da_map = ggplot() +
+    geom_sf(data = dis, mapping = aes(fill = assault)) +
+    scale_fill_viridis_c(name = "Number\nof Assaults") +
+    labs(title = "Assaults by District",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme_map()
+  }
+  
+  if("Robbery" %in% params$crimes){
+    db_map = ggplot() +
+    geom_sf(data = dis, mapping = aes(fill = robbery)) +
+    scale_fill_viridis_c(name = "Number\nof Robberies") +
+    labs(title = "Robberies by District",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme_map()
+  }
+  # init a gridwork
+  
+  #eval(parse(text="5+5"))
+  # if we create a character expression, remove extraneous pluses and then evaluate
 }
+```
+
+```{r echo=FALSE}
+# Neighborhood Maps
 if("Neighborhood Map" %in% params$maps){
   nhood <- group_by(crimedata, neighborhood) %>%
-    summarise(crimes = n()) %>%
-    left_join(params$hood, by = "neighborhood")
+    summarise(crimes = n(),
+              homicides = sum(homicide),
+              rapes = sum(rape),
+              robbery = sum(robbery),
+              assault = sum(assault)
+              ) %>%
+    left_join(hood, by = "neighborhood")  %>%
+       mutate(homicides = ifelse(is.na(homicides),0,homicides),
+              rapes = ifelse(is.na(rapes),0,rapes),
+              robbery = ifelse(is.na(robbery),0,robbery),
+              assault = ifelse(is.na(assault),0,assault))
   
-  ggplot() +
-    geom_sf(data = nhood, mapping = aes(fill = crimes)) +
-    scale_fill_viridis_c(name = "Number\nof Crimes") +
-    labs(title = "Crimes by Neighborhood",
+  if("Homcide" %in% params$crimes){
+    ggplot() +
+    geom_sf(data = nhood, mapping = aes(fill = homicides)) +
+    scale_fill_viridis_c(name = "Number\nof Homicides") +
+    labs(title = "Homicides by Neighborhood",
          subtitle = paste0(params$month, ", ", params$yr)) +
-    theme(axis.title = element_blank(),
-          axis.ticks = element_blank(),
-          axis.text = element_blank())
+    theme_map()
+  }
+  
+  if("Rape" %in% params$crimes){
+    ggplot() +
+    geom_sf(data = nhood, mapping = aes(fill = rape)) +
+    scale_fill_viridis_c(name = "Number\nof Rapes") +
+    labs(title = "Rapes by Neighborhood",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme_map()
+  }
+  if("Assault" %in% params$crimes){
+    ggplot() +
+    geom_sf(data = nhood, mapping = aes(fill = assault)) +
+    scale_fill_viridis_c(name = "Number\nof Assaults") +
+    labs(title = "Assaults by Neighborhood",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme_map()
+  }
+  
+  if("Robbery" %in% params$crimes){
+    ggplot() +
+    geom_sf(data = nhood, mapping = aes(fill = robbery)) +
+    scale_fill_viridis_c(name = "Number\nof Robberies") +
+    labs(title = "Robberies by Neighborhood",
+         subtitle = paste0(params$month, ", ", params$yr)) +
+    theme_map()
+  }
 }
+```
+
+```{r echo=FALSE}
+# Point and Heat Maps
 if("Point Map" %in% params$maps){
   print("Point Map")
 }
+```
+```{r echo=FALSE}
 if("Heat Map" %in% params$maps){
   print("Heat Map")
 }
