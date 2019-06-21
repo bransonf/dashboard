@@ -22,13 +22,13 @@ basMapUI <- function(){
                      ), 
                      multiple = TRUE
          ),
-         radioButtons("bas_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
+         awesomeRadio("bas_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
          uiOutput("bas_month"),
          selectInput("bas_region", "Region",
                      choices = c("Police Districts", "Neighborhoods"), # Maybe add wards later...
                      selected = "Neighborhoods"),
          checkboxInput("bas_legend", "Show Legend"),
-         checkboxInput("bas_popups", "Advanced Popups")
+         #checkboxInput("bas_popups", "Advanced Popups")
   )
 }
 
@@ -54,7 +54,7 @@ advMapUI <- function(){
                      ), 
                      multiple = TRUE
          ),
-         radioButtons("adv_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
+         awesomeRadio("adv_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
          uiOutput("adv_month"),
          pickerInput("adv_env", "Environment",
                      choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
@@ -95,7 +95,7 @@ dnsMapUI <- function(){
                      ), 
                      multiple = TRUE
          ),
-         radioButtons("dns_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
+         awesomeRadio("dns_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
          uiOutput("dns_month"),
          sliderInput("dns_size", "Heat Size", 30, 120, 90, 5)
   )
@@ -104,8 +104,7 @@ dnsMapUI <- function(){
 # Side by Side Map
 sbsMapUI <- function(){
   column(3,
-         
-         radioButtons("sbs_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
+         awesomeRadio("sbs_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
          uiOutput("sbs_month"),
          checkboxInput("sbs_legend", "Show Legend(s)"),
          HTML("<h5 class=heading>Left Map:</h5>"),
