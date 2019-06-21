@@ -28,7 +28,7 @@ reportUI <- function(rep_info){
                                 `selected-text-format` = "count > 3"
                               ),multiple = TRUE
                   ),
-                  awesomeRadio("rep_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
+                  awesomeRadio("rep_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE, status = "danger"),
                   uiOutput("rep_month"),
                   HTML("<h4 class=sans>Generate Report</h4>"),
                   downloadButton('report', "Download")

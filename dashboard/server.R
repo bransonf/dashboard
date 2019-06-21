@@ -410,24 +410,120 @@ shinyServer(function(input, output) {
   ## Side by Side Map
     output$sbs_map <- renderUI({
       # basemap and attribution case
-      bm <- switch(input$sbs_baseL, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-      at <- switch(input$sbs_baseL, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      bmL <- switch(input$sbs_baseL, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+      atL <- switch(input$sbs_baseL, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      bmR <- switch(input$sbs_baseR, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+      atR <- switch(input$sbs_baseR, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
       
       # left
       leaflet() %>%
         enableTileCaching() %>%
         addFullscreenControl() %>%
-        addTiles(bm, attribution = at) %>%
-        setView(-90.2594, 38.6530, zoom = 11) -> leaf1
+        addTiles(bmL, attribution = atL) %>%
+        setView(-90.2594, 38.6530, zoom = 11) -> leafL
+      
+      # add crime Data
+      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$sbs_crime)){
+        # filter for month and year
+        fmonth <- which(month.name == input$sbs_month)
+        fyear <- input$sbs_year
+        crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
+        
+        if(input$sbs_gun){
+          crime_sf <- crime_sf[which(crime_sf$gun),]
+        }
+        
+        homicide <- crime_sf[which(crime_sf$homicide),]
+        rape     <- crime_sf[which(crime_sf$rape),]
+        rob      <- crime_sf[which(crime_sf$robbery),]
+        assault  <- crime_sf[which(crime_sf$assault),]
+        
+        
+        # add points to map
+        if("Homicide" %in% input$sbs_crime){
+          leafL %>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5) -> leafL}
+        if("Rape" %in% input$sbs_crime)    {
+          leafL %>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5) -> leafL}
+        if("Robbery" %in% input$sbs_crime) {
+          leafL %>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5) -> leafL}
+        if("Assault" %in% input$sbs_crime) {
+          leafL %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leafL}
+        
+        
+      }
+      
+      #TODO add injury data
       
       # right
       leaflet() %>%
         enableTileCaching() %>%
         addFullscreenControl() %>%
-        addTiles(bm, attribution = at) %>%
-        setView(-90.2594, 38.6530, zoom = 11) -> leaf2
+        addTiles(bmR, attribution = atR) %>%
+        setView(-90.2594, 38.6530, zoom = 11) -> leafR
       
-      s = sync(leaf1, leaf2)
+      # add demographic layer
+      if(input$sbs_demog == "None"){                       leafR %>% addPolygons(data = boundary, fill = NA) -> leafR}
+      else if(input$sbs_demog == "Median Income"){         leafR %>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
+      else if(input$sbs_demog == "Poverty Rate"){          leafR %>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
+      else if(input$sbs_demog == "High School Attainment"){leafR %>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
+      else if(input$sbs_demog == "Bachelors Attainment"){  leafR %>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
+      else if(input$sbs_demog == "Unemployment Rate"){     leafR %>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
+      else if(input$sbs_demog == "Home Ownership"){        leafR %>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
+      
+      # add environment variables
+      if("Venues" %in% input$sbs_env){        leafR %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leafR}
+      if("Parks" %in% input$sbs_env){         leafR %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leafR}
+      
+      if("ATMs" %in% input$sbs_env){          leafR %>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm")) -> leafR}
+      if("Bars" %in% input$sbs_env){          leafR %>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar")) -> leafR}
+      if("Clubs" %in% input$sbs_env){         leafR %>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb")) -> leafR}
+      if("Liquor Stores" %in% input$sbs_env){ leafR %>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq")) -> leafR}
+      if("Gas Stations" %in% input$sbs_env){  leafR %>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas")) -> leafR}
+      if("Grocery Stores" %in% input$sbs_env){leafR %>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc")) -> leafR}
+      if("Bus Stops" %in% input$sbs_env){     leafR %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25) -> leafR}
+      if("Schools" %in% input$sbs_env){       leafR %>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45) -> leafR}
+      #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
+      
+      
+      
+      # add legends
+      if(input$sbs_legend){
+        if(input$sbs_demog != "None"){
+          p <- switch (input$sbs_demog, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
+          v <- switch (input$sbs_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
+          t <- switch (input$sbs_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
+          
+          leafR %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leafR
+        }
+        if(any(c("ATMs", "Bars", "Clubs", "Liquor Stores","Gas Stations", "Grocery Stores", "Bus Stops", "Schools") %in% input$sbs_env)){
+          
+          syms <- c(); col <- c()
+          if("ATMs" %in% input$sbs_env)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
+          if("Bars" %in% input$sbs_env)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
+          if("Clubs" %in% input$sbs_env)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
+          if("Liquor Stores" %in% input$sbs_env) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
+          if("Gas Stations" %in% input$sbs_env)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
+          if("Grocery Stores" %in% input$sbs_env){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
+          if("Bus Stops" %in% input$sbs_env)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
+          if("Schools" %in% input$sbs_env)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
+          
+          leafR %>% addCircleLegend(10, syms, col, "topleft") -> leafR
+        }
+        if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$sbs_crime)){
+          
+          syms <- c(); col <- c()
+          if("Homicide" %in% input$sbs_crime)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
+          if("Rape" %in% input$sbs_crime)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
+          if("Robbery" %in% input$sbs_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
+          if("Assault" %in% input$sbs_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}
+          
+          leafL %>% addCircleLegend(10, syms, col, "topleft") -> leafL
+        }
+      
+      }
+      
+      ## Create side by side
+      s = leafsync::sync(leafL, leafR)
       
       # set height
       h = 650
@@ -435,6 +531,7 @@ shinyServer(function(input, output) {
       s[[1]][[2]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       
       return(s)
+      
     })
     
     # draw a timeline # https://visjs.org/docs/timeline/#Configuration_Options
