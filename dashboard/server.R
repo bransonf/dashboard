@@ -242,10 +242,10 @@ shinyServer(function(input, output) {
       if(input$bas_legend){
         leaf %>% addLegend("topleft", region_pal(),
                            title =  switch (input$bas_crime,
-                                            "Homicide" = "Number of\nHomicides",
+                                            "Homicide" = "Number of</br>Homicides",
                                             "Rape" = "Number of Rapes",
-                                            "Robbery" = "Number of\nRobberies",
-                                            "Assault" = "Number of\nAssaults"
+                                            "Robbery" = "Number of</br>Robberies",
+                                            "Assault" = "Number of</br>Assaults"
                                             ),
                            values = switch (input$bas_crime,
                                              "Homicide" = region_crime()$homicide,
