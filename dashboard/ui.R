@@ -8,13 +8,11 @@ library(sf)
 library(dygraphs)
 library(timevis)
 
-# Get Current Month (Which is last month for this dashboard)
-cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
-
 # load copy
 load("copy.rda")
 # load Map UI
 source("map_UI.R")
+source("report_UI.R")
 
 # begin page  
 navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
@@ -22,7 +20,7 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                     tags$head(
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
                       tags$title("Cardiff Dashboard"), # Page Title
-                      tags$script(src = "customHref.js"), # And to import the custom href function
+                      tags$script(src = "customHref.js"), # import the custom href function
                       tags$link(rel="shortcut icon", href="favicon.ico") # Import favicon
                     ),
                     shinyjs::useShinyjs(), # enable js for debugging
@@ -31,22 +29,22 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                                 tabPanel("Basic",
                                          fluidRow(
                                            column(9, leafletOutput("bas_map", height = "650px")),
-                                           basMapUI(cur_month)
+                                           basMapUI()
                                          )),
                                 tabPanel("Advanced",
                                          fluidRow(
                                            column(9, leafletOutput("adv_map", height = "650px")),
-                                           advMapUI(cur_month)
+                                           advMapUI()
                                          )),
                                 tabPanel("Density",
                                          fluidRow(
                                            column(9, leafletOutput("dns_map", height = "650px")),
-                                           dnsMapUI(cur_month)
+                                           dnsMapUI()
                                          )),
                                 tabPanel("Comparison",
                                          fluidRow(
                                            column(9, htmlOutput("sbs_map", height = "650px")),
-                                           sbsMapUI(cur_month)
+                                           sbsMapUI()
                                          ))
                                 )
            ),
@@ -78,41 +76,7 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
            ),
            tabPanel("Reports", icon = icon("file-alt"),
                     headerPanel(HTML("<h1 class=title>Generate a Report</h1>")),
-                      column(12, align = 'center',
-                             HTML("<h4 class=sans>Select Options Below</h4>"),
-                             fluidRow(align = "center",
-                                      pickerInput("rep_table", "Table(s)",
-                                                  choices = c("Summary Table","District Table", "Neighborhood Table"),
-                                                  options = list(
-                                                    `actions-box` = TRUE, 
-                                                    size = 10,
-                                                    `selected-text-format` = "count > 3"
-                                                  ),multiple = TRUE
-                                      ),
-                                      pickerInput("rep_maps", "Map(s)",
-                                                  choices = c("District Map", "Neighborhood Map", "Point Map", "Heat Map"),
-                                                  options = list(
-                                                    `actions-box` = TRUE, 
-                                                    size = 10,
-                                                    `selected-text-format` = "count > 3"
-                                                  ),multiple = TRUE
-                                      ),
-                                      pickerInput("rep_crime", "Crime(s)",
-                                                  choices = c("Homicide","Rape", "Assault", "Robbery", "Non-Violent Crimes"),
-                                                  options = list(
-                                                    `actions-box` = TRUE, 
-                                                    size = 10,
-                                                    `selected-text-format` = "count > 3"
-                                                  ),multiple = TRUE
-                                      ),
-                                      #checkboxInput("rep_", ""),
-                                      radioButtons("rep_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE),
-                                      sliderTextInput("rep_month", "Select a Month:", month.name, cur_month),
-                                      HTML("<h4 class=sans>Generate Report</h4>"),
-                                      downloadButton('report', "Download")
-                             ),
-                             fluidRow(rep_info)
-                      )
+                    reportUI(rep_info) # see report_UI.R
            )
   )
 
