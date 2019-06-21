@@ -6755,3 +6755,13 @@ button.close {
   }
 }
 /*# sourceMappingURL=bootstrap.css.map */
+
+/* Custom selection color */
+::selection {
+  color:#ffffff;
+  background: #a94442; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  color:#ffffff;
+  background: #a94442; /* Gecko Browsers */
+}
