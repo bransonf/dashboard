@@ -240,11 +240,18 @@ shinyServer(function(input, output) {
       
       # add a legend
       if(input$bas_legend){
-        leaf %>% addLegend("topleft", region_pal(), values = switch (input$bas_crime,
-                                                                     "Homicide" = region_crime()$homicide,
-                                                                     "Rape" = region_crime()$rape,
-                                                                     "Robbery" = region_crime()$robbery,
-                                                                     "Assault" = region_crime()$assault)) -> leaf
+        leaf %>% addLegend("topleft", region_pal(),
+                           title =  switch (input$bas_crime,
+                                            "Homicide" = "Number of\nHomicides",
+                                            "Rape" = "Number of Rapes",
+                                            "Robbery" = "Number of\nRobberies",
+                                            "Assault" = "Number of\nAssaults"
+                                            ),
+                           values = switch (input$bas_crime,
+                                             "Homicide" = region_crime()$homicide,
+                                             "Rape" = region_crime()$rape,
+                                             "Robbery" = region_crime()$robbery,
+                                             "Assault" = region_crime()$assault)) -> leaf
       }
       
       return(leaf)
