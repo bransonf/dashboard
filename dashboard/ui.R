@@ -21,7 +21,14 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
                       tags$title("Cardiff Dashboard"), # Page Title
                       tags$script(src = "customHref.js"), # import the custom href function
-                      tags$link(rel="shortcut icon", href="favicon.ico") # Import favicon
+                      # Import favicon package
+                      tags$link(rel="apple-touch-icon", sizes="180x180", href="icon/apple-touch-icon.png"),
+                      tags$link(rel="icon", type="image/png", sizes="32x32", href="icon/favicon-32x32.png"),
+                      tags$link(rel="icon", type="image/png", sizes="16x16", href="icon/favicon-16x16.png"),
+                      tags$link(rel="manifest", href="icon/site.webmanifest"),
+                      tags$link(rel="mask-icon", href="icon/safari-pinned-tab.svg", color="#a50002"),
+                      tags$meta(name ="msapplication-TileColor", content="#b91d47"),
+                      tags$meta(name="theme-color", content="#ffffff")
                     ),
                     shinyjs::useShinyjs(), # enable js for debugging
                     headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
