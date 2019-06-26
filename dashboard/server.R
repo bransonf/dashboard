@@ -553,12 +553,16 @@ shinyServer(function(input, output) {
     
     #  draw a plot for murders
     output$n_murders <- renderDygraph({
-      dygraph(n_homicides, xlab = "Year", ylab = "Number of Homicides",main = 'Homicides by Year', group = "tline")
+      dg_m <- dygraph(n_homicides, xlab = "Year", ylab = "Number of Homicides",main = 'Homicides by Year', group = "tline")
+      dg_m[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
+      return(dg_m)
     })
 
     # and for funding
     output$funding_yr <- renderDygraph({
-      dygraph(vp_funding, xlab = "Year", ylab = "Total Funding ($ Thousands)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("Total", "Total Funding ($)")
+      dg_f <- dygraph(vp_funding, xlab = "Year", ylab = "Total Funding ($ Thousands)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("Total", "Total Funding ($)")
+      dg_f[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
+      return(dg_f)
     })
     
     # outputs for downloads
