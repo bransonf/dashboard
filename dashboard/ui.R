@@ -65,6 +65,7 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
            tabPanel("About", value = "about", icon = icon("sticky-note"),
                     headerPanel(HTML("<h1 class=title>The Cardiff Model</h1>")),
                     cardiff,
+                    about,
                     HTML("<h2>Violence Prevention Programs</h2>"),
                     vp_orgs
            ),
