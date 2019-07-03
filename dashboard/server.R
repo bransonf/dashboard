@@ -11,9 +11,10 @@ library(rmarkdown) # report gen
 library(dplyr) # data manipulation and summary
 library(htmltools) # forced EVAl of HTML
 library(leafsync) # side by side
-library(leafpop) # popups, optional
-library(ggplot2) # report generation and leafpop
+library(ggplot2) # report generation
 library(shinyjs) # optional, for debugging
+library(magrittr) # better syntax see ?`%<>%`
+#library(compstatr) # will be used for getting last month of data, still need to create DB to pull monthly
 
 # source custom functions
 source("functions.R")
@@ -186,17 +187,6 @@ shinyServer(function(input, output) {
       return(pal)
     })
     
-    # popg <- reactive({
-    #   if(input$bas_popups){
-    #     sf <- filter(crime_sf, year == input$bas_year & month == input$bas_month)
-    #     
-    #     gg = ggplot() +
-    #       geom_sf(data = sf)
-    #       
-    #       
-    #     return(gg)
-    #   }
-    # })
     
     output$bas_map <- renderLeaflet({
       # basemap and attribution case
@@ -402,8 +392,9 @@ shinyServer(function(input, output) {
           if("Assault" %in% input$dns_crime) {
             crm$lon <- append(crm$lon, st_coordinates(assault)[,1])
             crm$lat <- append(crm$lat, st_coordinates(assault)[,2])}
-
-          leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = input$dns_size, units = "px") -> leaf
+        if(length(crm$lon) < 1){NULL}
+        else{leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = input$dns_size, units = "px") -> leaf}
+          
       }
         return(leaf)
     })
