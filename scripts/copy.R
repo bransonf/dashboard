@@ -48,4 +48,4 @@ vp_orgs <- HTML("<h3 id='wns'>Weed & Seed</h3>
 
 rep_info <- HTML('<h4>About the Data:</h4><p>These reports are generated using data from the City of Saint Louis Metropolitan Police department. Unlike the UCR reports which display all crimes recorded in a month, these reports reflect only incidents that occured in a given month. Notably, counts of rape will usually differ from UCR reports. For crimes that do not contain precise address data, they are excluded from heatmaps and point maps. Counts on maps may not always reflect counts in tables due to missing information as well.</p>')
 
-save(cardiff, methods, vp_orgs, nav, rep_info, file = "../dashboard/copy.rda")
+save(cardiff, methods, vp_orgs, nav, rep_info, file = "../dashboard/dashboard/copy.rda")

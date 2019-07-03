@@ -24,9 +24,7 @@ source("functions.R")
 load("cardiff.rda")
 load("crimes.rda")
 load("bounds.rda")
-load("n_murder.rda")
-load("tvis.rda")
-load("funding.rda")
+load("time_data.rda")
 
 
 # using Jenks Natural Breaks

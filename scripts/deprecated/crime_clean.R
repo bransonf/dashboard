@@ -1,4 +1,5 @@
 # Creating a Crime Database from 2018-May2019 data
+## BECAME DEPRECATED WITH THE RELEASE OF SCRAPING IN COMPSTATR AND WITH THE DEVELOPMENT OF AN API
 
 library(readr)
 library(dplyr)
