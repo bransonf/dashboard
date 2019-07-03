@@ -91,17 +91,17 @@ shinyServer(function(input, output) {
       # filter for crimes, gun, year, date
       fmonth <- which(month.name == input$bas_month)
       fyear <- input$bas_year
-      crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
-      crimes <- crimes[which(crimes$month == fmonth & crimes$year == fyear),]
+      crime_sf  %<>% filter(month == fmonth & year == fyear)
+      crimes    %<>% filter(month == fmonth & year == fyear)
       
       if(input$bas_gun){
-        crime_sf <- crime_sf[which(crime_sf$gun),]
-        crimes <- crimes[which(crimes$gun),]
+        crime_sf %<>% filter(gun)
+        crimes   %<>% filter(gun)
       }
       
       # join to region
       if(input$bas_region == "Police Districts"){
-        crimes <- group_by(crimes, district) %>%
+        crimes %<>% group_by(district) %>%
           summarise(
             homicide = sum(homicide),
             rape = sum(rape),
@@ -128,9 +128,6 @@ shinyServer(function(input, output) {
                   robbery = ifelse(is.na(robbery),0,robbery),
                   assault = ifelse(is.na(assault),0,assault))
       }
-
-      
-      
       })
     
       # define bin and pallete based on selection of crime and region (Not routinely generated, point of possible failure)
@@ -168,11 +165,7 @@ shinyServer(function(input, output) {
       bm <- basemap(input$bas_base)$bm
       at <- basemap(input$bas_base)$at
       
-      leaflet() %>%
-        enableTileCaching() %>%
-        addFullscreenControl() %>%
-        addTiles(bm, attribution = at) %>%
-        setView(-90.2594, 38.6530, zoom = 11) -> leaf
+      leafInit(bm, at) -> leaf
       
       labs <- paste0("<h4>",region_crime()$name, "</h4>",
                      "<b>Homicides: </b>", region_crime()$homicide, "</br>",
@@ -262,11 +255,7 @@ shinyServer(function(input, output) {
         bm <- basemap(input$adv_base)$bm
         at <- basemap(input$adv_base)$at
       
-        leaflet() %>%
-            enableTileCaching() %>%
-            addFullscreenControl() %>%
-            addTiles(bm, attribution = at) %>%
-            setView(-90.2594, 38.6530, zoom = 11) -> leaf
+        leafInit(bm, at) -> leaf
             
       # add demographic layer
       if(input$adv_demog == "None"){                       leaf %<>% addPolygons(data = boundary, fill = NA)}
@@ -297,27 +286,27 @@ shinyServer(function(input, output) {
         # filter for month and year
           fmonth <- which(month.name == input$adv_month)
           fyear <- input$adv_year
-          crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
+          crime_sf %<>% filter(month == fmonth & year == fyear)
           
           if(input$adv_gun){
-            crime_sf <- crime_sf[which(crime_sf$gun),]
+            crime_sf %<>% filter(gun)
           }
           
-          homicide <- crime_sf[which(crime_sf$homicide),]
-          rape     <- crime_sf[which(crime_sf$rape),]
-          rob      <- crime_sf[which(crime_sf$robbery),]
-          assault  <- crime_sf[which(crime_sf$assault),]
+          homicide <- filter(crime_sf, homicide)
+          rape     <- filter(crime_sf, rape)
+          rob      <- filter(crime_sf, robbery)
+          assault  <- filter(crime_sf, assault)
           
         
         # add points to map
           if("Homicide" %in% input$adv_crime){
-            leaf %>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5) -> leaf}
+            leaf %<>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5)}
           if("Rape" %in% input$adv_crime)    {
-            leaf %>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5) -> leaf}
+            leaf %<>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5)}
           if("Robbery" %in% input$adv_crime) {
-            leaf %>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5) -> leaf}
+            leaf %<>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5)}
           if("Assault" %in% input$adv_crime) {
-            leaf %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leaf}
+            leaf %<>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5)}
         
         
       }
@@ -375,27 +364,23 @@ shinyServer(function(input, output) {
       bm <- basemap(input$dns_base)$bm
       at <- basemap(input$dns_base)$at
       
-      leaflet() %>%
-        enableTileCaching() %>%
-        addFullscreenControl() %>%
-        addTiles(bm, attribution = at) %>%
-        setView(-90.2594, 38.6530, zoom = 11) -> leaf
+      leafInit(bm, at) -> leaf
       
       # add crime Data
       if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$dns_crime)){
         # filter for month and year
         fmonth <- which(month.name == input$dns_month)
         fyear <- input$dns_year
-        crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
+        crime_sf %<>% filter(month == fmonth & year == fyear)
         
         if(input$dns_gun){
-          crime_sf <- crime_sf[which(crime_sf$gun),]
+          crime_sf %<>% filter(gun)
         }
         
-        homicide <- crime_sf[which(crime_sf$homicide),]
-        rape     <- crime_sf[which(crime_sf$rape),]
-        rob      <- crime_sf[which(crime_sf$robbery),]
-        assault  <- crime_sf[which(crime_sf$assault),]
+        homicide <- filter(crime_sf, homicide)
+        rape     <- filter(crime_sf, rape)
+        rob      <- filter(crime_sf, robbery)
+        assault  <- filter(crime_sf, assault)
         
         # add heatmap layer
           # init empty vector and build
@@ -440,27 +425,23 @@ shinyServer(function(input, output) {
       atR <- basemap(input$sbs_baseR)$at
       
       # left
-      leaflet() %>%
-        enableTileCaching() %>%
-        addFullscreenControl() %>%
-        addTiles(bmL, attribution = atL) %>%
-        setView(-90.2594, 38.6530, zoom = 11) -> leafL
+      leafInit(bmL, atL) -> leafL
       
       # add crime Data
       if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$sbs_crime)){
         # filter for month and year
         fmonth <- which(month.name == input$sbs_month)
         fyear <- input$sbs_year
-        crime_sf <- crime_sf[which(crime_sf$month == fmonth & crime_sf$year == fyear),]
+        crime_sf %<>% filter(month == fmonth & year == fyear)
         
         if(input$sbs_gun){
-          crime_sf <- crime_sf[which(crime_sf$gun),]
+          crime_sf %<>% filter(gun)
         }
         
-        homicide <- crime_sf[which(crime_sf$homicide),]
-        rape     <- crime_sf[which(crime_sf$rape),]
-        rob      <- crime_sf[which(crime_sf$robbery),]
-        assault  <- crime_sf[which(crime_sf$assault),]
+        homicide <- filter(crime_sf, homicide)
+        rape     <- filter(crime_sf, rape)
+        rob      <- filter(crime_sf, robbery)
+        assault  <- filter(crime_sf, assault)
         
         
         # add points to map
@@ -479,11 +460,7 @@ shinyServer(function(input, output) {
       #TODO add injury data
       
       # right
-      leaflet() %>%
-        enableTileCaching() %>%
-        addFullscreenControl() %>%
-        addTiles(bmR, attribution = atR) %>%
-        setView(-90.2594, 38.6530, zoom = 11) -> leafR
+      leafInit(bmR, atR) -> leafR
       
       # add demographic layer
       if(input$sbs_demog == "None"){                       leafR %<>% addPolygons(data = boundary, fill = NA)}
@@ -542,7 +519,7 @@ shinyServer(function(input, output) {
           if("Robbery" %in% input$sbs_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
           if("Assault" %in% input$sbs_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}
           
-          leafL %>% addCircleLegend(10, syms, col, "topleft") -> leafL
+          leafL %<>% addCircleLegend(10, syms, col, "topleft")
         }
       
       }
