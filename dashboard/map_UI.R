@@ -3,7 +3,7 @@
 # Basic Map (Choropleth)
 basMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
-         selectInput("bas_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         selectInput("bas_base", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("bas_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Assault"),
                      options = list(
@@ -34,7 +34,7 @@ basMapUI <- function(){
 # Advanced Map (Point)
 advMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
-         selectInput("adv_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         selectInput("adv_base", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("adv_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Assault"),
                      options = list(
@@ -75,7 +75,7 @@ advMapUI <- function(){
 # Density Map
 dnsMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
-         selectInput("dns_base", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         selectInput("dns_base", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("dns_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Assault"),
                      options = list(
@@ -107,7 +107,7 @@ sbsMapUI <- function(){
          uiOutput("sbs_month"),
          checkboxInput("sbs_legend", "Show Legends"),
          HTML("<h5 class=heading>Left Map:</h5>"),
-         selectInput("sbs_baseL", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         selectInput("sbs_baseL", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Assault"),
                      options = list(
@@ -127,7 +127,7 @@ sbsMapUI <- function(){
          ),
          checkboxInput("sbs_gun", "Filter for Gun Crimes"),
          HTML("<h5 class=heading>Right Map:</h5>"),
-         selectInput("sbs_baseR", "Basemap", c("Terrain", "No Labels"), selected = "Terrain"),
+         selectInput("sbs_baseR", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_env", "Environment",
                      choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
                      options = list(

@@ -39,69 +39,47 @@ r <- 7 # define radius
 
 # Define server logic
 shinyServer(function(input, output) {
+  #  get current month
+  cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1] # needs to be last updated month of crime data
   
   ## Dynamic Month Slider based on year
     output$bas_month <- renderUI({
-      # Get Current Month (Which is last month for this dashboard)
-      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
-      
       # if this year, max is month - 1
       if(input$bas_year == as.numeric(format(Sys.Date(), "%Y"))){
         sliderTextInput("bas_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
       }
-      # else all months
       else{
         sliderTextInput("bas_month", "Select a Month:", month.name, cur_month)
       }
     })
     output$adv_month <- renderUI({
-      # Get Current Month (Which is last month for this dashboard)
-      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
-      
-      # if this year, max is month - 1
       if(input$adv_year == as.numeric(format(Sys.Date(), "%Y"))){
         sliderTextInput("adv_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
       }
-      # else all months
       else{
         sliderTextInput("adv_month", "Select a Month:", month.name, cur_month)
       }
     })
     output$dns_month <- renderUI({
-      # Get Current Month (Which is last month for this dashboard)
-      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
-      
-      # if this year, max is month - 1
       if(input$dns_year == as.numeric(format(Sys.Date(), "%Y"))){
         sliderTextInput("dns_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
       }
-      # else all months
       else{
         sliderTextInput("dns_month", "Select a Month:", month.name, cur_month)
       }
     })
     output$sbs_month <- renderUI({
-      # Get Current Month (Which is last month for this dashboard)
-      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
-      
-      # if this year, max is month - 1
       if(input$sbs_year == as.numeric(format(Sys.Date(), "%Y"))){
         sliderTextInput("sbs_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
       }
-      # else all months
       else{
         sliderTextInput("sbs_month", "Select a Month:", month.name, cur_month)
       }
     })
     output$rep_month <- renderUI({
-      # Get Current Month (Which is last month for this dashboard)
-      cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1]
-      
-      # if this year, max is month - 1
       if(input$rep_year == as.numeric(format(Sys.Date(), "%Y"))){
         sliderTextInput("rep_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
       }
-      # else all months
       else{
         sliderTextInput("rep_month", "Select a Month:", month.name, cur_month)
       }
@@ -187,9 +165,8 @@ shinyServer(function(input, output) {
     
     
     output$bas_map <- renderLeaflet({
-      # basemap and attribution case
-      bm <- switch(input$bas_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-      at <- switch(input$bas_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      bm <- basemap(input$bas_base)$bm
+      at <- basemap(input$bas_base)$at
       
       leaflet() %>%
         enableTileCaching() %>%
@@ -222,9 +199,7 @@ shinyServer(function(input, output) {
       labelOptions = labelOptions(
         style = list("font-weight" = "normal", padding = "3px 8px"),
         textsize = "15px",
-        direction = "auto"),
-      popup = #switch(input$bas_popups, TRUE = popupGraph(popg()), FALSE = ) # Maybe Implement Popup graphs, switch logic invalid
-        region_crime()$name) -> leaf
+        direction = "auto")) -> leaf
       
       # add a legend
       if(input$bas_legend){
@@ -249,8 +224,8 @@ shinyServer(function(input, output) {
   ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy) #https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/server.R
     output$adv_map <- renderLeaflet({
         # basemap and attribution case
-        bm <- switch(input$adv_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-        at <- switch(input$adv_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+        bm <- basemap(input$adv_base)$bm
+        at <- basemap(input$adv_base)$at
       
         leaflet() %>%
             enableTileCaching() %>%
@@ -349,9 +324,8 @@ shinyServer(function(input, output) {
     
   ## Density Map
     output$dns_map <- renderLeaflet({
-      # basemap and attribution case
-      bm <- switch(input$dns_base, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-      at <- switch(input$dns_base, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      bm <- basemap(input$dns_base)$bm
+      at <- basemap(input$dns_base)$at
       
       leaflet() %>%
         enableTileCaching() %>%
@@ -399,10 +373,10 @@ shinyServer(function(input, output) {
   ## Side by Side Map
     output$sbs_map <- renderUI({
       # basemap and attribution case
-      bmL <- switch(input$sbs_baseL, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-      atL <- switch(input$sbs_baseL, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
-      bmR <- switch(input$sbs_baseR, "Terrain" = "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
-      atR <- switch(input$sbs_baseR, "Terrain" = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.', "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+      bmL <- basemap(input$sbs_baseL)$bm
+      atL <- basemap(input$sbs_baseL)$at
+      bmR <- basemap(input$sbs_baseR)$bm
+      atR <- basemap(input$sbs_baseR)$at
       
       # left
       leaflet() %>%

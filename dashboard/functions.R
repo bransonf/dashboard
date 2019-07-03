@@ -1,5 +1,6 @@
 # These should be minified custom functions for loading the web application
 
+# add circles to legend for points
 addCircleLegend <- function(map, size, text, color, position){
   if(length(text) != length(color)){stop("Color and Text arguments should be of equal length")}
   leg <- paste0()
@@ -18,8 +19,8 @@ addCircleLegend <- function(map, size, text, color, position){
   return(leaflet::addControl(map, html = leg, position))
 }
 
-
-colorDict <- function(key){ # define color dictionary, using https://carto.com/carto-colors/
+# define color dictionary, using https://carto.com/carto-colors/
+colorDict <- function(key){
   return(
     switch (key,
             "atm" = "#44AA99",
@@ -36,4 +37,19 @@ colorDict <- function(key){ # define color dictionary, using https://carto.com/c
             "ast" = "#888888"
     )
   )
+}
+
+# define basemap url and attribution
+basemap <- function(input){
+  bm <- switch(input,
+               "Satellite" = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+               "Terrain" = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png",
+               "No Labels" =  "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png")
+  at <- switch(input,
+               "Satellite" = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+               "Terrain" = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+               "No Labels" =  '<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>')
+  
+  
+  return(list(bm = bm, at = at))
 }
