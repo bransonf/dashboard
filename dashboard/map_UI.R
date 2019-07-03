@@ -27,7 +27,8 @@ basMapUI <- function(){
          selectInput("bas_region", "Region",
                      choices = c("Police Districts", "Neighborhoods"), # Maybe add wards later...
                      selected = "Neighborhoods"),
-         checkboxInput("bas_legend", "Show Legend")
+         checkboxInput("bas_legend", "Show Legend"),
+         checkboxInput("bas_popups", "Popups (Better for Mobile)")
   )
 }
 
@@ -56,7 +57,7 @@ advMapUI <- function(){
          awesomeRadio("adv_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE, status = "danger"),
          uiOutput("adv_month"),
          pickerInput("adv_env", "Environment",
-                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
+                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
@@ -129,7 +130,7 @@ sbsMapUI <- function(){
          HTML("<h5 class=heading>Right Map:</h5>"),
          selectInput("sbs_baseR", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_env", "Environment",
-                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks"),
+                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,

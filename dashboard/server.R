@@ -174,33 +174,56 @@ shinyServer(function(input, output) {
         addTiles(bm, attribution = at) %>%
         setView(-90.2594, 38.6530, zoom = 11) -> leaf
       
-      labs <- paste0("<b>Homicides: </b>", region_crime()$homicide, "</br>",
+      labs <- paste0("<h4>",region_crime()$name, "</h4>",
+                     "<b>Homicides: </b>", region_crime()$homicide, "</br>",
                      "<b>Rapes: </b>", region_crime()$rape, "</br>",
                      "<b>Robbery: </b>", region_crime()$robbery, "</br>",
                      "<b>Assault: </b>", region_crime()$assault) %>% lapply(htmltools::HTML)
       
-      leaf %>% addPolygons(data = region_crime(), label = labs,
-      fillColor = ~region_pal()(switch (input$bas_crime,
-                               "Homicide" = region_crime()$homicide,
-                               "Rape" = region_crime()$rape,
-                               "Robbery" = region_crime()$robbery,
-                               "Assault" = region_crime()$assault)),
-      weight = 2,
-      opacity = 1,
-      color = "white",
-      dashArray = "3",
-      fillOpacity = 0.7,
-      highlight = highlightOptions(
-        weight = 5,
-        color = "#666",
-        dashArray = "",
-        fillOpacity = 0.7,
-        bringToFront = TRUE),
-      labelOptions = labelOptions(
-        style = list("font-weight" = "normal", padding = "3px 8px"),
-        textsize = "15px",
-        direction = "auto")) -> leaf
       
+      if(input$bas_popups){
+      leaf %<>% addPolygons(data = region_crime(), popup = labs,
+                            fillColor = ~region_pal()(switch (input$bas_crime,
+                                                              "Homicide" = region_crime()$homicide,
+                                                              "Rape" = region_crime()$rape,
+                                                              "Robbery" = region_crime()$robbery,
+                                                              "Assault" = region_crime()$assault)),
+                            weight = 2,
+                            opacity = 1,
+                            color = "white",
+                            dashArray = "3",
+                            fillOpacity = 0.7,
+                            highlight = highlightOptions(
+                              weight = 5,
+                              color = "#666",
+                              dashArray = "",
+                              fillOpacity = 0.7,
+                              bringToFront = TRUE))
+      }
+      else
+      {
+      leaf %<>% addPolygons(data = region_crime(), label = labs,
+                            fillColor = ~region_pal()(switch (input$bas_crime,
+                                                              "Homicide" = region_crime()$homicide,
+                                                              "Rape" = region_crime()$rape,
+                                                              "Robbery" = region_crime()$robbery,
+                                                              "Assault" = region_crime()$assault)),
+                            weight = 2,
+                            opacity = 1,
+                            color = "white",
+                            dashArray = "3",
+                            fillOpacity = 0.7,
+                            highlight = highlightOptions(
+                              weight = 5,
+                              color = "#666",
+                              dashArray = "",
+                              fillOpacity = 0.7,
+                              bringToFront = TRUE),
+                            labelOptions = labelOptions(
+                              style = list("font-weight" = "normal", padding = "3px 8px"),
+                              textsize = "15px",
+                              direction = "auto"))
+      }
       # add a legend
       if(input$bas_legend){
         leaf %>% addLegend("topleft", region_pal(),
@@ -234,26 +257,27 @@ shinyServer(function(input, output) {
             setView(-90.2594, 38.6530, zoom = 11) -> leaf
             
       # add demographic layer
-      if(input$adv_demog == "None"){                       leaf %>% addPolygons(data = boundary, fill = NA) -> leaf}
-      else if(input$adv_demog == "Median Income"){         leaf %>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$adv_demog == "Poverty Rate"){          leaf %>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$adv_demog == "High School Attainment"){leaf %>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$adv_demog == "Bachelors Attainment"){  leaf %>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$adv_demog == "Unemployment Rate"){     leaf %>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
-      else if(input$adv_demog == "Home Ownership"){        leaf %>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leaf}
+      if(input$adv_demog == "None"){                       leaf %<>% addPolygons(data = boundary, fill = NA)}
+      else if(input$adv_demog == "Median Income"){         leaf %<>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$adv_demog == "Poverty Rate"){          leaf %<>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$adv_demog == "High School Attainment"){leaf %<>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$adv_demog == "Bachelors Attainment"){  leaf %<>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$adv_demog == "Unemployment Rate"){     leaf %<>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$adv_demog == "Home Ownership"){        leaf %<>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
          
       # add environment variables
-      if("Venues" %in% input$adv_env){        leaf %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leaf}
-      if("Parks" %in% input$adv_env){         leaf %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leaf}
+      if("Venues" %in% input$adv_env){        leaf %<>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name)}
+      if("Parks" %in% input$adv_env){         leaf %<>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name)}
+      if("Zones" %in% input$adv_env){         leaf %<>% addPolygons(data = hayden, color = "red", fill = NA, popup = "Hayden's Rectangle") %>% addPolygons(data = wedge, color = "red", fill = NA, popup = "The Wedge")}
       
-      if("ATMs" %in% input$adv_env){          leaf %>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm")) -> leaf}
-      if("Bars" %in% input$adv_env){          leaf %>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar")) -> leaf}
-      if("Clubs" %in% input$adv_env){         leaf %>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb")) -> leaf}
-      if("Liquor Stores" %in% input$adv_env){ leaf %>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq")) -> leaf}
-      if("Gas Stations" %in% input$adv_env){  leaf %>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas")) -> leaf}
-      if("Grocery Stores" %in% input$adv_env){leaf %>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc")) -> leaf}
-      if("Bus Stops" %in% input$adv_env){     leaf %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25) -> leaf}
-      if("Schools" %in% input$adv_env){       leaf %>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45) -> leaf}
+      if("ATMs" %in% input$adv_env){          leaf %<>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm"))}
+      if("Bars" %in% input$adv_env){          leaf %<>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar"))}
+      if("Clubs" %in% input$adv_env){         leaf %<>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb"))}
+      if("Liquor Stores" %in% input$adv_env){ leaf %<>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq"))}
+      if("Gas Stations" %in% input$adv_env){  leaf %<>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas"))}
+      if("Grocery Stores" %in% input$adv_env){leaf %<>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc"))}
+      if("Bus Stops" %in% input$adv_env){     leaf %<>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25)}
+      if("Schools" %in% input$adv_env){       leaf %<>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45)}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
     
       # add crime Data
@@ -404,13 +428,13 @@ shinyServer(function(input, output) {
         
         # add points to map
         if("Homicide" %in% input$sbs_crime){
-          leafL %>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5) -> leafL}
+          leafL %<>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5)}
         if("Rape" %in% input$sbs_crime)    {
-          leafL %>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5) -> leafL}
+          leafL %<>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5)}
         if("Robbery" %in% input$sbs_crime) {
-          leafL %>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5) -> leafL}
+          leafL %<>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5)}
         if("Assault" %in% input$sbs_crime) {
-          leafL %>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5) -> leafL}
+          leafL %<>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5)}
         
         
       }
@@ -425,26 +449,27 @@ shinyServer(function(input, output) {
         setView(-90.2594, 38.6530, zoom = 11) -> leafR
       
       # add demographic layer
-      if(input$sbs_demog == "None"){                       leafR %>% addPolygons(data = boundary, fill = NA) -> leafR}
-      else if(input$sbs_demog == "Median Income"){         leafR %>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
-      else if(input$sbs_demog == "Poverty Rate"){          leafR %>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
-      else if(input$sbs_demog == "High School Attainment"){leafR %>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
-      else if(input$sbs_demog == "Bachelors Attainment"){  leafR %>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
-      else if(input$sbs_demog == "Unemployment Rate"){     leafR %>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
-      else if(input$sbs_demog == "Home Ownership"){        leafR %>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5) -> leafR}
+      if(input$sbs_demog == "None"){                       leafR %<>% addPolygons(data = boundary, fill = NA)}
+      else if(input$sbs_demog == "Median Income"){         leafR %<>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$sbs_demog == "Poverty Rate"){          leafR %<>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$sbs_demog == "High School Attainment"){leafR %<>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$sbs_demog == "Bachelors Attainment"){  leafR %<>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$sbs_demog == "Unemployment Rate"){     leafR %<>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      else if(input$sbs_demog == "Home Ownership"){        leafR %<>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
       
       # add environment variables
-      if("Venues" %in% input$sbs_env){        leafR %>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name) -> leafR}
-      if("Parks" %in% input$sbs_env){         leafR %>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name) -> leafR}
+      if("Venues" %in% input$sbs_env){        leafR %<>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name)}
+      if("Parks" %in% input$sbs_env){         leafR %<>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name)}
+      if("Zones" %in% input$sbs_env){         leafR %<>% addPolygons(data = hayden, color = "red", fill = NA, popup = "Hayden's Rectangle") %>% addPolygons(data = wedge, color = "red", fill = NA, popup = "The Wedge")}
       
-      if("ATMs" %in% input$sbs_env){          leafR %>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm")) -> leafR}
-      if("Bars" %in% input$sbs_env){          leafR %>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar")) -> leafR}
-      if("Clubs" %in% input$sbs_env){         leafR %>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb")) -> leafR}
-      if("Liquor Stores" %in% input$sbs_env){ leafR %>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq")) -> leafR}
-      if("Gas Stations" %in% input$sbs_env){  leafR %>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas")) -> leafR}
-      if("Grocery Stores" %in% input$sbs_env){leafR %>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc")) -> leafR}
-      if("Bus Stops" %in% input$sbs_env){     leafR %>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25) -> leafR}
-      if("Schools" %in% input$sbs_env){       leafR %>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45) -> leafR}
+      if("ATMs" %in% input$sbs_env){          leafR %<>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm"))}
+      if("Bars" %in% input$sbs_env){          leafR %<>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar"))}
+      if("Clubs" %in% input$sbs_env){         leafR %<>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb"))}
+      if("Liquor Stores" %in% input$sbs_env){ leafR %<>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq"))}
+      if("Gas Stations" %in% input$sbs_env){  leafR %<>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas"))}
+      if("Grocery Stores" %in% input$sbs_env){leafR %<>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc"))}
+      if("Bus Stops" %in% input$sbs_env){     leafR %<>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25)}
+      if("Schools" %in% input$sbs_env){       leafR %<>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45)}
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
       
       
@@ -580,6 +605,9 @@ shinyServer(function(input, output) {
     
     
     # JS LOG for DEBUGGING
-   observe({shinyjs::logjs(input$bas_map_shape_click)})
+   observe({shinyjs::logjs(input$bas_map_zoom)})
+   observe({shinyjs::logjs(input$bas_map_center)})
+   observe({shinyjs::logjs(input$adv_map_zoom)})
+   observe({shinyjs::logjs(input$adv_map_center)})
     
 })
