@@ -243,6 +243,18 @@ shinyServer(function(input, output) {
       return(leaf)
     })
   
+    observe({
+      c = input$adv_map_center
+      z = input$adv_map_zoom
+      
+      leafletProxy("bas_map") %>% setView(c$lng, c$lat, z)
+    })
+    observe({
+      c = input$dns_map_center
+      z = input$dns_map_zoom
+      
+      leafletProxy("bas_map") %>% setView(c$lng, c$lat, z)
+    })
   ## Advanced Map
   ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy) #https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/server.R
     output$adv_map <- renderLeaflet({
@@ -346,6 +358,18 @@ shinyServer(function(input, output) {
       return(leaf)
     })
     
+    observe({
+      c = input$bas_map_center
+      z = input$bas_map_zoom
+      
+      leafletProxy("adv_map") %>% setView(c$lng, c$lat, z)
+    })
+    observe({
+      c = input$dns_map_center
+      z = input$dns_map_zoom
+      
+      leafletProxy("adv_map") %>% setView(c$lng, c$lat, z)
+    })
   ## Density Map
     output$dns_map <- renderLeaflet({
       bm <- basemap(input$dns_base)$bm
@@ -393,6 +417,19 @@ shinyServer(function(input, output) {
           
       }
         return(leaf)
+    })
+    
+    observe({
+      c = input$bas_map_center
+      z = input$bas_map_zoom
+      
+      leafletProxy("dns_map") %>% setView(c$lng, c$lat, z)
+    })
+    observe({
+      c = input$adv_map_center
+      z = input$adv_map_zoom
+      
+      leafletProxy("dns_map") %>% setView(c$lng, c$lat, z)
     })
   ## Side by Side Map
     output$sbs_map <- renderUI({
@@ -606,8 +643,5 @@ shinyServer(function(input, output) {
     
     # JS LOG for DEBUGGING
    observe({shinyjs::logjs(input$bas_map_zoom)})
-   observe({shinyjs::logjs(input$bas_map_center)})
-   observe({shinyjs::logjs(input$adv_map_zoom)})
-   observe({shinyjs::logjs(input$adv_map_center)})
     
 })
