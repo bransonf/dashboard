@@ -62,30 +62,36 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                     dygraphOutput("funding_yr")
                     
            ),
-           tabPanel("About", value = "about", icon = icon("sticky-note"),
-                    headerPanel(HTML("<h1 class=title>The Cardiff Model</h1>")),
-                    cardiff,
-                    about,
-                    HTML("<h2>Violence Prevention Programs</h2>"),
-                    vp_orgs
-           ),
-           tabPanel("Methods", icon = icon("book"),
-                    headerPanel(HTML("<h1 class=title>Data and Methodology</h1>")),
-                    methods
-           ),
-           tabPanel("Downloads", icon = icon("file-download"),
-                    headerPanel(HTML("<h1 class=title>Data Downloads</h1>")),
-                      column(12,
-                             fluidRow(align = "center",
-                                downloadButton('dlhmc', "Homicide Counts"),
-                                downloadButton('dlfund', "Funding")
-                             )
-                      )
-           ),
            tabPanel("Reports", icon = icon("file-alt"),
                     headerPanel(HTML("<h1 class=title>Generate a Report</h1>")),
                     reportUI(rep_info) # see report_UI.R
+           ),
+           tabPanel("Prevention", icon = icon("hands-helping"),
+                    HTML("<h1 class=title>Violence Prevention Programs</h1>"),
+                    vp_orgs
+           ),
+           
+           navbarMenu("More", icon = icon("bars"),
+                      tabPanel("About", value = "about", icon = icon("sticky-note"),
+                               headerPanel(HTML("<h1 class=title>The Cardiff Model</h1>")),
+                               cardiff,
+                               about
+                      ),
+                      tabPanel("Methods", icon = icon("book"),
+                               headerPanel(HTML("<h1 class=title>Data and Methodology</h1>")),
+                               methods
+                      ),
+                      tabPanel("Data/Downloads", icon = icon("file-download"),
+                               headerPanel(HTML("<h1 class=title>Data Downloads</h1>")),
+                               column(12,
+                                      fluidRow(align = "center",
+                                               downloadButton('dlhmc', "Homicide Counts"),
+                                               downloadButton('dlfund', "Funding")
+                                      )
+                               )
+                      )
            )
+           
   )
 
    
