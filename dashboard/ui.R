@@ -66,7 +66,7 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                     headerPanel(HTML("<h1 class=title>Generate a Report</h1>")),
                     reportUI(rep_info) # see report_UI.R
            ),
-           tabPanel("Prevention", icon = icon("hands-helping"),
+           tabPanel("Prevention", icon = icon("handshake"),
                     HTML("<h1 class=title>Violence Prevention Programs</h1>"),
                     vp_orgs
            ),
