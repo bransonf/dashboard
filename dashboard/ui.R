@@ -66,13 +66,13 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                     headerPanel(HTML("<h1 class=title>Generate a Report</h1>")),
                     reportUI(rep_info) # see report_UI.R
            ),
-           tabPanel("Prevention", icon = icon("handshake"),
+           tabPanel("Prevention", value = "prev", icon = icon("handshake"),
                     HTML("<h1 class=title>Violence Prevention Programs</h1>"),
                     vp_orgs
            ),
            
            navbarMenu("More", icon = icon("bars"),
-                      tabPanel("About", value = "about", icon = icon("sticky-note"),
+                      tabPanel("About", icon = icon("sticky-note"),
                                headerPanel(HTML("<h1 class=title>The Cardiff Model</h1>")),
                                cardiff,
                                about
