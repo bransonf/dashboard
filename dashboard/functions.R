@@ -21,7 +21,6 @@ addCircleLegend <- function(map, size, text, color, position){
 
 # define color dictionary, using https://carto.com/carto-colors/
 colorDict <- function(key){
-  return(
     switch (key,
             "atm" = "#44AA99",
             "bar" = "#882255",
@@ -36,7 +35,38 @@ colorDict <- function(key){
             "rob" = "#6699CC",
             "ast" = "#888888"
     )
-  )
+}
+
+# define pallette dictionary ## NOT CURRENTLY IN USE, Syntax may be worse than saving 6 lines in server.R
+palDict <- function(key){
+    switch (key,
+            "inc"   = colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425)),
+            "pov"   = colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62)),
+            "hs"    = colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99)),
+            "ba"    = colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78)),
+            "unemp" = colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36)),
+            "home"  = colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
+    )
+}
+# define bins dictionary
+binDict <- function(region, crime){
+  if(region == "Neighborhoods"){
+    bins = switch (crime,
+                   "Homicide" = c(0,1,2,5,10),
+                   "Rape" = c(0,1,2),
+                   "Robbery" = c(0,2,5,10,15),
+                   "Assault" = c(0,5,10,15,30)
+    )
+  }
+  else if(region == "Police Districts"){
+    bins = switch (crime,
+                   "Homicide" = c(0,1,5,10,20),
+                   "Rape" = c(0,1,2,5,10),
+                   "Robbery" = c(0,10,20,30,50),
+                   "Assault" = c(0,25,50,75,100)
+    )
+  }
+  return(bins)
 }
 
 # define basemap url and attribution

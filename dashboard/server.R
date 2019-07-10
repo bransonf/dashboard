@@ -132,23 +132,7 @@ shinyServer(function(input, output) {
     
       # define bin and pallete based on selection of crime and region (Not routinely generated, point of possible failure)
     region_bins <- reactive({
-      if(input$bas_region == "Neighborhoods"){
-        bins <- switch (input$bas_crime,
-                        "Homicide" = c(0,1,2,5,10),
-                        "Rape" = c(0,1,2),
-                        "Robbery" = c(0,2,5,10,15),
-                        "Assault" = c(0,5,10,15,30)
-        )
-      }
-      else if(input$bas_region == "Police Districts"){
-        bins <- switch (input$bas_crime,
-                        "Homicide" = c(0,1,5,10,20),
-                        "Rape" = c(0,1,2,5,10),
-                        "Robbery" = c(0,10,20,30,50),
-                        "Assault" = c(0,25,50,75,100)
-        )
-      }
-      return(bins)
+      binDict(input$bas_region, input$bas_crime)
     })
     
     region_pal <- reactive({
@@ -236,12 +220,6 @@ shinyServer(function(input, output) {
       return(leaf)
     })
   
-    observe({
-      c = input$adv_map_center
-      z = input$adv_map_zoom
-      
-      leafletProxy("bas_map") %>% setView(c$lng, c$lat, z)
-    })
     observe({
       c = input$dns_map_center
       z = input$dns_map_zoom
@@ -353,12 +331,7 @@ shinyServer(function(input, output) {
       
       leafletProxy("adv_map") %>% setView(c$lng, c$lat, z)
     })
-    observe({
-      c = input$dns_map_center
-      z = input$dns_map_zoom
-      
-      leafletProxy("adv_map") %>% setView(c$lng, c$lat, z)
-    })
+  
   ## Density Map
     output$dns_map <- renderLeaflet({
       bm <- basemap(input$dns_base)$bm
@@ -404,12 +377,6 @@ shinyServer(function(input, output) {
         return(leaf)
     })
     
-    observe({
-      c = input$bas_map_center
-      z = input$bas_map_zoom
-      
-      leafletProxy("dns_map") %>% setView(c$lng, c$lat, z)
-    })
     observe({
       c = input$adv_map_center
       z = input$adv_map_zoom
