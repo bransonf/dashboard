@@ -34,7 +34,7 @@ colorDict <- function(key){
             "rap" = "#661100",
             "rob" = "#6699CC",
             "ast" = "#888888",
-            "undef" = "#FFFFFF"
+            "undef" = "#ff5d30"
     )
 }
 
@@ -113,8 +113,216 @@ addPoints <- function(map, lon, lat, radius = 7, stroke = NA, fillColor = colorD
 }
 
 # larger batch function for adding crime points
-addCrimePoints <- function(.data, crimes){
+addCrimePoints <- function(map, variables, data){
+  if("Homicide" %in% variables){
+    
+    x <- filter(data, ucr_category == "Homicide") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("mrd"))
+    }
+  }
+  if("Rape" %in% variables){
+    
+    x <- filter(data, ucr_category == "Rape")
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("rap"))
+    }
+  }
+  if("Robbery" %in% variables){
+    
+    x <- filter(data, ucr_category == "Robbery") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("rob"))
+    }
+  }
+  if("Aggravated Assault" %in% variables){
+    
+    x <- filter(data, ucr_category == "Aggravated Assault") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("ast"))
+    }
+  }
+  if("Burglary" %in% variables){
+    
+    x <- filter(data, ucr_category == "Burglary") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Larceny" %in% variables){
+    
+    x <- filter(data, ucr_category == "Larceny") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Vehicle Theft" %in% variables){
+    
+    x <- filter(data, ucr_category == "Vehicle Theft") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Arson" %in% variables){
+    
+    x <- filter(data, ucr_category == "Arson") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Simple Assault" %in% variables){
+    
+    x <- filter(data, ucr_category == "Simple Assault") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Forgery" %in% variables){
+    
+    x <- filter(data, ucr_category == "Forgery") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Fraud" %in% variables){
+    
+    x <- filter(data, ucr_category == "Fraud") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Embezzlement" %in% variables){
+    
+    x <- filter(data, ucr_category == "Embezzlement") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Stolen Property" %in% variables){
+    
+    x <- filter(data, ucr_category == "Stolen Property") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Destruction of Property" %in% variables){
+    
+    x <- filter(data, ucr_category == "Destruction of Property") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Weapons Offense" %in% variables){
+    
+    x <- filter(data, ucr_category == "Weapons Offense") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Sex offense" %in% variables){
+    
+    x <- filter(data, ucr_category == "Sex offense") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("VMCSL" %in% variables){
+    
+    x <- filter(data, ucr_category == "VMCSL") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Offense Against Family" %in% variables){
+    
+    x <- filter(data, ucr_category == "Offense Against Family") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("DWI/DUI" %in% variables){
+    
+    x <- filter(data, ucr_category == "DWI/DUI") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Liquor Laws" %in% variables){
+    
+    x <- filter(data, ucr_category == "Liquor Laws") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Disorderly Conduct" %in% variables){
+    
+    x <- filter(data, ucr_category == "Disorderly Conduct") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Loitering/Begging" %in% variables){
+    
+    x <- filter(data, ucr_category == "Loitering/Begging") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+  if("Other" %in% variables){
+    
+    x <- filter(data, ucr_category == "Other") %>%
+          filter(!is.na(wgs_x) & !is.na(wgs_y))
+    
+    if(length(x$wgs_x) > 0){
+    map %<>% addPoints(lon = x$wgs_x, lat = x$wgs_y, fillColor = colorDict("undef"))
+    }
+  }
+
   
+  return(map)
 }
 
 # add demographic layer
@@ -139,6 +347,21 @@ addDemographic <- function(map, variable, demog, boundary){
 }
 
 # add environmental points
-addEnvironment <- function(map, variables){
+addEnvironment <- function(map, variables, data, r = 7){
+  # add environment variables
+  if("Venues" %in% variables){        map %<>% addPolygons(data = data[[1]], fillColor = "blue", stroke = NA, popup = data[[1]]$name)}
+  if("Parks" %in% variables){         map %<>% addPolygons(data = data[[2]], fillColor = "green", stroke = NA, popup = data[[2]]$name)}
+  if("Zones" %in% variables){         map %<>% addPolygons(data = data[[3]], color = "red", fill = NA, popup = "Hayden's Rectangle") %>% addPolygons(data = data[[4]], color = "red", fill = NA, popup = "The Wedge")}
   
+  if("ATMs" %in% variables){          map %<>% addCircleMarkers(data = data[[5]], radius = r,stroke = NA, popup = data[[5]]$name, fillColor = colorDict("atm"))}
+  if("Bars" %in% variables){          map %<>% addCircleMarkers(data = data[[6]], radius = r,stroke = NA, popup = data[[6]]$name, fillColor = colorDict("bar"))}
+  if("Clubs" %in% variables){         map %<>% addCircleMarkers(data = data[[7]], radius = r,stroke = NA, popup = data[[7]]$name, fillColor = colorDict("clb"))}
+  if("Liquor Stores" %in% variables){ map %<>% addCircleMarkers(data = data[[8]], radius = r,stroke = NA, popup = data[[8]]$name, fillColor = colorDict("liq"))}
+  if("Gas Stations" %in% variables){  map %<>% addCircleMarkers(data = data[[9]], radius = r,stroke = NA, popup = data[[9]]$name, fillColor = colorDict("gas"))}
+  if("Grocery Stores" %in% variables){map %<>% addCircleMarkers(data = data[[10]], radius = r,stroke = NA, popup = data[[10]]$name, fillColor = colorDict("grc"))}
+  if("Bus Stops" %in% variables){     map %<>% addCircleMarkers(data = data[[11]], radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25)}
+  if("Schools" %in% variables){       map %<>% addCircleMarkers(data = data[[12]], radius = r,stroke = NA, popup = data[[12]]$name, fillColor = colorDict("scl"), fillOpacity = .45)}
+  #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
+  
+  return(map)
 }

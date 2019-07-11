@@ -40,6 +40,9 @@ ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
 unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
 home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
 
+# package envrionmental data
+env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, food, bus, school)
+
 # Define server logic
 shinyServer(function(input, output) {
   #  get current month
@@ -92,17 +95,12 @@ shinyServer(function(input, output) {
   ## Basic Map
     region_crime <- reactive({
       
-      if(input$bas_gun){
-        bas_g <- 'true'
-      }else{bas_g = 'false'}
-      
-      
       if(input$bas_region == "Police Districts"){
 
         crime <- api_call(apiURL, paste0("district",
                                          "?month=",input$bas_month,
                                          "&year=", input$bas_year,
-                                         "&gun=",  bas_g)) %>%
+                                         "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
           dplyr::mutate(district = as.numeric(district)) %>%
           dplyr::left_join(districts, ., by = "district") %>%
           tidyr::spread("ucr_category", "Incidents")
@@ -116,7 +114,7 @@ shinyServer(function(input, output) {
         crime <- api_call(apiURL, paste0("nbhood",
                                          "?month=",input$bas_month,
                                          "&year=", input$bas_year,
-                                         "&gun=",  bas_g)) %>%
+                                         "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
           dplyr::mutate(neighborhood = as.numeric(neighborhood)) %>%
           dplyr::left_join(nbhoods, ., by = "neighborhood") %>%
           tidyr::spread("ucr_category", "Incidents")
@@ -141,7 +139,7 @@ shinyServer(function(input, output) {
       return(pal)
     })
     
-    
+
     output$bas_map <- renderLeaflet({
       bm <- basemap(input$bas_base)$bm
       at <- basemap(input$bas_base)$at
@@ -236,51 +234,19 @@ shinyServer(function(input, output) {
         leaf %<>% addDemographic(input$adv_demog, demog, boundary)
          
       # add environment variables
-      if("Venues" %in% input$adv_env){        leaf %<>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name)}
-      if("Parks" %in% input$adv_env){         leaf %<>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name)}
-      if("Zones" %in% input$adv_env){         leaf %<>% addPolygons(data = hayden, color = "red", fill = NA, popup = "Hayden's Rectangle") %>% addPolygons(data = wedge, color = "red", fill = NA, popup = "The Wedge")}
-      
-      if("ATMs" %in% input$adv_env){          leaf %<>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm"))}
-      if("Bars" %in% input$adv_env){          leaf %<>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar"))}
-      if("Clubs" %in% input$adv_env){         leaf %<>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb"))}
-      if("Liquor Stores" %in% input$adv_env){ leaf %<>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq"))}
-      if("Gas Stations" %in% input$adv_env){  leaf %<>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas"))}
-      if("Grocery Stores" %in% input$adv_env){leaf %<>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc"))}
-      if("Bus Stops" %in% input$adv_env){     leaf %<>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25)}
-      if("Schools" %in% input$adv_env){       leaf %<>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45)}
-      #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
-    
+        leaf %<>% addEnvironment(input$adv_env, env_data)
+        
       # add crime Data
       if(length(input$adv_crime) > 0){
-        
-        if(input$adv_gun){
-          adv_g <- 'true'
-        }else{adv_g = 'false'}
         
         crime <- api_call(apiURL, paste0("coords",
                           "?month=", input$adv_month,
                           "&year=", input$adv_year,
-                          "&gun=", adv_g,
+                          "&gun=", ifelse(input$adv_gun, 'true', 'false'),
                           "&ucr=", jsonlite::toJSON(input$adv_crime)))
           
         # add points to map
-          if("Homicide" %in% input$adv_crime){
-            homicide <- filter(crime, ucr_category == "Homicide")
-            leaf %<>% addPoints(lon = homicide$wgs_x, lat = homicide$wgs_y, fillColor = colorDict("mrd"))}
-          
-          if("Rape" %in% input$adv_crime){
-            rape     <- filter(crime, ucr_category == "Rape")
-            if(!all(is.na(rape$wgs_x))){ # extra check for missing points
-            leaf %<>% addPoints(lon = rape$wgs_x, lat = rape$wgs_y, fillColor = colorDict("rap"))}}
-          
-          if("Robbery" %in% input$adv_crime) {
-            rob      <- filter(crime, ucr_category == "Robbery")
-            leaf %<>% addPoints(lon = rob$wgs_x, lat = rob$wgs_y, fillColor = colorDict("rob"))}
-          
-          if("Aggravated Assault" %in% input$adv_crime) {
-            assault  <- filter(crime, ucr_category == "Aggravated Assault")
-            leaf %<>% addPoints(lon = assault$wgs_x, lat = assault$wgs_y, fillColor = colorDict("ast"))}
-        
+          leaf %<>% addCrimePoints(input$adv_crime, crime)
         
       }
         
@@ -335,40 +301,20 @@ shinyServer(function(input, output) {
       leafInit(bm, at) -> leaf
       
       # add crime Data
-      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$dns_crime)){
-        # filter for month and year
-        fmonth <- which(month.name == input$dns_month)
-        fyear <- input$dns_year
-        crime_sf %<>% filter(month == fmonth & year == fyear)
-        
-        if(input$dns_gun){
-          crime_sf %<>% filter(gun)
-        }
-        
-        homicide <- filter(crime_sf, homicide)
-        rape     <- filter(crime_sf, rape)
-        rob      <- filter(crime_sf, robbery)
-        assault  <- filter(crime_sf, assault)
-        
-        # add heatmap layer
-          # init empty vector and build
-          crm <- list(lon=NULL, lat=NULL)
-          if("Homicide" %in% input$dns_crime){
-            crm$lon <- append(crm$lon, st_coordinates(homicide)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(homicide)[,2])}
-          if("Rape" %in% input$dns_crime)    {
-            crm$lon <- append(crm$lon, st_coordinates(rape)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(rape)[,2])}
-          if("Robbery" %in% input$dns_crime) {
-            crm$lon <- append(crm$lon, st_coordinates(rob)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(rob)[,2])}
-          if("Assault" %in% input$dns_crime) {
-            crm$lon <- append(crm$lon, st_coordinates(assault)[,1])
-            crm$lat <- append(crm$lat, st_coordinates(assault)[,2])}
-        if(length(crm$lon) < 1){NULL}
-        else{leaf %>% addWebGLHeatmap(data = crm,lng = ~lon, lat = ~lat, size = input$dns_size, units = "px") -> leaf}
+      if(length(input$dns_crime) > 0){
+        crime <- api_call(apiURL, paste0("coords",
+                                         "?month=", input$dns_month,
+                                         "&year=", input$dns_year,
+                                         "&gun=", ifelse(input$dns_gun, 'true', 'false'),
+                                         "&ucr=", jsonlite::toJSON(input$dns_crime)))
+                   
+        if(length(crime$wgs_x) < 1){NULL}
+        else{
+          crime %<>% filter(!is.na(wgs_x) & !is.na(wgs_y))
+          leaf %<>% addWebGLHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, size = input$dns_size, units = "px")}
           
       }
+      
         return(leaf)
     })
     
@@ -390,32 +336,16 @@ shinyServer(function(input, output) {
       leafInit(bmL, atL) -> leafL
       
       # add crime Data
-      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$sbs_crime)){
-        # filter for month and year
-        fmonth <- which(month.name == input$sbs_month)
-        fyear <- input$sbs_year
-        crime_sf %<>% filter(month == fmonth & year == fyear)
+      if(length(input$sbs_crime) > 0){
         
-        if(input$sbs_gun){
-          crime_sf %<>% filter(gun)
-        }
-        
-        homicide <- filter(crime_sf, homicide)
-        rape     <- filter(crime_sf, rape)
-        rob      <- filter(crime_sf, robbery)
-        assault  <- filter(crime_sf, assault)
-        
+        crime <- api_call(apiURL, paste0("coords",
+                                         "?month=", input$sbs_month,
+                                         "&year=", input$sbs_year,
+                                         "&gun=", ifelse(input$sbs_gun, 'true', 'false'),
+                                         "&ucr=", jsonlite::toJSON(input$sbs_crime)))
         
         # add points to map
-        if("Homicide" %in% input$sbs_crime){
-          leafL %<>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5)}
-        if("Rape" %in% input$sbs_crime)    {
-          leafL %<>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5)}
-        if("Robbery" %in% input$sbs_crime) {
-          leafL %<>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5)}
-        if("Assault" %in% input$sbs_crime) {
-          leafL %<>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5)}
-        
+        leafL %<>% addCrimePoints(input$sbs_crime, crime)
         
       }
       
@@ -428,21 +358,7 @@ shinyServer(function(input, output) {
       leafR %<>% addDemographic(input$sbs_demog, demog, boundary)
       
       # add environment variables
-      if("Venues" %in% input$sbs_env){        leafR %<>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name)}
-      if("Parks" %in% input$sbs_env){         leafR %<>% addPolygons(data = park, fillColor = "green", stroke = NA, popup = park$name)}
-      if("Zones" %in% input$sbs_env){         leafR %<>% addPolygons(data = hayden, color = "red", fill = NA, popup = "Hayden's Rectangle") %>% addPolygons(data = wedge, color = "red", fill = NA, popup = "The Wedge")}
-      
-      if("ATMs" %in% input$sbs_env){          leafR %<>% addCircleMarkers(data = atm, radius = r,stroke = NA, popup = atm$name, fillColor = colorDict("atm"))}
-      if("Bars" %in% input$sbs_env){          leafR %<>% addCircleMarkers(data = bar, radius = r,stroke = NA, popup = bar$name, fillColor = colorDict("bar"))}
-      if("Clubs" %in% input$sbs_env){         leafR %<>% addCircleMarkers(data = club, radius = r,stroke = NA, popup = club$name, fillColor = colorDict("clb"))}
-      if("Liquor Stores" %in% input$sbs_env){ leafR %<>% addCircleMarkers(data = liquor, radius = r,stroke = NA, popup = liquor$name, fillColor = colorDict("liq"))}
-      if("Gas Stations" %in% input$sbs_env){  leafR %<>% addCircleMarkers(data = gas, radius = r,stroke = NA, popup = gas$name, fillColor = colorDict("gas"))}
-      if("Grocery Stores" %in% input$sbs_env){leafR %<>% addCircleMarkers(data = food, radius = r,stroke = NA, popup = food$name, fillColor = colorDict("grc"))}
-      if("Bus Stops" %in% input$sbs_env){     leafR %<>% addCircleMarkers(data = bus, radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25)}
-      if("Schools" %in% input$sbs_env){       leafR %<>% addCircleMarkers(data = school, radius = r,stroke = NA, popup = school$name, fillColor = colorDict("scl"), fillOpacity = .45)}
-      #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
-      
-      
+      leafR %<>% addEnvironment(input$sbs_env, env_data)
       
       # add legends
       if(input$sbs_legend){
