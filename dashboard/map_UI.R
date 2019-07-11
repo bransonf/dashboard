@@ -5,7 +5,7 @@ basMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
          selectInput("bas_base", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("bas_crime", "Crime",
-                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", " Disorderly Conduct", "Loitering/Begging", "Other"),
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary *", "Larceny *", "Vehicle Theft *", "Arson *", "Simple Assault *", "Forgery *", "Fraud *", "Embezzlement *", "Stolen Property *", "Destruction of Property *", "Weapons Offense *", "Sex Offense *", "VMCSL *", "Offense Against Family *", "DWI/DUI *", "Liquor Laws *", " Disorderly Conduct *", "Loitering/Begging *", "Other *"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
@@ -110,7 +110,7 @@ sbsMapUI <- function(){
          HTML("<h5 class=heading>Left Map:</h5>"),
          selectInput("sbs_baseL", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_crime", "Crime",
-                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary *", "Larceny *", "Vehicle Theft *", "Arson *", "Simple Assault *", "Forgery *", "Fraud *", "Embezzlement *", "Stolen Property *", "Destruction of Property *", "Weapons Offense *", "Sex Offense *", "VMCSL *", "Offense Against Family *", "DWI/DUI *", "Liquor Laws *", " Disorderly Conduct *", "Loitering/Begging *", "Other *"),
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", " Disorderly Conduct", "Loitering/Begging", "Other"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
