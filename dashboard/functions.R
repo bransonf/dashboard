@@ -55,7 +55,7 @@ binDict <- function(region, crime){
                    "Homicide" = c(0,1,2,5,10),
                    "Rape" = c(0,1,2),
                    "Robbery" = c(0,2,5,10,15),
-                   "Assault" = c(0,5,10,15,30)
+                   "Aggravated Assault" = c(0,5,10,15,30)
     )
   }
   else if(region == "Police Districts"){
@@ -63,7 +63,7 @@ binDict <- function(region, crime){
                    "Homicide" = c(0,1,5,10,20),
                    "Rape" = c(0,1,2,5,10),
                    "Robbery" = c(0,10,20,30,50),
-                   "Assault" = c(0,25,50,75,100)
+                   "Aggravated Assault" = c(0,25,50,75,115)
     )
   }
   return(bins)
