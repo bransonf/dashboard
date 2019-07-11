@@ -92,3 +92,14 @@ leafInit <- function(bm, at){
     addTiles(bm, attribution = at) %>%
     setView(-90.2594, 38.6530, zoom = 11)
 }
+
+# function to make API calls and parse the response
+api_call <- function(base, endpoint){
+  
+ get <- httr::GET(paste0(base, endpoint))
+ parsed <- httr::content(get, as = "text", encoding = "utf-8") %>%
+   jsonlite::fromJSON()
+ 
+ # return the parsed json (dataframe..)
+ return(parsed)
+}

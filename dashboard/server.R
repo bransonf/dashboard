@@ -4,17 +4,19 @@ library(shiny)
 library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
-library(sf)
+#library(sf) Deprecated with API
 library(dygraphs) # time-series line graphs
 library(timevis) # timeline
-library(rmarkdown) # report gen
+library(rmarkdown) # report generation
 library(dplyr) # data manipulation and summary
 library(htmltools) # forced EVAl of HTML
 library(leafsync) # side by side
 library(ggplot2) # report generation
 library(shinyjs) # optional, for debugging
 library(magrittr) # better syntax see ?`%<>%`
-#library(compstatr) # will be used for getting last month of data, still need to create DB to pull monthly
+
+library(httr)
+library(jsonlite)
 
 # source custom functions
 source("functions.R")
@@ -22,10 +24,12 @@ source("functions.R")
 # Load data and define palettes
 
 load("cardiff.rda")
-load("crimes.rda")
+#load("crimes.rda") DEPRECATED WITH API
 load("bounds.rda")
 load("time_data.rda")
 
+# API URL
+apiURL <- "api.bransonf.com/stlcrime/"
 
 # using Jenks Natural Breaks
 inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
@@ -40,7 +44,7 @@ r <- 7 # define radius
 # Define server logic
 shinyServer(function(input, output) {
   #  get current month
-  cur_month <- month.name[as.numeric(format(Sys.Date(), "%m")) - 1] # needs to be last updated month of crime data
+  cur_month <- strsplit(api_call(apiURL, "latest")," ")[[1]][1] # needs to be last updated month of crime data
   
   ## Dynamic Month Slider based on year
     output$bas_month <- renderUI({
