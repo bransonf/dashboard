@@ -220,7 +220,7 @@ shinyServer(function(input, output) {
       return(leaf)
     })
   
-    observe({
+    observeEvent(NULL,{
       c = input$dns_map_center
       z = input$dns_map_zoom
       
@@ -325,7 +325,7 @@ shinyServer(function(input, output) {
       return(leaf)
     })
     
-    observe({
+    observeEvent(NULL, {
       c = input$bas_map_center
       z = input$bas_map_zoom
       
@@ -377,7 +377,7 @@ shinyServer(function(input, output) {
         return(leaf)
     })
     
-    observe({
+    observeEvent(NULL,{
       c = input$adv_map_center
       z = input$adv_map_zoom
       

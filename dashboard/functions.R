@@ -86,7 +86,7 @@ basemap <- function(input){
 
 # initialize a leaflet map to build from
 leafInit <- function(bm, at){
-  leaflet() %>%
+  leaflet(options = leafletOptions(zoomSnap = 0.5)) %>%
     enableTileCaching() %>%
     addFullscreenControl() %>%
     addTiles(bm, attribution = at) %>%
