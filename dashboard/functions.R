@@ -33,7 +33,8 @@ colorDict <- function(key){
             "mrd" = "#CC6677",
             "rap" = "#661100",
             "rob" = "#6699CC",
-            "ast" = "#888888"
+            "ast" = "#888888",
+            "undef" = "#FFFFFF"
     )
 }
 
@@ -96,10 +97,48 @@ leafInit <- function(bm, at){
 # function to make API calls and parse the response
 api_call <- function(base, endpoint){
   
- get <- httr::GET(paste0(base, endpoint))
- parsed <- httr::content(get, as = "text", encoding = "utf-8") %>%
+ parsed <- httr::GET(utils::URLencode(paste0(base, endpoint))) %>%
+ httr::content(., as = "text", encoding = "utf-8") %>%
    jsonlite::fromJSON()
  
  # return the parsed json (dataframe..)
  return(parsed)
+}
+
+# function for adding points to leaflet map
+addPoints <- function(map, lon, lat, radius = 7, stroke = NA, fillColor = colorDict("undef"), fillOpacity = .5){
+  
+    addCircleMarkers(map, lon, lat, radius, stroke = stroke, fillColor = fillColor, fillOpacity = fillOpacity)
+
+}
+
+# larger batch function for adding crime points
+addCrimePoints <- function(.data, crimes){
+  
+}
+
+# add demographic layer
+addDemographic <- function(map, variable, demog, boundary){
+  # using Jenks Natural Breaks
+  inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
+  pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
+  hs_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99))
+  ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
+  unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
+  home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
+  # add demographic layer
+       if(variable == "None"){                       map %<>% addPolygons(data = boundary, fill = NA)}
+  else if(variable == "Median Income"){         map %<>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Poverty Rate"){          map %<>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "High School Attainment"){map %<>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Bachelors Attainment"){  map %<>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Unemployment Rate"){     map %<>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Home Ownership"){        map %<>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  
+  return(map)
+}
+
+# add environmental points
+addEnvironment <- function(map, variables){
+  
 }

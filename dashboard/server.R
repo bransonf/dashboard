@@ -4,7 +4,7 @@ library(shiny)
 library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
-#library(sf) Deprecated with API
+library(sf) # polygons still depend on 
 library(dygraphs) # time-series line graphs
 library(timevis) # timeline
 library(rmarkdown) # report generation
@@ -12,8 +12,9 @@ library(dplyr) # data manipulation and summary
 library(htmltools) # forced EVAl of HTML
 library(leafsync) # side by side
 library(ggplot2) # report generation
-library(shinyjs) # optional, for debugging
+
 library(magrittr) # better syntax see ?`%<>%`
+library(tidyr)
 
 library(httr)
 library(jsonlite)
@@ -31,7 +32,7 @@ load("time_data.rda")
 # API URL
 apiURL <- "api.bransonf.com/stlcrime/"
 
-# using Jenks Natural Breaks
+# Define Palettes
 inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
 pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
 hs_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99))
@@ -39,18 +40,16 @@ ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
 unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
 home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
 
-r <- 7 # define radius
-
 # Define server logic
 shinyServer(function(input, output) {
   #  get current month
-  cur_month <- strsplit(api_call(apiURL, "latest")," ")[[1]][1] # needs to be last updated month of crime data
+  cur_month <- strsplit(api_call(apiURL, "latest")," ")[[1]][1]
   
   ## Dynamic Month Slider based on year
     output$bas_month <- renderUI({
       # if this year, max is month - 1
       if(input$bas_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("bas_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+        sliderTextInput("bas_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
       }
       else{
         sliderTextInput("bas_month", "Select a Month:", month.name, cur_month)
@@ -58,7 +57,7 @@ shinyServer(function(input, output) {
     })
     output$adv_month <- renderUI({
       if(input$adv_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("adv_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+        sliderTextInput("adv_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
       }
       else{
         sliderTextInput("adv_month", "Select a Month:", month.name, cur_month)
@@ -66,7 +65,7 @@ shinyServer(function(input, output) {
     })
     output$dns_month <- renderUI({
       if(input$dns_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("dns_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+        sliderTextInput("dns_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
       }
       else{
         sliderTextInput("dns_month", "Select a Month:", month.name, cur_month)
@@ -74,7 +73,7 @@ shinyServer(function(input, output) {
     })
     output$sbs_month <- renderUI({
       if(input$sbs_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("sbs_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+        sliderTextInput("sbs_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
       }
       else{
         sliderTextInput("sbs_month", "Select a Month:", month.name, cur_month)
@@ -82,7 +81,7 @@ shinyServer(function(input, output) {
     })
     output$rep_month <- renderUI({
       if(input$rep_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("rep_month", "Select a Month:", month.name[1:as.numeric(format(Sys.Date(), "%m")) - 1], cur_month)
+        sliderTextInput("rep_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
       }
       else{
         sliderTextInput("rep_month", "Select a Month:", month.name, cur_month)
@@ -92,45 +91,39 @@ shinyServer(function(input, output) {
   
   ## Basic Map
     region_crime <- reactive({
-      # filter for crimes, gun, year, date
-      fmonth <- which(month.name == input$bas_month)
-      fyear <- input$bas_year
-      crime_sf  %<>% filter(month == fmonth & year == fyear)
-      crimes    %<>% filter(month == fmonth & year == fyear)
       
       if(input$bas_gun){
-        crime_sf %<>% filter(gun)
-        crimes   %<>% filter(gun)
-      }
+        bas_g <- 'true'
+      }else{bas_g = 'false'}
       
-      # join to region
+      
       if(input$bas_region == "Police Districts"){
-        crimes %<>% group_by(district) %>%
-          summarise(
-            homicide = sum(homicide),
-            rape = sum(rape),
-            robbery = sum(robbery),
-            assault = sum (assault)
-          )
-        dplyr::left_join(districts, crimes, by = "district") %>%
-           mutate(homicide = ifelse(is.na(homicide),0,homicide),
-                  rape = ifelse(is.na(rape),0,rape),
-                  robbery = ifelse(is.na(robbery),0,robbery),
-                  assault = ifelse(is.na(assault),0,assault))
+
+        crime <- api_call(apiURL, paste0("district",
+                                         "?month=",input$bas_month,
+                                         "&year=", input$bas_year,
+                                         "&gun=",  bas_g)) %>%
+          dplyr::mutate(district = as.numeric(district)) %>%
+          dplyr::left_join(districts, ., by = "district") %>%
+          tidyr::spread("ucr_category", "Incidents")
+        
+        crime[is.na(crime)] <- 0
+        
+        return(crime)
       }
       else if(input$bas_region == "Neighborhoods"){
-        crimes <- group_by(crimes, neighborhood) %>%
-          summarise(
-            homicide = sum(homicide),
-            rape = sum(rape),
-            robbery = sum(robbery),
-            assault = sum (assault)
-          )
-        dplyr::left_join(nbhoods, crimes, by = "neighborhood") %>%
-           mutate(homicide = ifelse(is.na(homicide),0,homicide),
-                  rape = ifelse(is.na(rape),0,rape),
-                  robbery = ifelse(is.na(robbery),0,robbery),
-                  assault = ifelse(is.na(assault),0,assault))
+        
+        crime <- api_call(apiURL, paste0("nbhood",
+                                         "?month=",input$bas_month,
+                                         "&year=", input$bas_year,
+                                         "&gun=",  bas_g)) %>%
+          dplyr::mutate(neighborhood = as.numeric(neighborhood)) %>%
+          dplyr::left_join(nbhoods, ., by = "neighborhood") %>%
+          tidyr::spread("ucr_category", "Incidents")
+        
+        crime[is.na(crime)] <- 0
+    
+        return(crime)
       }
       })
     
@@ -141,10 +134,10 @@ shinyServer(function(input, output) {
     
     region_pal <- reactive({
       pal <- colorBin("YlGnBu", bins = region_bins(), domain = switch (input$bas_crime,
-                                                 "Homicide" = region_crime()$homicide,
-                                                 "Rape" = region_crime()$rape,
-                                                 "Robbery" = region_crime()$robbery,
-                                                 "Assault" = region_crime()$assault))
+                                                 "Homicide" = region_crime()$Homicide,
+                                                 "Rape" = region_crime()$Rape,
+                                                 "Robbery" = region_crime()$Robbery,
+                                                 "Aggravated Assault" = region_crime()$`Aggravated Assault`))
       return(pal)
     })
     
@@ -156,19 +149,19 @@ shinyServer(function(input, output) {
       leafInit(bm, at) -> leaf
       
       labs <- paste0("<h4>",region_crime()$name, "</h4>",
-                     "<b>Homicides: </b>", region_crime()$homicide, "</br>",
-                     "<b>Rapes: </b>", region_crime()$rape, "</br>",
-                     "<b>Robbery: </b>", region_crime()$robbery, "</br>",
-                     "<b>Assault: </b>", region_crime()$assault) %>% lapply(htmltools::HTML)
+                     "<b>Homicides: </b>", region_crime()$Homicide, "</br>",
+                     "<b>Rapes: </b>", region_crime()$Rape, "</br>",
+                     "<b>Robbery: </b>", region_crime()$Robbery, "</br>",
+                     "<b>Assault: </b>", region_crime()$`Aggravated Assault`) %>% lapply(htmltools::HTML)
       
       
       if(input$bas_popups){
       leaf %<>% addPolygons(data = region_crime(), popup = labs,
                             fillColor = ~region_pal()(switch (input$bas_crime,
-                                                              "Homicide" = region_crime()$homicide,
-                                                              "Rape" = region_crime()$rape,
-                                                              "Robbery" = region_crime()$robbery,
-                                                              "Assault" = region_crime()$assault)),
+                                                              "Homicide" = region_crime()$Homicide,
+                                                              "Rape" = region_crime()$Rape,
+                                                              "Robbery" = region_crime()$Robbery,
+                                                              "Aggravated Assault" = region_crime()$`Aggravated Assault`)),
                             weight = 2,
                             opacity = 1,
                             color = "white",
@@ -185,10 +178,10 @@ shinyServer(function(input, output) {
       {
       leaf %<>% addPolygons(data = region_crime(), label = labs,
                             fillColor = ~region_pal()(switch (input$bas_crime,
-                                                              "Homicide" = region_crime()$homicide,
-                                                              "Rape" = region_crime()$rape,
-                                                              "Robbery" = region_crime()$robbery,
-                                                              "Assault" = region_crime()$assault)),
+                                                              "Homicide" = region_crime()$Homicide,
+                                                              "Rape" = region_crime()$Rape,
+                                                              "Robbery" = region_crime()$Robbery,
+                                                              "Aggravated Assault" = region_crime()$`Aggravated Assault`)),
                             weight = 2,
                             opacity = 1,
                             color = "white",
@@ -212,13 +205,13 @@ shinyServer(function(input, output) {
                                             "Homicide" = "Number of</br>Homicides",
                                             "Rape" = "Number of Rapes",
                                             "Robbery" = "Number of</br>Robberies",
-                                            "Assault" = "Number of</br>Assaults"
+                                            "Aggravated Assault" = "Number of</br>Assaults"
                                             ),
                            values = switch (input$bas_crime,
-                                             "Homicide" = region_crime()$homicide,
-                                             "Rape" = region_crime()$rape,
-                                             "Robbery" = region_crime()$robbery,
-                                             "Assault" = region_crime()$assault)) -> leaf
+                                            "Homicide" = region_crime()$Homicide,
+                                            "Rape" = region_crime()$Rape,
+                                            "Robbery" = region_crime()$Robbery,
+                                            "Aggravated Assault" = region_crime()$`Aggravated Assault`)) -> leaf
       }
       
       return(leaf)
@@ -239,14 +232,8 @@ shinyServer(function(input, output) {
       
         leafInit(bm, at) -> leaf
             
-      # add demographic layer
-      if(input$adv_demog == "None"){                       leaf %<>% addPolygons(data = boundary, fill = NA)}
-      else if(input$adv_demog == "Median Income"){         leaf %<>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$adv_demog == "Poverty Rate"){          leaf %<>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$adv_demog == "High School Attainment"){leaf %<>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$adv_demog == "Bachelors Attainment"){  leaf %<>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$adv_demog == "Unemployment Rate"){     leaf %<>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$adv_demog == "Home Ownership"){        leaf %<>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      # add demographic data
+        leaf %<>% addDemographic(input$adv_demog, demog, boundary)
          
       # add environment variables
       if("Venues" %in% input$adv_env){        leaf %<>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name)}
@@ -264,31 +251,35 @@ shinyServer(function(input, output) {
       #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
     
       # add crime Data
-      if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$adv_crime)){
-        # filter for month and year
-          fmonth <- which(month.name == input$adv_month)
-          fyear <- input$adv_year
-          crime_sf %<>% filter(month == fmonth & year == fyear)
-          
-          if(input$adv_gun){
-            crime_sf %<>% filter(gun)
-          }
-          
-          homicide <- filter(crime_sf, homicide)
-          rape     <- filter(crime_sf, rape)
-          rob      <- filter(crime_sf, robbery)
-          assault  <- filter(crime_sf, assault)
-          
+      if(length(input$adv_crime) > 0){
         
+        if(input$adv_gun){
+          adv_g <- 'true'
+        }else{adv_g = 'false'}
+        
+        crime <- api_call(apiURL, paste0("coords",
+                          "?month=", input$adv_month,
+                          "&year=", input$adv_year,
+                          "&gun=", adv_g,
+                          "&ucr=", jsonlite::toJSON(input$adv_crime)))
+          
         # add points to map
           if("Homicide" %in% input$adv_crime){
-            leaf %<>% addCircleMarkers(data = homicide, radius = r,stroke = NA, fillColor = colorDict("mrd"), fillOpacity = .5)}
-          if("Rape" %in% input$adv_crime)    {
-            leaf %<>% addCircleMarkers(data = rape, radius = r,stroke = NA, fillColor = colorDict("rap"), fillOpacity = .5)}
+            homicide <- filter(crime, ucr_category == "Homicide")
+            leaf %<>% addPoints(lon = homicide$wgs_x, lat = homicide$wgs_y, fillColor = colorDict("mrd"))}
+          
+          if("Rape" %in% input$adv_crime){
+            rape     <- filter(crime, ucr_category == "Rape")
+            if(!all(is.na(rape$wgs_x))){ # extra check for missing points
+            leaf %<>% addPoints(lon = rape$wgs_x, lat = rape$wgs_y, fillColor = colorDict("rap"))}}
+          
           if("Robbery" %in% input$adv_crime) {
-            leaf %<>% addCircleMarkers(data = rob, radius = r,stroke = NA, fillColor = colorDict("rob"), fillOpacity = .5)}
-          if("Assault" %in% input$adv_crime) {
-            leaf %<>% addCircleMarkers(data = assault, radius = r,stroke = NA, fillColor = colorDict("ast"), fillOpacity = .5)}
+            rob      <- filter(crime, ucr_category == "Robbery")
+            leaf %<>% addPoints(lon = rob$wgs_x, lat = rob$wgs_y, fillColor = colorDict("rob"))}
+          
+          if("Aggravated Assault" %in% input$adv_crime) {
+            assault  <- filter(crime, ucr_category == "Aggravated Assault")
+            leaf %<>% addPoints(lon = assault$wgs_x, lat = assault$wgs_y, fillColor = colorDict("ast"))}
         
         
       }
@@ -434,13 +425,7 @@ shinyServer(function(input, output) {
       leafInit(bmR, atR) -> leafR
       
       # add demographic layer
-      if(input$sbs_demog == "None"){                       leafR %<>% addPolygons(data = boundary, fill = NA)}
-      else if(input$sbs_demog == "Median Income"){         leafR %<>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$sbs_demog == "Poverty Rate"){          leafR %<>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$sbs_demog == "High School Attainment"){leafR %<>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$sbs_demog == "Bachelors Attainment"){  leafR %<>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$sbs_demog == "Unemployment Rate"){     leafR %<>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-      else if(input$sbs_demog == "Home Ownership"){        leafR %<>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+      leafR %<>% addDemographic(input$sbs_demog, demog, boundary)
       
       # add environment variables
       if("Venues" %in% input$sbs_env){        leafR %<>% addPolygons(data = venues, fillColor = "blue", stroke = NA, popup = venues$name)}
@@ -488,7 +473,7 @@ shinyServer(function(input, output) {
           if("Homicide" %in% input$sbs_crime)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
           if("Rape" %in% input$sbs_crime)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
           if("Robbery" %in% input$sbs_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
-          if("Assault" %in% input$sbs_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}
+          if("Aggravated Assault" %in% input$sbs_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}
           
           leafL %<>% addCircleLegend(10, syms, col, "topleft")
         }
@@ -587,9 +572,5 @@ shinyServer(function(input, output) {
        
      }
    )
-    
-    
-    # JS LOG for DEBUGGING
-   observe({shinyjs::logjs(input$bas_map_zoom)})
     
 })
