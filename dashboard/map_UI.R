@@ -5,7 +5,7 @@ basMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
          selectInput("bas_base", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("bas_crime", "Crime",
-                     choices = c("Homicide", "Rape", "Robbery", "Assault"),
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", " Disorderly Conduct", "Loitering/Begging", "Other"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
@@ -22,7 +22,7 @@ basMapUI <- function(){
                      ), 
                      multiple = TRUE
          ),
-         awesomeRadio("bas_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE, status = "danger"),
+         sliderTextInput("bas_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("bas_month"),
          selectInput("bas_region", "Region",
                      choices = c("Police Districts", "Neighborhoods"), # Maybe add wards later...
@@ -37,7 +37,7 @@ advMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
          selectInput("adv_base", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("adv_crime", "Crime",
-                     choices = c("Homicide", "Rape", "Robbery", "Assault"),
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", " Disorderly Conduct", "Loitering/Begging", "Other"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
@@ -54,7 +54,7 @@ advMapUI <- function(){
                      ), 
                      multiple = TRUE
          ),
-         awesomeRadio("adv_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE, status = "danger"),
+         sliderTextInput("adv_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("adv_month"),
          pickerInput("adv_env", "Environment",
                      choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
@@ -78,7 +78,7 @@ dnsMapUI <- function(){
   column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
          selectInput("dns_base", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("dns_crime", "Crime",
-                     choices = c("Homicide", "Rape", "Robbery", "Assault"),
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", " Disorderly Conduct", "Loitering/Begging", "Other"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
@@ -95,7 +95,7 @@ dnsMapUI <- function(){
                      ), 
                      multiple = TRUE
          ),
-         awesomeRadio("dns_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE, status = "danger"),
+         sliderTextInput("dns_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("dns_month"),
          sliderInput("dns_size", "Heat Size", 30, 120, 90, 5)
   )
@@ -104,13 +104,13 @@ dnsMapUI <- function(){
 # Side by Side Map
 sbsMapUI <- function(){
   column(3,
-         awesomeRadio("sbs_year", "Select a Year:", c(2018, 2019), 2019, inline = TRUE, status = "danger"),
+         sliderTextInput("sbs_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("sbs_month"),
          checkboxInput("sbs_legend", "Show Legends"),
          HTML("<h5 class=heading>Left Map:</h5>"),
          selectInput("sbs_baseL", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_crime", "Crime",
-                     choices = c("Homicide", "Rape", "Robbery", "Assault"),
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", " Disorderly Conduct", "Loitering/Begging", "Other"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
