@@ -30,7 +30,6 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                       tags$meta(name ="msapplication-TileColor", content="#b91d47"),
                       tags$meta(name="theme-color", content="#ffffff")
                     ),
-                    shinyjs::useShinyjs(), # enable js for debugging
                     headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
                     tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
                                 tabPanel("Basic",
