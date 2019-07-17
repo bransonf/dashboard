@@ -21,7 +21,7 @@ reportUI <- function(rep_info){
                               ),multiple = TRUE
                   ),
                   pickerInput("rep_crime", "Crime(s)",
-                              choices = c("Homicide","Rape", "Assault", "Robbery"),#, "Non-Violent Crimes"
+                              choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
                               options = list(
                                 `actions-box` = TRUE,
                                 size = 10,

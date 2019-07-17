@@ -459,7 +459,7 @@ shinyServer(function(input, output) {
     
    output$report <- downloadHandler(
      filename = function(){
-        paste0("cardiff_Report_", substr(Sys.Date(),6,10),".html") # once LaTeX is available, PDF
+        paste0("cardiff_Report_", substr(Sys.Date(),6,10),".pdf") # once LaTeX is available, PDF
      },
      content = function(file){
        # store in a temp dir because of dir privledges on server
@@ -474,11 +474,10 @@ shinyServer(function(input, output) {
                   crimes = input$rep_crime,
                   month = input$rep_month,
                   yr = input$rep_year,
-                  crimedata = crimes,
-                  crimesf = crime_sf,
                   stlbound = boundary,
                   dist = districts,
-                  hood = nbhoods
+                  hood = nbhoods,
+                  baseurl = apiURL
                   )
        
        rmarkdown::render(tempReport, output_file = file,
