@@ -59,5 +59,3 @@ vp_funding <- data.frame(
   Other = c(NA, NA, NA, NA, NA, NA, 498.134,NA,    NA,    NA, 230.000,    NA,                      NA,                      NA,             NA,    NA,    NA,    NA,    NA,    NA,    NA,    NA,   NA,NA,NA,NA,NA,NA,NA),
   Total = c(NA, NA, NA, NA, NA, NA, 498.134,287.117,324.755,NA, 513.279,235.310,                 1008.650,                 1182.516,         378.036,398.123,404.727,587.792,519.642,492.740,526.830,420.366,45.023,NA,NA,NA,NA,NA,NA)
 )
-
-save(vp_funding, n_homicides, tvis, file = "../dashboard/dashboard/time_data.rda")

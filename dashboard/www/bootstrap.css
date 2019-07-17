@@ -4,6 +4,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+
 html {
   font-family: sans-serif;
   -webkit-text-size-adjust: 100%;
@@ -6764,4 +6765,58 @@ button.close {
 ::-moz-selection {
   color:#ffffff;
   background: #a94442; /* Gecko Browsers */
+}
+
+
+/* Custom Extensions for specific elements */
+
+/* Font Classes and Styling */
+.sans,.control-label{
+  font-family: 'Open Sans', sans-serif;
+}
+
+.title {
+  font-family: 'Libre Baskerville', serif;
+  text-align: center;
+}
+
+.heading {
+  font-family: 'Lora', serif;
+}
+
+/* Customize Range Slider */
+
+.irs-line{
+  background: #a51417;
+}
+
+.irs-from,.irs-to,.irs-bar,.irs-single{
+  background: #a51417;
+}
+.irs-bar{
+  border-top: 1px #a51417;
+  border-bottom: 1px #a51417;
+}
+.irs-bar-edge{
+  border:1px #a51417;
+  background: #a51417;
+}
+.irs-grid-pol{
+  background: #a51417;
+}
+
+/* Custom Button Style*/
+
+.btn-primary,.btn-primary:active,.btn-primary:focus,.btn-primary:active:hover,.btn-primary:active:focus{
+  background-color: #a51417;
+  border-color:#3c3c3d;
+}
+.btn-primary:hover{
+  background-color: #610c0d;
+  border-color:#3c3c3d;
+}
+
+/* Nav Bar Brand Text*/
+.navbar-brand{
+  font-family: 'Lora', serif;
 }

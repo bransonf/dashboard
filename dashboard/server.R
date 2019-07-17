@@ -25,9 +25,8 @@ source("functions.R")
 # Load data and define palettes
 
 load("cardiff.rda")
-#load("crimes.rda") DEPRECATED WITH API
 load("bounds.rda")
-load("time_data.rda")
+source("time_data.R")
 
 # API URL
 apiURL <- "api.bransonf.com/stlcrime/"
@@ -438,54 +437,6 @@ shinyServer(function(input, output) {
       dg_f[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
       return(dg_f)
     })
-    
-    # outputs for downloads
-    
-    output$dlhmc  <- downloadHandler(filename = function(){
-                                      "Stl_Homicides.csv"
-                                      },
-                                      content = function(file){
-                                       write.csv(n_homicides, file = file, row.names = FALSE)
-                                      }
-                      )
-    
-    output$dlfund <- downloadHandler("Stl_ViolenceFunding.csv",
-                                      content = function(file){
-                                       write.csv(vp_funding, file = file, row.names = FALSE)
-                                      }
-                      )
-    
-    # generate custom reports using the crime data
-    
-   output$report <- downloadHandler(
-     filename = function(){
-        paste0("cardiff_Report_", substr(Sys.Date(),6,10),".pdf") # once LaTeX is available, PDF
-     },
-     content = function(file){
-       # store in a temp dir because of dir privledges on server
-       tempReport <- file.path(tempdir(), "report.Rmd")
-       file.copy("report.Rmd",  tempReport, overwrite = TRUE)
-       
-       
-       # store and send params to be rendered
-       params <- list(
-                  maps =  input$rep_maps,
-                  tables = input$rep_table,
-                  crimes = input$rep_crime,
-                  month = input$rep_month,
-                  yr = input$rep_year,
-                  stlbound = boundary,
-                  dist = districts,
-                  hood = nbhoods,
-                  baseurl = apiURL
-                  )
-       
-       rmarkdown::render(tempReport, output_file = file,
-                         params = params,
-                         envir = new.env(parent = globalenv())
-                         )
-       
-     }
-   )
+
     
 })

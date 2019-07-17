@@ -8,14 +8,12 @@ library(sf)
 library(dygraphs)
 library(timevis)
 
-# load copy
-load("copy.rda")
-# load Map UI
+# load Map UI and copy
 source("map_UI.R")
-source("report_UI.R")
+source("copy.R")
 
 # begin page  
-navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
+navbarPage("STL Crime", fluid = TRUE, theme = "bootstrap.css",
            tabPanel("Map", icon = icon("map"),
                     tags$head(
                       tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
@@ -28,9 +26,11 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                       tags$link(rel="manifest", href="icon/site.webmanifest"),
                       tags$link(rel="mask-icon", href="icon/safari-pinned-tab.svg", color="#a50002"),
                       tags$meta(name ="msapplication-TileColor", content="#b91d47"),
-                      tags$meta(name="theme-color", content="#ffffff")
+                      tags$meta(name="theme-color", content="#ffffff"),
+                      # Import google fonts
+                      tags$link(rel = "stylesheet", href="https://fonts.googleapis.com/css?family=Libre+Baskerville|Lora|Open+Sans&display=swap")
                     ),
-                    headerPanel(HTML("<h1 class=title>Cardiff Map</h1>")),
+                    headerPanel(HTML("<h1 class=title>Crime Map</h1>")),
                     tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
                                 tabPanel("Basic",
                                          fluidRow(
@@ -61,34 +61,15 @@ navbarPage("Cardiff STL", fluid = TRUE, theme = "bootstrap.css",
                     dygraphOutput("funding_yr")
                     
            ),
-           tabPanel("Reports", icon = icon("file-alt"),
-                    headerPanel(HTML("<h1 class=title>Generate a Report</h1>")),
-                    reportUI(rep_info) # see report_UI.R
-           ),
            tabPanel("Prevention", value = "prev", icon = icon("handshake"),
                     HTML("<h1 class=title>Violence Prevention Programs</h1>"),
                     vp_orgs
            ),
-           
-           navbarMenu("More", icon = icon("bars"),
-                      tabPanel("About", icon = icon("sticky-note"),
-                               headerPanel(HTML("<h1 class=title>The Cardiff Model</h1>")),
-                               cardiff,
-                               about
-                      ),
-                      tabPanel("Methods", icon = icon("book"),
-                               headerPanel(HTML("<h1 class=title>Data and Methodology</h1>")),
-                               methods
-                      ),
-                      tabPanel("Data/Downloads", icon = icon("file-download"),
-                               headerPanel(HTML("<h1 class=title>Data Downloads</h1>")),
-                               column(12,
-                                      fluidRow(align = "center",
-                                               downloadButton('dlhmc', "Homicide Counts"),
-                                               downloadButton('dlfund', "Funding")
-                                      )
-                               )
-                      )
+           tabPanel("About", icon = icon("book"),
+                    headerPanel(HTML("<h1 class=title>About This Project</h1>")),
+                    about,
+                    HTML("<h2 class=title>Data & Methodology</h2>"),
+                    methods
            )
            
   )
