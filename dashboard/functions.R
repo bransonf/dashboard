@@ -1,5 +1,8 @@
 # GLOBAL FUNCTIONS FOR APP
 
+## Constants
+apiURL <- "api.bransonf.com/stlcrime/"
+
 # add circles to legend for points
 addCircleLegend <- function(map, size, text, color, position){
   if(length(text) != length(color)){stop("Color and Text arguments should be of equal length")}
@@ -353,7 +356,7 @@ addEnvironment <- function(map, variables, data, r = 7){
   if("Clubs" %in% variables){         map %<>% addCircleMarkers(data = data[[7]], radius = r,stroke = NA, popup = data[[7]]$name, fillColor = colorDict("clb"))}
   if("Liquor Stores" %in% variables){ map %<>% addCircleMarkers(data = data[[8]], radius = r,stroke = NA, popup = data[[8]]$name, fillColor = colorDict("liq"))}
   if("Gas Stations" %in% variables){  map %<>% addCircleMarkers(data = data[[9]], radius = r,stroke = NA, popup = data[[9]]$name, fillColor = colorDict("gas"))}
-  if("Grocery Stores" %in% variables){map %<>% addCircleMarkers(data = data[[10]], radius = r,stroke = NA, popup = data[[10]]$name, fillColor = colorDict("grc"))}
+  if("Hotels" %in% variables){        map %<>% addCircleMarkers(data = data[[10]], radius = r,stroke = NA, popup = data[[10]]$name, fillColor = colorDict("hot"))}
   if("Bus Stops" %in% variables){     map %<>% addCircleMarkers(data = data[[11]], radius = r,stroke = NA, fillColor = colorDict("bus"), fillOpacity = .25)}
   if("Schools" %in% variables){       map %<>% addCircleMarkers(data = data[[12]], radius = r,stroke = NA, popup = data[[12]]$name, fillColor = colorDict("scl"), fillOpacity = .45)}
   #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
@@ -403,15 +406,15 @@ monthSlider <- function(sel_year, max_month){
 }
 
 # call and parse region crime
-regionCrime <- function(region){
+regionCrime <- function(region, month, year, gun, hood, dist){
   if(region == "Police Districts"){
     
     crime <- api_call(apiURL, paste0("district",
-                                     "?month=",input$bas_month,
-                                     "&year=", input$bas_year,
-                                     "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
+                                     "?month=", month,
+                                     "&year=", year,
+                                     "&gun=",  ifelse(gun, 'true', 'false'))) %>%
       dplyr::mutate(district = as.numeric(district)) %>%
-      dplyr::left_join(districts, ., by = "district") %>%
+      dplyr::left_join(dist, ., by = "district") %>%
       tidyr::spread("ucr_category", "Incidents")
     
     crime[is.na(crime)] <- 0
@@ -421,11 +424,11 @@ regionCrime <- function(region){
   else if(region == "Neighborhoods"){
     
     crime <- api_call(apiURL, paste0("nbhood",
-                                     "?month=",input$bas_month,
-                                     "&year=", input$bas_year,
-                                     "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
+                                     "?month=",month,
+                                     "&year=", year,
+                                     "&gun=",  ifelse(gun, 'true', 'false'))) %>%
       dplyr::mutate(neighborhood = as.numeric(neighborhood)) %>%
-      dplyr::left_join(nbhoods, ., by = "neighborhood") %>%
+      dplyr::left_join(hood, ., by = "neighborhood") %>%
       tidyr::spread("ucr_category", "Incidents")
     
     crime[is.na(crime)] <- 0

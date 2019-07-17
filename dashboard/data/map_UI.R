@@ -37,7 +37,7 @@ advMapUI <- function(){
          sliderTextInput("adv_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("adv_month"),
          pickerInput("adv_env", "Environment",
-                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
+                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
@@ -92,7 +92,7 @@ sbsMapUI <- function(){
          HTML("<h5 class=heading>Right Map:</h5>"),
          selectInput("sbs_baseR", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_env", "Environment",
-                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Grocery Stores", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
+                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,

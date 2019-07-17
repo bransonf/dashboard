@@ -9,27 +9,22 @@ library(dygraphs) # time-series line graphs
 library(timevis) # timeline
 library(dplyr) # data manipulation and summary
 library(leafsync) # side by side
-
 library(magrittr) # better syntax see ?`%<>%`
 library(tidyr)
-
 library(httr) # API requests
 library(jsonlite) # Parsing
 
-# source custom functions
+# source custom functions and load data
 source("functions.R")
-
-# Load data and define palettes
-
-load("cardiff.rda")
-load("bounds.rda")
-source("time_data.R")
+load("data/rtm.rda")
+load("data/bounds.rda")
+source("data/time_data.R")
 
 # API URL
 apiURL <- "api.bransonf.com/stlcrime/"
 
 # package envrionmental data
-env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, food, bus, school)
+env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, hotel, bus, school)
 
 # Define server logic
 shinyServer(function(input, output) {
@@ -52,7 +47,7 @@ shinyServer(function(input, output) {
   
   ## Basic Map
     region_crime <- reactive({
-      regionCrime(input$bas_region)
+      regionCrime(input$bas_region, input$bas_month, input$bas_year, input$bas_gun, nbhoods, districts)
       })
     
       # define bin and pallete based on selection of crime and region (Not routinely generated, point of possible failure)
@@ -80,30 +75,8 @@ shinyServer(function(input, output) {
                      "<b>Homicides: </b>", region_crime()$Homicide, "</br>",
                      "<b>Rapes: </b>", region_crime()$Rape, "</br>",
                      "<b>Robbery: </b>", region_crime()$Robbery, "</br>",
-                     "<b>Assault: </b>", region_crime()$`Aggravated Assault`) %>% lapply(htmltools::HTML)
+                     "<b>Assault: </b>", region_crime()$`Aggravated Assault`) %>% lapply(shiny::HTML)
       
-      
-      if(input$bas_popups){
-      leaf %<>% addPolygons(data = region_crime(), popup = labs,
-                            fillColor = ~region_pal()(switch (input$bas_crime,
-                                                              "Homicide" = region_crime()$Homicide,
-                                                              "Rape" = region_crime()$Rape,
-                                                              "Robbery" = region_crime()$Robbery,
-                                                              "Aggravated Assault" = region_crime()$`Aggravated Assault`)),
-                            weight = 2,
-                            opacity = 1,
-                            color = "white",
-                            dashArray = "3",
-                            fillOpacity = 0.7,
-                            highlight = highlightOptions(
-                              weight = 5,
-                              color = "#666",
-                              dashArray = "",
-                              fillOpacity = 0.7,
-                              bringToFront = TRUE))
-      }
-      else
-      {
       leaf %<>% addPolygons(data = region_crime(), label = labs,
                             fillColor = ~region_pal()(switch (input$bas_crime,
                                                               "Homicide" = region_crime()$Homicide,
@@ -125,7 +98,7 @@ shinyServer(function(input, output) {
                               style = list("font-weight" = "normal", padding = "3px 8px"),
                               textsize = "15px",
                               direction = "auto"))
-      }
+
       # add a legend
       if(input$bas_legend){
         leaf %>% addLegend("topleft", region_pal(),
@@ -340,7 +313,7 @@ shinyServer(function(input, output) {
 
     # and for funding
     output$funding_yr <- renderDygraph({
-      dg_f <- dygraph(vp_funding, xlab = "Year", ylab = "Total Funding ($ Thousands)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("Total", "Total Funding ($)")
+      dg_f <- dygraph(vp_funding, xlab = "Year", ylab = "Total Funding (Thousands $)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("Total", "Total Funding ($)")
       dg_f[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
       return(dg_f)
     })

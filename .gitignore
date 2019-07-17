@@ -38,3 +38,4 @@ rsconnect/
 # UNIX
 
 ._*
+.DS_Store

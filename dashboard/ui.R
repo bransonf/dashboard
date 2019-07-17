@@ -9,8 +9,8 @@ library(dygraphs)
 library(timevis)
 
 # load Map UI and copy
-source("map_UI.R")
-source("copy.R")
+source("data/map_UI.R")
+source("data/copy.R")
 
 # begin page  
 navbarPage("STL Crime", fluid = TRUE, theme = "bootstrap.css",
@@ -56,20 +56,39 @@ navbarPage("STL Crime", fluid = TRUE, theme = "bootstrap.css",
            ),
            tabPanel("Timeline", icon = icon("clock"),
                     headerPanel(HTML("<h1 class=title>Timeline</h1>")),
-                    timevisOutput("time"),
-                    dygraphOutput("n_murders"),
-                    dygraphOutput("funding_yr")
-                    
+                    fluidRow(
+                      column(10, offset = 1,
+                        timevisOutput("time")
+                      )
+                    ),
+                    fluidRow(
+                      column(10, offset = 1,
+                        dygraphOutput("n_murders"),
+                        dygraphOutput("funding_yr")
+                      )
+                    )
            ),
            tabPanel("Prevention", value = "prev", icon = icon("handshake"),
                     HTML("<h1 class=title>Violence Prevention Programs</h1>"),
-                    vp_orgs
+                    fluidRow(
+                      column(12,
+                        vp_orgs
+                      )
+                    )
            ),
            tabPanel("About", icon = icon("book"),
                     headerPanel(HTML("<h1 class=title>About This Project</h1>")),
-                    about,
-                    HTML("<h2 class=title>Data & Methodology</h2>"),
-                    methods
+                    fluidRow(
+                      column(10, offset = 1,
+                             about
+                      )
+                    ),
+                    fluidRow(
+                      column(10, offset = 1,
+                        HTML("<h2 class=title>Data & Methodology</h2>"),
+                        methods
+                      )
+                    )
            )
            
   )
