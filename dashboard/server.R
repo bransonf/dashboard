@@ -4,20 +4,17 @@ library(shiny)
 library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
-library(sf) # polygons still depend on 
+library(sf) # spatial class
 library(dygraphs) # time-series line graphs
 library(timevis) # timeline
-library(rmarkdown) # report generation
 library(dplyr) # data manipulation and summary
-library(htmltools) # forced EVAl of HTML
 library(leafsync) # side by side
-library(ggplot2) # report generation
 
 library(magrittr) # better syntax see ?`%<>%`
 library(tidyr)
 
-library(httr)
-library(jsonlite)
+library(httr) # API requests
+library(jsonlite) # Parsing
 
 # source custom functions
 source("functions.R")
@@ -31,14 +28,6 @@ source("time_data.R")
 # API URL
 apiURL <- "api.bransonf.com/stlcrime/"
 
-# Define Palettes
-inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
-pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
-hs_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99))
-ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
-unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
-home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
-
 # package envrionmental data
 env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, food, bus, school)
 
@@ -49,79 +38,21 @@ shinyServer(function(input, output) {
   
   ## Dynamic Month Slider based on year
     output$bas_month <- renderUI({
-      # if this year, max is month - 1
-      if(input$bas_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("bas_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("bas_month", "Select a Month:", month.name, cur_month)
-      }
+     monthSlider(input$bas_year, cur_month)
     })
     output$adv_month <- renderUI({
-      if(input$adv_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("adv_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("adv_month", "Select a Month:", month.name, cur_month)
-      }
+      monthSlider(input$adv_year, cur_month)
     })
     output$dns_month <- renderUI({
-      if(input$dns_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("dns_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("dns_month", "Select a Month:", month.name, cur_month)
-      }
+      monthSlider(input$dns_year, cur_month)
     })
     output$sbs_month <- renderUI({
-      if(input$sbs_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("sbs_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("sbs_month", "Select a Month:", month.name, cur_month)
-      }
+      monthSlider(input$sbs_year, cur_month)
     })
-    output$rep_month <- renderUI({
-      if(input$rep_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("rep_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("rep_month", "Select a Month:", month.name, cur_month)
-      }
-    })
-  
   
   ## Basic Map
     region_crime <- reactive({
-      
-      if(input$bas_region == "Police Districts"){
-
-        crime <- api_call(apiURL, paste0("district",
-                                         "?month=",input$bas_month,
-                                         "&year=", input$bas_year,
-                                         "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
-          dplyr::mutate(district = as.numeric(district)) %>%
-          dplyr::left_join(districts, ., by = "district") %>%
-          tidyr::spread("ucr_category", "Incidents")
-        
-        crime[is.na(crime)] <- 0
-        
-        return(crime)
-      }
-      else if(input$bas_region == "Neighborhoods"){
-        
-        crime <- api_call(apiURL, paste0("nbhood",
-                                         "?month=",input$bas_month,
-                                         "&year=", input$bas_year,
-                                         "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
-          dplyr::mutate(neighborhood = as.numeric(neighborhood)) %>%
-          dplyr::left_join(nbhoods, ., by = "neighborhood") %>%
-          tidyr::spread("ucr_category", "Incidents")
-        
-        crime[is.na(crime)] <- 0
-    
-        return(crime)
-      }
+      regionCrime(input$bas_region)
       })
     
       # define bin and pallete based on selection of crime and region (Not routinely generated, point of possible failure)
@@ -214,14 +145,7 @@ shinyServer(function(input, output) {
       return(leaf)
     })
   
-    observeEvent(NULL,{
-      c = input$dns_map_center
-      z = input$dns_map_zoom
-      
-      leafletProxy("bas_map") %>% setView(c$lng, c$lat, z)
-    })
   ## Advanced Map
-  ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy) #https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/server.R
     output$adv_map <- renderLeaflet({
         # basemap and attribution case
         bm <- basemap(input$adv_base)$bm
@@ -248,13 +172,11 @@ shinyServer(function(input, output) {
           leaf %<>% addCrimePoints(input$adv_crime, crime)
         
       }
-        
-      #TODO add injury data
           
       # add legend
       if(input$adv_legend){
         if(input$adv_demog != "None"){
-        p <- switch (input$adv_demog, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
+        p <- switch (input$adv_demog, "Median Income" = palDict("inc"), "Poverty Rate" = palDict("pov"), "High School Attainment" = palDict("hs"), "Bachelors Attainment" = palDict("ba"), "Unemployment Rate" = palDict("unemp"), "Home Ownership" = palDict("home"))
         v <- switch (input$adv_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
         t <- switch (input$adv_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
         
@@ -284,13 +206,6 @@ shinyServer(function(input, output) {
       # print map
       return(leaf)
     })
-    
-    observeEvent(NULL, {
-      c = input$bas_map_center
-      z = input$bas_map_zoom
-      
-      leafletProxy("adv_map") %>% setView(c$lng, c$lat, z)
-    })
   
   ## Density Map
     output$dns_map <- renderLeaflet({
@@ -317,12 +232,6 @@ shinyServer(function(input, output) {
         return(leaf)
     })
     
-    observeEvent(NULL,{
-      c = input$adv_map_center
-      z = input$adv_map_zoom
-      
-      leafletProxy("dns_map") %>% setView(c$lng, c$lat, z)
-    })
   ## Side by Side Map
     output$sbs_map <- renderUI({
       # basemap and attribution case
@@ -347,8 +256,6 @@ shinyServer(function(input, output) {
         leafL %<>% addCrimePoints(input$sbs_crime, crime)
         
       }
-      
-      #TODO add injury data
       
       # right
       leafInit(bmR, atR) -> leafR

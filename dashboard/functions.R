@@ -1,4 +1,4 @@
-# These should be minified custom functions for loading the web application
+# GLOBAL FUNCTIONS FOR APP
 
 # add circles to legend for points
 addCircleLegend <- function(map, size, text, color, position){
@@ -27,7 +27,7 @@ colorDict <- function(key){
             "clb" = "#DDCC77",
             "liq" = "#117733",
             "gas" = "#332288",
-            "grc" = "#AA4499",
+            "hot" = "#AA4499",
             "bus" = "#88CCEE",
             "scl" = "#999933",
             "mrd" = "#CC6677",
@@ -38,17 +38,19 @@ colorDict <- function(key){
     )
 }
 
-# define pallette dictionary ## NOT CURRENTLY IN USE, Syntax may be worse than saving 6 lines in server.R
+# define palette dictionary (For demographic data.. for now)
 palDict <- function(key){
-    switch (key,
-            "inc"   = colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425)),
-            "pov"   = colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62)),
-            "hs"    = colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99)),
-            "ba"    = colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78)),
-            "unemp" = colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36)),
-            "home"  = colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
-    )
+  switch(key,
+         # Demographic uses Jenks Natural Breaks
+  inc   = colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425)),
+  pov   = colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62)),
+  hs    = colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99)),
+  ba    = colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78)),
+  unemp = colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36)),
+  home  = colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
+  )
 }
+
 # define bins dictionary
 binDict <- function(region, crime){
   if(region == "Neighborhoods"){
@@ -327,21 +329,14 @@ addCrimePoints <- function(map, variables, data){
 
 # add demographic layer
 addDemographic <- function(map, variable, demog, boundary){
-  # using Jenks Natural Breaks
-  inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
-  pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
-  hs_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99))
-  ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
-  unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
-  home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
   # add demographic layer
        if(variable == "None"){                       map %<>% addPolygons(data = boundary, fill = NA)}
-  else if(variable == "Median Income"){         map %<>% addPolygons(data = demog, fillColor = ~inc_pal(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-  else if(variable == "Poverty Rate"){          map %<>% addPolygons(data = demog, fillColor = ~pov_pal(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-  else if(variable == "High School Attainment"){map %<>% addPolygons(data = demog, fillColor = ~hs_pal(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-  else if(variable == "Bachelors Attainment"){  map %<>% addPolygons(data = demog, fillColor = ~ba_pal(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-  else if(variable == "Unemployment Rate"){     map %<>% addPolygons(data = demog, fillColor = ~unemp_pal(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
-  else if(variable == "Home Ownership"){        map %<>% addPolygons(data = demog, fillColor = ~home_pal(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Median Income"){         map %<>% addPolygons(data = demog, fillColor = ~palDict("inc")(med_income), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Poverty Rate"){          map %<>% addPolygons(data = demog, fillColor = ~palDict("pov")(pov_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "High School Attainment"){map %<>% addPolygons(data = demog, fillColor = ~palDict("hs")(hs_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Bachelors Attainment"){  map %<>% addPolygons(data = demog, fillColor = ~palDict("ba")(ba_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Unemployment Rate"){     map %<>% addPolygons(data = demog, fillColor = ~palDict("unemp")(unemploy_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
+  else if(variable == "Home Ownership"){        map %<>% addPolygons(data = demog, fillColor = ~palDict("home")(home_own_pct), weight = 2, opacity = 1, color = "white", dashArray = "3", fillOpacity = 0.5)}
   
   return(map)
 }
@@ -364,4 +359,77 @@ addEnvironment <- function(map, variables, data, r = 7){
   #TODO get data if("Vacancy" %in% input$env_chk){       leaf %>% addCircleMarkers(data = vacancy) -> leaf}
   
   return(map)
+}
+
+# add legend
+addCustomLegend <- function(map, demog, crime, env){
+  if(input$adv_demog != "None"){
+    p <- switch (input$adv_demog, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
+    v <- switch (input$adv_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
+    t <- switch (input$adv_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
+    
+    map %<>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t)
+  }
+  
+  # draw symbol legend too
+  syms <- c(); col <- c()
+  if("Homicide"       %in% crime){syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
+  if("Rape"           %in% crime){syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
+  if("Robbery"        %in% crime){syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
+  if("Assault"        %in% crime){syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}
+  
+  if("ATMs"           %in% env)  {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
+  if("Bars"           %in% env)  {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
+  if("Clubs"          %in% env)  {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
+  if("Liquor Stores"  %in% env)  {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
+  if("Gas Stations"   %in% env)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
+  if("Hotels"         %in% env)  {syms <- c(syms, "Hotel");         col <- c(col, colorDict("hot"))}
+  if("Bus Stops"      %in% env)  {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
+  if("Schools"        %in% env)  {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
+  
+  map %<>% addCircleLegend(10, syms, col, "topleft")
+  
+  return(map)
+}
+
+# render a UI slider element with most recent month
+monthSlider <- function(sel_year, max_month){
+  if(sel_year == as.numeric(format(Sys.Date(), "%Y"))){
+    sliderTextInput("bas_month", "Select a Month:", month.name[1:which(month.name == max_month)], max_month)
+  }
+  else{
+    sliderTextInput("bas_month", "Select a Month:", month.name, max_month)
+  }
+}
+
+# call and parse region crime
+regionCrime <- function(region){
+  if(region == "Police Districts"){
+    
+    crime <- api_call(apiURL, paste0("district",
+                                     "?month=",input$bas_month,
+                                     "&year=", input$bas_year,
+                                     "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
+      dplyr::mutate(district = as.numeric(district)) %>%
+      dplyr::left_join(districts, ., by = "district") %>%
+      tidyr::spread("ucr_category", "Incidents")
+    
+    crime[is.na(crime)] <- 0
+    
+    return(crime)
+  }
+  else if(region == "Neighborhoods"){
+    
+    crime <- api_call(apiURL, paste0("nbhood",
+                                     "?month=",input$bas_month,
+                                     "&year=", input$bas_year,
+                                     "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
+      dplyr::mutate(neighborhood = as.numeric(neighborhood)) %>%
+      dplyr::left_join(nbhoods, ., by = "neighborhood") %>%
+      tidyr::spread("ucr_category", "Incidents")
+    
+    crime[is.na(crime)] <- 0
+    
+    return(crime)
+  }
 }

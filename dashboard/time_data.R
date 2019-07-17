@@ -51,7 +51,7 @@ n_homicides <- data.frame(
 )
 
 # funding
-
+# numbers are in Thousands of dollars
 vp_funding <- data.frame(
   year = c(1990:2018),
   WS =    c(NA, NA, NA, NA, NA, NA, NA,    287.117,324.755,NA, 283.279,235.310,                  361.657,                  418.500,             NA,292.270,343.822,389.423,377.813,374.877,402.118,420.366,45.023,NA,NA,NA,NA,NA,NA),
