@@ -33,86 +33,47 @@ shinyServer(function(input, output) {
   
   ## Dynamic Month Slider based on year
     output$bas_month <- renderUI({
-     monthSlider(input$bas_year, cur_month)
+     monthSliderUI(input$bas_year, cur_month, "bas_month")
     })
     output$adv_month <- renderUI({
-      monthSlider(input$adv_year, cur_month)
+      monthSliderUI(input$adv_year, cur_month, "adv_month")
     })
     output$dns_month <- renderUI({
-      monthSlider(input$dns_year, cur_month)
+      monthSliderUI(input$dns_year, cur_month, "dns_month")
     })
     output$sbs_month <- renderUI({
-      monthSlider(input$sbs_year, cur_month)
+      monthSliderUI(input$sbs_year, cur_month, "sbs_month")
     })
   
-  ## Basic Map
-    region_crime <- reactive({
-      regionCrime(input$bas_region, input$bas_month, input$bas_year, input$bas_gun, nbhoods, districts)
+  # Dynamic Filter for gun crime
+    output$bas_gunf <- renderUI({
+      gunFiltUI(input$bas_crime, "bas_gun")
+      })
+    output$adv_gunf <- renderUI({
+      gunFiltUI(input$adv_crime, "adv_gun")
+      })
+    output$dns_gunf <- renderUI({
+      gunFiltUI(input$dns_crime, "dns_gun")
+      })
+    output$sbs_gunf <- renderUI({
+      gunFiltUI(input$sbs_crime, "sbs_gun")
       })
     
-      # define bin and pallete based on selection of crime and region (Not routinely generated, point of possible failure)
-    region_bins <- reactive({
-      binDict(input$bas_region, input$bas_crime)
-    })
-    
-    region_pal <- reactive({
-      pal <- colorBin("YlGnBu", bins = region_bins(), domain = switch (input$bas_crime,
-                                                 "Homicide" = region_crime()$Homicide,
-                                                 "Rape" = region_crime()$Rape,
-                                                 "Robbery" = region_crime()$Robbery,
-                                                 "Aggravated Assault" = region_crime()$`Aggravated Assault`))
-      return(pal)
-    })
-    
-
+  ## Basic Map
     output$bas_map <- renderLeaflet({
       bm <- basemap(input$bas_base)$bm
       at <- basemap(input$bas_base)$at
       
       leafInit(bm, at) -> leaf
       
-      labs <- paste0("<h4>",region_crime()$name, "</h4>",
-                     "<b>Homicides: </b>", region_crime()$Homicide, "</br>",
-                     "<b>Rapes: </b>", region_crime()$Rape, "</br>",
-                     "<b>Robbery: </b>", region_crime()$Robbery, "</br>",
-                     "<b>Assault: </b>", region_crime()$`Aggravated Assault`) %>% lapply(shiny::HTML)
       
-      leaf %<>% addPolygons(data = region_crime(), label = labs,
-                            fillColor = ~region_pal()(switch (input$bas_crime,
-                                                              "Homicide" = region_crime()$Homicide,
-                                                              "Rape" = region_crime()$Rape,
-                                                              "Robbery" = region_crime()$Robbery,
-                                                              "Aggravated Assault" = region_crime()$`Aggravated Assault`)),
-                            weight = 2,
-                            opacity = 1,
-                            color = "white",
-                            dashArray = "3",
-                            fillOpacity = 0.7,
-                            highlight = highlightOptions(
-                              weight = 5,
-                              color = "#666",
-                              dashArray = "",
-                              fillOpacity = 0.7,
-                              bringToFront = TRUE),
-                            labelOptions = labelOptions(
-                              style = list("font-weight" = "normal", padding = "3px 8px"),
-                              textsize = "15px",
-                              direction = "auto"))
+      region_crime <- regionCrime(input$bas_region, input$bas_month, input$bas_year, input$bas_gun, nbhoods, districts)
+      
+      leaf %<>% choropleth(region_crime, input$bas_crime, input$bas_region)
 
       # add a legend
       if(input$bas_legend){
-        leaf %>% addLegend("topleft", region_pal(),
-                           title =  switch (input$bas_crime,
-                                            "Homicide" = "Number of</br>Homicides",
-                                            "Rape" = "Number of Rapes",
-                                            "Robbery" = "Number of</br>Robberies",
-                                            "Aggravated Assault" = "Number of</br>Assaults"
-                                            ),
-                           values = switch (input$bas_crime,
-                                            "Homicide" = region_crime()$Homicide,
-                                            "Rape" = region_crime()$Rape,
-                                            "Robbery" = region_crime()$Robbery,
-                                            "Aggravated Assault" = region_crime()$`Aggravated Assault`)) -> leaf
+        leaf %<>% choroLegend(region_crime, input$bas_crime, input$bas_region)
       }
       
       return(leaf)
@@ -130,7 +91,7 @@ shinyServer(function(input, output) {
         leaf %<>% addDemographic(input$adv_demog, demog, boundary)
          
       # add environment variables
-        leaf %<>% addEnvironment(input$adv_env, env_data)
+        leaf %<>% addEnvironment(input$adv_env, env_data, c(input$adv_crime, input$adv_env))
         
       # add crime Data
       if(length(input$adv_crime) > 0){
@@ -142,37 +103,21 @@ shinyServer(function(input, output) {
                           "&ucr=", jsonlite::toJSON(input$adv_crime)))
           
         # add points to map
-          leaf %<>% addCrimePoints(input$adv_crime, crime)
+          leaf %<>% addCrimePoints(input$adv_crime, crime, c(input$adv_crime, input$adv_env))
         
       }
           
       # add legend
       if(input$adv_legend){
         if(input$adv_demog != "None"){
-        p <- switch (input$adv_demog, "Median Income" = palDict("inc"), "Poverty Rate" = palDict("pov"), "High School Attainment" = palDict("hs"), "Bachelors Attainment" = palDict("ba"), "Unemployment Rate" = palDict("unemp"), "Home Ownership" = palDict("home"))
-        v <- switch (input$adv_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
-        t <- switch (input$adv_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
-        
-        leaf %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leaf
+          leaf %<>% demogLegend(demog, input$adv_demog)
         }
-        
-        # draw symbol legend too
-          syms <- c(); col <- c()
-          if("Homicide" %in% input$adv_crime)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
-          if("Rape" %in% input$adv_crime)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
-          if("Robbery" %in% input$adv_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
-          if("Assault" %in% input$adv_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}          
-          if("ATMs" %in% input$adv_env)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
-          if("Bars" %in% input$adv_env)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
-          if("Clubs" %in% input$adv_env)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
-          if("Liquor Stores" %in% input$adv_env) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
-          if("Gas Stations" %in% input$adv_env)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
-          if("Grocery Stores" %in% input$adv_env){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
-          if("Bus Stops" %in% input$adv_env)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
-          if("Schools" %in% input$adv_env)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
-          
-        leaf %>% addCircleLegend(10, syms, col, "topleft") -> leaf  
-        
+        if(length(input$adv_env) > 0){
+          leaf %<>% envLegend(input$adv_env, c(input$adv_crime, input$adv_env))
+        }
+        if(length(input$adv_crime) > 0){
+          leaf %<>% crimeLegend(input$adv_crime, c(input$adv_crime, input$adv_env))
+        }
       }
       
         
@@ -226,7 +171,7 @@ shinyServer(function(input, output) {
                                          "&ucr=", jsonlite::toJSON(input$sbs_crime)))
         
         # add points to map
-        leafL %<>% addCrimePoints(input$sbs_crime, crime)
+        leafL %<>% addCrimePoints(input$sbs_crime, crime, c(input$sbs_crime, input$sbs_env))
         
       }
       
@@ -237,42 +182,19 @@ shinyServer(function(input, output) {
       leafR %<>% addDemographic(input$sbs_demog, demog, boundary)
       
       # add environment variables
-      leafR %<>% addEnvironment(input$sbs_env, env_data)
+      leafR %<>% addEnvironment(input$sbs_env, env_data, c(input$sbs_crime, input$sbs_env))
       
       # add legends
       if(input$sbs_legend){
         if(input$sbs_demog != "None"){
-          p <- switch (input$sbs_demog, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
-          v <- switch (input$sbs_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
-          t <- switch (input$sbs_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
-          
-          leafR %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leafR
+          leafR %<>% demogLegend(demog, input$sbs_demog)
         }
-        if(any(c("ATMs", "Bars", "Clubs", "Liquor Stores","Gas Stations", "Grocery Stores", "Bus Stops", "Schools") %in% input$sbs_env)){
-          
-          syms <- c(); col <- c()
-          if("ATMs" %in% input$sbs_env)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
-          if("Bars" %in% input$sbs_env)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
-          if("Clubs" %in% input$sbs_env)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
-          if("Liquor Stores" %in% input$sbs_env) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
-          if("Gas Stations" %in% input$sbs_env)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
-          if("Grocery Stores" %in% input$sbs_env){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
-          if("Bus Stops" %in% input$sbs_env)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
-          if("Schools" %in% input$sbs_env)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
-          
-          leafR %>% addCircleLegend(10, syms, col, "topleft") -> leafR
+        if(length(input$sbs_crime) > 0){
+          leafL %<>% crimeLegend(input$sbs_crime, c(input$sbs_crime, input$sbs_env))
         }
-        if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$sbs_crime)){
-          
-          syms <- c(); col <- c()
-          if("Homicide" %in% input$sbs_crime)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
-          if("Rape" %in% input$sbs_crime)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
-          if("Robbery" %in% input$sbs_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
-          if("Aggravated Assault" %in% input$sbs_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}
-          
-          leafL %<>% addCircleLegend(10, syms, col, "topleft")
+        if(length(input$sbs_env) > 0){
+          leafR %<>% envLegend(input$sbs_env, c(input$sbs_crime, input$sbs_env))
         }
-      
       }
       
       ## Create side by side

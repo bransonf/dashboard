@@ -11,7 +11,7 @@ basMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = FALSE),
-         checkboxInput("bas_gun", "Filter for Gun Crimes"),
+         uiOutput("bas_gunf"),
          sliderTextInput("bas_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("bas_month"),
          selectInput("bas_region", "Region",
@@ -33,11 +33,11 @@ advMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         checkboxInput("adv_gun", "Filter for Gun Crimes"),
+         uiOutput("adv_gunf"),
          sliderTextInput("adv_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("adv_month"),
          pickerInput("adv_env", "Environment",
-                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
+                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Venues", "Parks", "Zones"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
@@ -65,7 +65,7 @@ dnsMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         checkboxInput("dns_gun", "Filter for Gun Crimes"),
+         uiOutput("dns_gunf"),
          sliderTextInput("dns_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("dns_month"),
          sliderInput("dns_size", "Heat Size", 30, 120, 90, 5)
@@ -78,7 +78,7 @@ sbsMapUI <- function(){
          sliderTextInput("sbs_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("sbs_month"),
          checkboxInput("sbs_legend", "Show Legends"),
-         HTML("<h5 class=heading>Left Map:</h5>"),
+         HTML("<h4 class=heading style='font-weight:bold;text-decoration:underline'>Left Map:</h4>"),
          selectInput("sbs_baseL", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
@@ -88,11 +88,11 @@ sbsMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         checkboxInput("sbs_gun", "Filter for Gun Crimes"),
-         HTML("<h5 class=heading>Right Map:</h5>"),
+         uiOutput("sbs_gunf"),
+         HTML("<h4 class=heading style='font-weight:bold;text-decoration:underline'>Right Map:</h4>"),
          selectInput("sbs_baseR", "Basemap", c("Satellite" ,"Terrain", "No Labels"), selected = "Terrain"),
          pickerInput("sbs_env", "Environment",
-                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Vacancy *", "Venues", "Parks", "Zones"),
+                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Venues", "Parks", "Zones"),
                      options = list(
                        `actions-box` = TRUE, 
                        size = 10,
