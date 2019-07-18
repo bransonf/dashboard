@@ -17,6 +17,7 @@ basMapUI <- function(){
          selectInput("bas_region", "Region",
                      choices = c("Police Districts", "Neighborhoods"),
                      selected = "Neighborhoods"),
+         checkboxInput("bas_legend", "Show Legend")
   )
 }
 
