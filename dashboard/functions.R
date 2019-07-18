@@ -408,7 +408,8 @@ demogLegend <- function(map, demog, variable){
 
 # add environment legend
 envLegend <- function(map, env, all){
-  
+  cols <-  sapply(env, colorDict, all = all, USE.NAMES = FALSE)
+  map %<>% addCircleLegend(10, env, cols, "topleft")
 }
 
 # add choropleth legend

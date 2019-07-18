@@ -20,11 +20,11 @@ navbarPage("STL Crime", fluid = TRUE, theme = "bootstrap.css",
                       tags$title("Cardiff Dashboard"), # Page Title
                       tags$script(src = "customHref.js"), # import the custom href function
                       # Import favicon package
-                      tags$link(rel="apple-touch-icon", sizes="180x180", href="icon/apple-touch-icon.png"),
-                      tags$link(rel="icon", type="image/png", sizes="32x32", href="icon/favicon-32x32.png"),
-                      tags$link(rel="icon", type="image/png", sizes="16x16", href="icon/favicon-16x16.png"),
-                      tags$link(rel="manifest", href="icon/site.webmanifest"),
-                      tags$link(rel="mask-icon", href="icon/safari-pinned-tab.svg", color="#a50002"),
+                      tags$link(rel="apple-touch-icon", sizes="180x180", href="favicon/apple-touch-icon.png"),
+                      tags$link(rel="icon", type="image/png", sizes="32x32", href="favicon/favicon-32x32.png"),
+                      tags$link(rel="icon", type="image/png", sizes="16x16", href="favicon/favicon-16x16.png"),
+                      tags$link(rel="manifest", href="favicon/site.webmanifest"),
+                      tags$link(rel="mask-icon", href="favicon/safari-pinned-tab.svg", color="#a50002"),
                       tags$meta(name ="msapplication-TileColor", content="#b91d47"),
                       tags$meta(name="theme-color", content="#ffffff"),
                       # Import google fonts
