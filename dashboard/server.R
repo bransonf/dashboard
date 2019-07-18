@@ -153,7 +153,7 @@ shinyServer(function(input, output) {
       filename = "STL_Crime_Map.png",
       content = function(file) {
         withProgress(message = 'Exporting Map...', {
-          basic_map() %>% setView(input$adv_map_center[1],
+          advanced_map() %>% setView(input$adv_map_center[1],
                                   input$adv_map_center[2],
                                   input$adv_map_zoom) -> m
           incProgress(.6)
@@ -197,7 +197,7 @@ shinyServer(function(input, output) {
       filename = "STL_Crime_Map.png",
       content = function(file) {
         withProgress(message = 'Exporting Map...', {
-          basic_map() %>% setView(input$dns_map_center[1],
+          density_map() %>% setView(input$dns_map_center[1],
                                   input$dns_map_center[2],
                                   input$dns_map_zoom) -> m
           incProgress(.6)
