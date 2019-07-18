@@ -4,14 +4,14 @@ library(shiny)
 library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
-library(sf) # spatial class
+library(sf) # spatial class (udunits and gdal depends)
 library(dygraphs) # time-series line graphs
 library(timevis) # timeline
 library(dplyr) # data manipulation and summary
 library(leafsync) # side by side
 library(magrittr) # better syntax see ?`%<>%`
 library(tidyr)
-library(httr) # API requests
+library(httr) # API requests (openssl depends)
 library(jsonlite) # Parsing
 
 # source custom functions and load data

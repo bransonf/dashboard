@@ -13,11 +13,9 @@ source("data/map_UI.R")
 source("data/copy.R")
 
 # begin page  
-navbarPage("STL Crime", fluid = TRUE, theme = "bootstrap.css",
+navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), fluid = TRUE, theme = "bootstrap.css", collapsible = TRUE, windowTitle = "Crime Dashboard",
            tabPanel("Map", icon = icon("map"),
                     tags$head(
-                      tags$link(rel = "stylesheet", type = "text/css", href = "style.css"), # This links to the CSS stylesheet
-                      tags$title("Cardiff Dashboard"), # Page Title
                       tags$script(src = "customHref.js"), # import the custom href function
                       # Import favicon package
                       tags$link(rel="apple-touch-icon", sizes="180x180", href="favicon/apple-touch-icon.png"),
