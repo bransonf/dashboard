@@ -9,6 +9,7 @@ library(dygraphs)
 library(timevis)
 
 # load Map UI and copy
+source("functions.R")
 source("data/map_UI.R")
 source("data/copy.R")
 

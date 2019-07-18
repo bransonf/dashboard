@@ -17,7 +17,8 @@ basMapUI <- function(){
          selectInput("bas_region", "Region",
                      choices = c("Police Districts", "Neighborhoods"),
                      selected = "Neighborhoods"),
-         checkboxInput("bas_legend", "Show Legend")
+         checkboxInput("bas_legend", "Show Legend"),
+         downloadImage("bas_save")
   )
 }
 
@@ -48,8 +49,8 @@ advMapUI <- function(){
          selectInput("adv_demog", "Demographic",
                      choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                      selected = "None"),
-         checkboxInput("adv_legend", "Show Legend(s)")
-         
+         checkboxInput("adv_legend", "Show Legend(s)"),
+         downloadImage("adv_save")
   )
 }
 
@@ -68,7 +69,8 @@ dnsMapUI <- function(){
          uiOutput("dns_gunf"),
          sliderTextInput("dns_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("dns_month"),
-         sliderInput("dns_size", "Heat Size", 30, 120, 90, 5)
+         sliderInput("dns_size", "Heat Size", 30, 120, 90, 5),
+         downloadImage("dns_save")
   )
 }
 

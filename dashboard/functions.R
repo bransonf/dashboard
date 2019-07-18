@@ -511,3 +511,10 @@ gunFiltUI <- function(input, label){
   }
 }
 
+# custom download button
+downloadImage <- function(outputId, label = "Save Image", class = NULL, ...){
+  aTag <- tags$a(id = outputId, class = paste("btn btn-default shiny-download-link", 
+                                              class), href = "", target = "_blank", download = NA, 
+                 icon("image"), label, ...)
+}
+

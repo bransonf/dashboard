@@ -13,9 +13,10 @@ library(magrittr) # better syntax see ?`%<>%`
 library(tidyr)
 library(httr) # API requests (openssl depends)
 library(jsonlite) # Parsing
+library(mapview) # mapshot function
 
 # source custom functions and load data
-source("functions.R")
+# source("functions.R")  Sourced in UI
 load("data/rtm.rda")
 load("data/bounds.rda")
 source("data/time_data.R")
@@ -60,17 +61,16 @@ shinyServer(function(input, output) {
       })
     
   ## Basic Map
-    output$bas_map <- renderLeaflet({
+    basic_map <- reactive({
       bm <- basemap(input$bas_base)$bm
       at <- basemap(input$bas_base)$at
       
       leafInit(bm, at) -> leaf
       
-      
       region_crime <- regionCrime(input$bas_region, input$bas_month, input$bas_year, input$bas_gun, nbhoods, districts)
       
       leaf %<>% choropleth(region_crime, input$bas_crime, input$bas_region)
-
+      
       # add a legend
       if(input$bas_legend){
         leaf %<>% choroLegend(region_crime, input$bas_crime, input$bas_region)
@@ -78,9 +78,28 @@ shinyServer(function(input, output) {
       
       return(leaf)
     })
-  
+    
+    output$bas_map <- renderLeaflet({
+      basic_map()
+    })
+    
+    ## Save Basic Map
+    output$bas_save <- downloadHandler(
+      filename = "STL_Crime_Map.png",
+      content = function(file) {
+        withProgress(message = 'Exporting Map...', {
+        basic_map() %>% setView(input$bas_map_center[1],
+                                input$bas_map_center[2],
+                                input$bas_map_zoom) -> m
+          incProgress(.6)
+          mapshot(m, file = file)
+          incProgress(.3, message = "Map Saved")
+        })
+      }
+    )
+    
   ## Advanced Map
-    output$adv_map <- renderLeaflet({
+    advanced_map <- reactive({
         # basemap and attribution case
         bm <- basemap(input$adv_base)$bm
         at <- basemap(input$adv_base)$at
@@ -104,7 +123,7 @@ shinyServer(function(input, output) {
           
         # add points to map
           leaf %<>% addCrimePoints(input$adv_crime, crime, c(input$adv_crime, input$adv_env))
-        
+
       }
           
       # add legend
@@ -124,9 +143,28 @@ shinyServer(function(input, output) {
       # print map
       return(leaf)
     })
+    
+    output$adv_map <- renderLeaflet({
+      advanced_map()
+    })
   
+    ## Save Advanced Map
+    output$adv_save <- downloadHandler(
+      filename = "STL_Crime_Map.png",
+      content = function(file) {
+        withProgress(message = 'Exporting Map...', {
+          basic_map() %>% setView(input$adv_map_center[1],
+                                  input$adv_map_center[2],
+                                  input$adv_map_zoom) -> m
+          incProgress(.6)
+          mapshot(m, file = file)
+          incProgress(.3, message = "Map Saved")
+        })
+      }
+    )
+    
   ## Density Map
-    output$dns_map <- renderLeaflet({
+    density_map <- reactive({
       bm <- basemap(input$dns_base)$bm
       at <- basemap(input$dns_base)$at
       
@@ -149,6 +187,25 @@ shinyServer(function(input, output) {
       
         return(leaf)
     })
+    
+    output$dns_map <- renderLeaflet({
+      density_map()
+    })
+    
+    ## Save Density Map
+    output$dns_save <- downloadHandler(
+      filename = "STL_Crime_Map.png",
+      content = function(file) {
+        withProgress(message = 'Exporting Map...', {
+          basic_map() %>% setView(input$dns_map_center[1],
+                                  input$dns_map_center[2],
+                                  input$dns_map_zoom) -> m
+          incProgress(.6)
+          mapshot(m, file = file)
+          incProgress(.3, message = "Map Saved")
+        })
+      }
+    )
     
   ## Side by Side Map
     output$sbs_map <- renderUI({
