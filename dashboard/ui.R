@@ -41,12 +41,12 @@ navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), f
                                            column(9, leafletOutput("adv_map", height = "650px")),
                                            advMapUI()
                                          )),
-                                tabPanel("Density",
+                                tabPanel("Heatmap",
                                          fluidRow(
                                            column(9, leafletOutput("dns_map", height = "650px")),
                                            dnsMapUI()
                                          )),
-                                tabPanel("Comparison",
+                                tabPanel("Side by Side",
                                          fluidRow(
                                            column(9, htmlOutput("sbs_map", height = "650px")),
                                            sbsMapUI()

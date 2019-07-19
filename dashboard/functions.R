@@ -485,6 +485,7 @@ choroLegend <- function(map, data, variable, region){
     
   return(map)
 }
+
 # generate labels
 genLabs <- function(data, variable){
   value <- data[[variable]]

@@ -86,7 +86,9 @@ shinyServer(function(input, output) {
     
     ## Save Basic Map
     output$bas_save <- downloadHandler(
-      filename = "STL_Crime_Map.png",
+      filename = function(){paste(
+        "STL", input$bas_month, input$bas_year, input$bas_crime,
+        "Map.png", sep = "_")},
       content = function(file) {
         withProgress(message = 'Exporting Map...', {
         basic_map() %>% setView(input$bas_map_center[1],
@@ -152,7 +154,9 @@ shinyServer(function(input, output) {
   
     ## Save Advanced Map
     output$adv_save <- downloadHandler(
-      filename = "STL_Crime_Map.png",
+      filename = function(){paste(
+        "STL", input$adv_month, input$adv_year,
+        "Crime_Map.png", sep = "_")},
       content = function(file) {
         withProgress(message = 'Exporting Map...', {
           advanced_map() %>% setView(input$adv_map_center[1],
@@ -198,7 +202,9 @@ shinyServer(function(input, output) {
     
     ## Save Density Map
     output$dns_save <- downloadHandler(
-      filename = "STL_Crime_Map.png",
+      filename = function(){paste(
+        "STL", input$dns_month, input$dns_year,
+        "Heat_Map.png", sep = "_")},
       content = function(file) {
         withProgress(message = 'Exporting Map...', {
           density_map() %>% setView(input$dns_map_center[1],
