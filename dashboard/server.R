@@ -80,7 +80,8 @@ shinyServer(function(input, output) {
     })
     
     output$bas_map <- renderLeaflet({
-      basic_map()
+      basic_map() %>%
+        addFullscreenControl()
     })
     
     ## Save Basic Map
@@ -131,11 +132,11 @@ shinyServer(function(input, output) {
         if(input$adv_demog != "None"){
           leaf %<>% demogLegend(demog, input$adv_demog)
         }
-        if(length(input$adv_env) > 0){
-          leaf %<>% envLegend(input$adv_env, c(input$adv_crime, input$adv_env))
-        }
         if(length(input$adv_crime) > 0){
           leaf %<>% crimeLegend(input$adv_crime, c(input$adv_crime, input$adv_env))
+        }
+        if(length(input$adv_env) > 0){
+          leaf %<>% envLegend(input$adv_env, c(input$adv_crime, input$adv_env))
         }
       }
       
@@ -145,7 +146,8 @@ shinyServer(function(input, output) {
     })
     
     output$adv_map <- renderLeaflet({
-      advanced_map()
+      advanced_map() %>%
+        addFullscreenControl()
     })
   
     ## Save Advanced Map
@@ -181,7 +183,8 @@ shinyServer(function(input, output) {
         if(length(crime$wgs_x) < 1){NULL}
         else{
           crime %<>% filter(!is.na(wgs_x) & !is.na(wgs_y))
-          leaf %<>% addWebGLHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, size = input$dns_size, units = "px")}
+          #leaf %<>% addWebGLHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, size = input$dns_size, units = "px")}
+          leaf %<>% addHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, radius = input$dns_size/2, gradient = "YlOrRd")}
           
       }
       
@@ -189,7 +192,8 @@ shinyServer(function(input, output) {
     })
     
     output$dns_map <- renderLeaflet({
-      density_map()
+      density_map() %>%
+        addFullscreenControl()
     })
     
     ## Save Density Map
@@ -216,7 +220,7 @@ shinyServer(function(input, output) {
       atR <- basemap(input$sbs_baseR)$at
       
       # left
-      leafInit(bmL, atL) -> leafL
+      leafInit(bmL, atL) %>% addFullscreenControl() -> leafL
       
       # add crime Data
       if(length(input$sbs_crime) > 0){
@@ -233,7 +237,7 @@ shinyServer(function(input, output) {
       }
       
       # right
-      leafInit(bmR, atR) -> leafR
+      leafInit(bmR, atR) %>% addFullscreenControl() -> leafR
       
       # add demographic layer
       leafR %<>% addDemographic(input$sbs_demog, demog, boundary)

@@ -124,7 +124,6 @@ basemap <- function(input){
 leafInit <- function(bm, at){
   leaflet(options = leafletOptions(zoomSnap = 0.5)) %>%
     enableTileCaching() %>%
-    addFullscreenControl() %>%
     addTiles(bm, attribution = at) %>%
     setView(-90.2594, 38.6530, zoom = 11)
 }
@@ -149,6 +148,17 @@ addPoints <- function(map, lon, lat, radius = 7, stroke = NA, fillColor, fillOpa
 
 # larger batch function for adding crime points
 addCrimePoints <- function(map, variables, data, all){
+  # remove non points from the all vector
+  if("Parks" %in% all){
+    all <- all[-which(all == "Parks")]
+  }
+  if("Venues" %in% all){
+    all <- all[-which(all == "Venues")]
+  }
+  if("Zones" %in% all){
+    all <- all[-which(all == "Zones")]
+  }
+  
   if("Homicide" %in% variables){
     
     x <- filter(data, ucr_category == "Homicide") %>%
@@ -376,6 +386,17 @@ addDemographic <- function(map, variable, demog, boundary){
 
 # add environmental points
 addEnvironment <- function(map, variables, data, all, r = 7){
+  # remove non points from the all vector
+  if("Parks" %in% all){
+    all <- all[-which(all == "Parks")]
+  }
+  if("Venues" %in% all){
+    all <- all[-which(all == "Venues")]
+  }
+  if("Zones" %in% all){
+    all <- all[-which(all == "Zones")]
+  }
+  
   # add environment variables
   if("Venues" %in% variables){        map %<>% addPolygons(data = data[[1]], fillColor = "blue", stroke = NA, popup = data[[1]]$name)}
   if("Parks" %in% variables){         map %<>% addPolygons(data = data[[2]], fillColor = "green", stroke = NA, popup = data[[2]]$name)}
@@ -395,6 +416,17 @@ addEnvironment <- function(map, variables, data, all, r = 7){
 
 # add crime legend
 crimeLegend <- function(map, crime, all){
+  # remove non points from the all vector
+  if("Parks" %in% all){
+    all <- all[-which(all == "Parks")]
+  }
+  if("Venues" %in% all){
+    all <- all[-which(all == "Venues")]
+  }
+  if("Zones" %in% all){
+    all <- all[-which(all == "Zones")]
+  }
+  
   cols <-  sapply(crime, colorDict, all = all, USE.NAMES = FALSE)
   map %<>% addCircleLegend(10, crime, cols, "topleft")
 }
@@ -410,8 +442,33 @@ demogLegend <- function(map, demog, variable){
 
 # add environment legend
 envLegend <- function(map, env, all){
-  cols <-  sapply(env, colorDict, all = all, USE.NAMES = FALSE)
-  map %<>% addCircleLegend(10, env, cols, "topleft")
+  # if not any other than these, NULL
+  if(all(env %in% c("Parks", "Venues", "Zones"))){
+    return(map)
+  }else{  
+    # remove non points from the all and env vectors
+    if("Parks" %in% env){
+      env <- env[-which(env == "Parks")]
+    }
+    if("Venues" %in% env){
+      env <- env[-which(env == "Venues")]
+    }
+    if("Zones" %in% env){
+      env <- env[-which(env == "Zones")]
+    }
+    if("Parks" %in% all){
+      all <- all[-which(all == "Parks")]
+    }
+    if("Venues" %in% all){
+      all <- all[-which(all == "Venues")]
+    }
+    if("Zones" %in% all){
+      all <- all[-which(all == "Zones")]
+    }
+    
+    cols <-  sapply(env, colorDict, all = all, USE.NAMES = FALSE)
+    map %<>% addCircleLegend(10, env, cols, "topleft")
+  }
 }
 
 # add choropleth legend
