@@ -14,6 +14,7 @@ library(tidyr)
 library(httr) # API requests (openssl depends)
 library(jsonlite) # Parsing
 library(mapview) # mapshot function
+library(RColorBrewer)
 
 # source custom functions and load data
 # source("functions.R")  Sourced in UI
@@ -194,7 +195,7 @@ shinyServer(function(input, output) {
         if(length(crime$wgs_x) < 1){NULL}
         else{
           crime %<>% filter(!is.na(wgs_x) & !is.na(wgs_y))
-          leaf %<>% addHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, radius = input$dns_size/2, gradient = "YlOrRd")}
+          leaf %<>% addHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, radius = input$dns_size, gradient = RColorBrewer::brewer.pal(9,"YlOrRd")[1:8], blur = input$dns_blur)}
           
       }
       

@@ -70,7 +70,8 @@ dnsMapUI <- function(){
          uiOutput("dns_gunf"),
          sliderTextInput("dns_year", "Select a Year:", 2008:2019, 2019),
          uiOutput("dns_month"),
-         sliderInput("dns_size", "Heat Size", 30, 120, 90, 5),
+         sliderInput("dns_size", "Heat Radius", 5, 30, 20, 5),
+         sliderInput("dns_blur", "Heat Blur", 5, 50, 15, 1),
          downloadImage("dns_save")
   )
 }
