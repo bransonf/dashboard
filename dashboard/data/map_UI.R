@@ -50,6 +50,7 @@ advMapUI <- function(){
                      choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
                      selected = "None"),
          checkboxInput("adv_legend", "Show Legend(s)"),
+         checkboxInput("adv_bunit", "Show Block Units"), # Block Units...
          downloadImage("adv_save")
   )
 }

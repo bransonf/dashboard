@@ -20,6 +20,7 @@ library(mapview) # mapshot function
 load("data/rtm.rda")
 load("data/bounds.rda")
 source("data/time_data.R")
+load("data/block_units.rda") # Block Units...
 
 # API URL
 apiURL <- "api.bransonf.com/stlcrime/"
@@ -142,6 +143,12 @@ shinyServer(function(input, output) {
         }
       }
       
+        # blockunits
+        if(input$adv_bunit){
+          pops <- paste0("<b>Area Council: </b>", bunits$`Area Council`, "<br>",
+                         "<b>Block Unit Number: </b>", bunits$`Block Unit Number`) %>% lapply(HTML)
+          leaf %<>% addMarkers(bunits$lon, bunits$lat, popup = pops, icon = makeIcon("icons/home-15.svg", popupAnchorX = 10, popupAnchorY = 1))
+        }
         
       # print map
       return(leaf)
@@ -187,7 +194,6 @@ shinyServer(function(input, output) {
         if(length(crime$wgs_x) < 1){NULL}
         else{
           crime %<>% filter(!is.na(wgs_x) & !is.na(wgs_y))
-          #leaf %<>% addWebGLHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, size = input$dns_size, units = "px")}
           leaf %<>% addHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, radius = input$dns_size/2, gradient = "YlOrRd")}
           
       }
