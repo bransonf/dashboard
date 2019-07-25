@@ -1,7 +1,7 @@
 # GLOBAL FUNCTIONS FOR APP
 
 ## Constants
-apiURL <- "api.bransonf.com/stlcrime/"
+apiURL <- "api.stldata.org/stlcrime/"
 
 # add circles to legend for points
 addCircleLegend <- function(map, size, text, color, position){
