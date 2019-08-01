@@ -32,25 +32,49 @@ navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), f
                     headerPanel(HTML("<h1 class=title>Crime Map</h1>")),
                     tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
                                 tabPanel("Basic",
-                                         fluidRow(
-                                           column(9, leafletOutput("bas_map", height = "650px")),
-                                           basMapUI()
+                                         div(class='outer',
+                                             includeCSS("./www/bootstrap.css"),
+                                         
+                                           leafletOutput("bas_map", height = "100%", width = "100%"),
+                                           absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                                         draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
+                                                         width = 330, height = "auto",
+                                                         
+                                                         basMapUI()
+                                           )
                                          )),
                                 tabPanel("Advanced",
-                                         fluidRow(
-                                           column(9, leafletOutput("adv_map", height = "650px")),
-                                           advMapUI()
+                                         div(class='outer',
+                                             includeCSS("./www/bootstrap.css"),
+                                             
+                                             leafletOutput("adv_map", height = "100%", width = "100%"),
+                                             absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                                           draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
+                                                           width = 330, height = "auto",
+                                                           
+                                                           advMapUI()
+                                             )
                                          )),
                                 tabPanel("Heatmap",
-                                         fluidRow(
-                                           column(9, leafletOutput("dns_map", height = "650px")),
-                                           dnsMapUI()
+                                         div(class='outer',
+                                             includeCSS("./www/bootstrap.css"),
+                                             
+                                             leafletOutput("dns_map", height = "100%", width = "100%"),
+                                             absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                                           draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
+                                                           width = 330, height = "auto",
+                                                           
+                                                           dnsMapUI()
+                                             )
                                          )),
                                 tabPanel("Side by Side",
-                                         fluidRow(
-                                           column(9, htmlOutput("sbs_map", height = "650px")),
-                                           sbsMapUI()
-                                         ))
+                                        fluidRow(
+                                          column(12,
+                                                 htmlOutput("sbs_map")
+                                          )
+                                        ),
+                                        sbsMapUI()
+                                        )
                                 )
            ),
            tabPanel("Timeline", icon = icon("clock"),

@@ -1,7 +1,7 @@
 ## Map Component UI
 # Basic Map (Choropleth)
 basMapUI <- function(){
-  column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
+  column(12, HTML("<h3 class=heading>Select Data to Map:</h3>"),
          selectInput("bas_base", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
          pickerInput("bas_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
@@ -24,7 +24,7 @@ basMapUI <- function(){
 
 # Advanced Map (Point)
 advMapUI <- function(){
-  column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
+  column(12, HTML("<h3 class=heading>Select Data to Map:</h3>"),
          selectInput("adv_base", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
          pickerInput("adv_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
@@ -57,7 +57,7 @@ advMapUI <- function(){
 
 # Density Map
 dnsMapUI <- function(){
-  column(3, HTML("<h5 class=heading>Select Data to Map:</h5>"),
+  column(12, HTML("<h3 class=heading>Select Data to Map:</h3>"),
          selectInput("dns_base", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
          pickerInput("dns_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
@@ -78,39 +78,38 @@ dnsMapUI <- function(){
 
 # Side by Side Map
 sbsMapUI <- function(){
-  column(3,
-         sliderTextInput("sbs_year", "Select a Year:", 2008:2019, 2019),
-         uiOutput("sbs_month"),
-         checkboxInput("sbs_legend", "Show Legends"),
-         HTML("<h4 class=heading style='font-weight:bold;text-decoration:underline'>Left Map:</h4>"),
-         selectInput("sbs_baseL", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
-         pickerInput("sbs_crime", "Crime",
-                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
-                     options = list(
-                       `actions-box` = TRUE, 
-                       size = 10,
-                       `selected-text-format` = "count > 3"
-                     ), 
-                     multiple = TRUE),
-         uiOutput("sbs_gunf"),
-         HTML("<h4 class=heading style='font-weight:bold;text-decoration:underline'>Right Map:</h4>"),
-         selectInput("sbs_baseR", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
-         pickerInput("sbs_env", "Environment",
-                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Venues", "Parks", "Zones"),
-                     options = list(
-                       `actions-box` = TRUE, 
-                       size = 10,
-                       `selected-text-format` = "count > 3"
-                     ), 
-                     multiple = TRUE
-         ),
-         selectInput("sbs_demog", "Demographic",
-                     choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
-                     selected = "None"),
-         fluidRow(
-           #column(1, submitButton("Update")),
-           #column(1, offset = 3, dropdownButton(nav, icon = icon("question"), size = "sm", right = TRUE, up = TRUE))
-         )
-         
+  fluidRow(
+    column(4, offset = 1,
+           HTML("<h4 class=heading style='font-weight:bold;text-decoration:underline'>Left Map:</h4>"),
+           selectInput("sbs_baseL", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
+           pickerInput("sbs_crime", "Crime",
+                       choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
+                       options = list(
+                         `actions-box` = TRUE, 
+                         size = 10,
+                         `selected-text-format` = "count > 3"
+                       ), 
+                       multiple = TRUE),
+           uiOutput("sbs_gunf"),
+           sliderTextInput("sbs_year", "Select a Year:", 2008:2019, 2019),
+           uiOutput("sbs_month"),
+           checkboxInput("sbs_legend", "Show Legends")
+    ),
+    column(4, offset = 1,
+           HTML("<h4 class=heading style='font-weight:bold;text-decoration:underline'>Right Map:</h4>"),
+           selectInput("sbs_baseR", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
+           pickerInput("sbs_env", "Environment",
+                       choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Venues", "Parks", "Zones"),
+                       options = list(
+                         `actions-box` = TRUE, 
+                         size = 10,
+                         `selected-text-format` = "count > 3"
+                       ), 
+                       multiple = TRUE
+           ),
+           selectInput("sbs_demog", "Demographic",
+                       choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
+                       selected = "None")
+    )
   )
 }

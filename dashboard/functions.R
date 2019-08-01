@@ -1,7 +1,7 @@
 # GLOBAL FUNCTIONS FOR APP
 
 ## Constants
-apiURL <- "api.stldata.org/stlcrime/"
+apiURL <- "http://api.stldata.org/stlcrime/"
 
 # add circles to legend for points
 addCircleLegend <- function(map, size, text, color, position){
@@ -125,7 +125,7 @@ leafInit <- function(bm, at){
   leaflet(options = leafletOptions(zoomSnap = 0.5)) %>%
     enableTileCaching() %>%
     addTiles(bm, attribution = at) %>%
-    setView(-90.2594, 38.6530, zoom = 11)
+    setView(-90.2594, 38.6530, zoom = 12)
 }
 
 # function to make API calls and parse the response
