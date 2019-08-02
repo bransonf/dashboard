@@ -7,6 +7,7 @@ library(leaflet.extras)
 library(sf)
 library(dygraphs)
 library(timevis)
+library(pushbar)
 
 # load Map UI and copy
 source("functions.R")
