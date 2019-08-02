@@ -4167,7 +4167,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar {
   position: relative;
   min-height: 50px;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
   border: 1px solid transparent;
 }
 @media (min-width: 768px) {
@@ -6824,12 +6824,30 @@ button.close {
 /* leaflet shiny div height*/
 div.outer {
   position: fixed;
-  top: 180px;
+  top: 160px;
   left: 0;
   right: 0;
   bottom: 0;
   overflow: hidden;
   padding: 0;
+}
+
+/* shiny div height MOBILE*/
+div.outer_mobile {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Mobile Button for Select Data */
+div.mob-bttn {
+  position: fixed;
+  bottom: 30px;
+  width: 90%;
 }
 
 /* give controls fading animation */

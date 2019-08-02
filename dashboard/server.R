@@ -15,6 +15,7 @@ library(httr) # API requests (openssl depends)
 library(jsonlite) # Parsing
 library(mapview) # mapshot function
 library(RColorBrewer)
+library(pushbar) # JS Push bar for controls on mobile
 
 # source custom functions and load data
 # source("functions.R")  Sourced in UI
@@ -47,6 +48,9 @@ shinyServer(function(input, output) {
     output$sbs_month <- renderUI({
       monthSliderUI(input$sbs_year, cur_month, "sbs_month")
     })
+    output$mob_month <- renderUI({
+      monthSliderUI(input$mob_year, cur_month, "mob_month")
+    })
   
   # Dynamic Filter for gun crime
     output$bas_gunf <- renderUI({
@@ -60,6 +64,9 @@ shinyServer(function(input, output) {
       })
     output$sbs_gunf <- renderUI({
       gunFiltUI(input$sbs_crime, "sbs_gun")
+      })
+    output$mob_gunf <- renderUI({
+      gunFiltUI(input$mob_crime, "mob_gun")
       })
     
   ## Basic Map
@@ -283,6 +290,52 @@ shinyServer(function(input, output) {
       
     })
     
+  ## Mobile Map
+    output$mob_map <- renderLeaflet({
+      # basemap and attribution case
+      bm <- basemap(input$mob_base)$bm
+      at <- "" # No Attribution on Mobile...
+      
+      leafInit(bm, at) %>%
+        addFullscreenControl() -> leaf
+      
+      # add demographic data
+      leaf %<>% addDemographic(input$mob_demog, demog, boundary)
+      
+      # add environment variables
+      leaf %<>% addEnvironment(input$mob_env, env_data, c(input$mob_crime, input$mob_env))
+      
+      # add crime Data
+      if(length(input$mob_crime) > 0){
+        
+        crime <- api_call(apiURL, paste0("coords",
+                                         "?month=", input$mob_month,
+                                         "&year=", input$mob_year,
+                                         "&gun=", ifelse(input$mob_gun, 'true', 'false'),
+                                         "&ucr=", jsonlite::toJSON(input$mob_crime)))
+        
+        # add points to map
+        leaf %<>% addCrimePoints(input$mob_crime, crime, c(input$mob_crime, input$mob_env))
+        
+      }
+      
+      # add legend
+      if(input$mob_legend){
+        if(input$mob_demog != "None"){
+          leaf %<>% demogLegend(demog, input$mob_demog)
+        }
+        if(length(input$mob_crime) > 0){
+          leaf %<>% crimeLegend(input$mob_crime, c(input$mob_crime, input$mob_env))
+        }
+        if(length(input$mob_env) > 0){
+          leaf %<>% envLegend(input$mob_env, c(input$mob_crime, input$mob_env))
+        }
+      }
+      
+      # print map
+      return(leaf)
+  })
+    
     # draw a timeline # https://visjs.org/docs/timeline/#Configuration_Options
     output$time <- renderTimevis({
       timevis(tvis, options = list(
@@ -314,5 +367,87 @@ shinyServer(function(input, output) {
       return(dg_f)
     })
 
+    # Setup Pushbar for Mobile Layout
+    setup_pushbar()
     
+    observeEvent(input$open, {
+      pushbar_open(id = "mobpush")
+    })  
+    
+    observeEvent(input$close, {
+      pushbar_close()
+    })  
+    
+    # Render the UI based on Mobile or Desktop Status
+    output$ui <- renderUI({
+      if(input$isMobile){
+        # Mobile Version
+        div(
+          div(class='outer_mobile',
+              includeCSS("./www/bootstrap.css"),
+              leafletOutput('mob_map', height = '100%', width = '100%')  
+          ),
+          div(class='mob-bttn',
+              actionBttn("open", "Select Data", icon('server'), style = "jelly", block = TRUE, color = 'danger')),
+              pushbar(
+                mobMapUI(),
+                id = "mobpush", # add id to get event
+                actionButton("close", "Close"),
+                from = 'bottom'
+              )
+        )
+      }
+      else{
+        # Desktop Version
+        div(
+        headerPanel(HTML("<h1 class=title>Crime Map</h1>")),
+        tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
+                    tabPanel("Basic",
+                             div(class='outer',
+                                 includeCSS("./www/bootstrap.css"),
+                                 
+                                 leafletOutput("bas_map", height = "100%", width = "100%"),
+                                 absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                               draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
+                                               width = 330, height = "auto",
+                                               
+                                               basMapUI()
+                                 )
+                             )),
+                    tabPanel("Advanced",
+                             div(class='outer',
+                                 includeCSS("./www/bootstrap.css"),
+                                 
+                                 leafletOutput("adv_map", height = "100%", width = "100%"),
+                                 absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                               draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
+                                               width = 330, height = "auto",
+                                               
+                                               advMapUI()
+                                 )
+                             )),
+                    tabPanel("Heatmap",
+                             div(class='outer',
+                                 includeCSS("./www/bootstrap.css"),
+                                 
+                                 leafletOutput("dns_map", height = "100%", width = "100%"),
+                                 absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                               draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
+                                               width = 330, height = "auto",
+                                               
+                                               dnsMapUI()
+                                 )
+                             )),
+                    tabPanel("Side by Side",
+                             fluidRow(
+                               column(12,
+                                      htmlOutput("sbs_map")
+                               )
+                             ),
+                             sbsMapUI()
+                    )
+        )) # end div
+        
+      }
+    })
 })

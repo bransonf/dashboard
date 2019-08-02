@@ -576,3 +576,12 @@ downloadImage <- function(outputId, label = "Save Image", class = NULL, ...){
                  icon("image"), label, ...)
 }
 
+# function for detecting mobile devices
+mobileDetect <- function(inputId, value = 0) {
+  tagList(
+    singleton(tags$head(tags$script(src = "mobile.js"))),
+    tags$input(id = inputId,
+               class = "mobile-element",
+               type = "hidden")
+  )
+}

@@ -113,3 +113,34 @@ sbsMapUI <- function(){
     )
   )
 }
+## Mobile Specific User Interface
+
+mobMapUI <- function(){
+  column(12, HTML("<h3 class=heading>Select Data to Map:</h3>"),
+         selectInput("mob_base", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
+         pickerInput("mob_crime", "Crime",
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
+                     options = list(
+                       `actions-box` = TRUE, 
+                       size = 10,
+                       `selected-text-format` = "count > 3"
+                     ), 
+                     multiple = TRUE),
+         uiOutput("mob_gunf"),
+         sliderTextInput("mob_year", "Select a Year:", 2008:2019, 2019),
+         uiOutput("mob_month"),
+         pickerInput("mob_env", "Environment",
+                     choices = c("ATMs", "Bars", "Clubs", "Liquor Stores", "Gas Stations", "Hotels", "Bus Stops", "Schools", "Venues", "Parks", "Zones"),
+                     options = list(
+                       `actions-box` = TRUE, 
+                       size = 10,
+                       `selected-text-format` = "count > 3"
+                     ), 
+                     multiple = TRUE
+         ),
+         selectInput("mob_demog", "Demographic",
+                     choices = c("Median Income", "Poverty Rate", "High School Attainment", "Bachelors Attainment", "Unemployment Rate", "Home Ownership", "None"),
+                     selected = "None"),
+         checkboxInput("mob_legend", "Show Legend(s)")
+  )
+}

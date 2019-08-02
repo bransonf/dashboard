@@ -29,53 +29,11 @@ navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), f
                       # Import google fonts
                       tags$link(rel = "stylesheet", href="https://fonts.googleapis.com/css?family=Libre+Baskerville|Lora|Open+Sans&display=swap")
                     ),
-                    headerPanel(HTML("<h1 class=title>Crime Map</h1>")),
-                    tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
-                                tabPanel("Basic",
-                                         div(class='outer',
-                                             includeCSS("./www/bootstrap.css"),
-                                         
-                                           leafletOutput("bas_map", height = "100%", width = "100%"),
-                                           absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                         draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
-                                                         width = 330, height = "auto",
-                                                         
-                                                         basMapUI()
-                                           )
-                                         )),
-                                tabPanel("Advanced",
-                                         div(class='outer',
-                                             includeCSS("./www/bootstrap.css"),
-                                             
-                                             leafletOutput("adv_map", height = "100%", width = "100%"),
-                                             absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                           draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
-                                                           width = 330, height = "auto",
-                                                           
-                                                           advMapUI()
-                                             )
-                                         )),
-                                tabPanel("Heatmap",
-                                         div(class='outer',
-                                             includeCSS("./www/bootstrap.css"),
-                                             
-                                             leafletOutput("dns_map", height = "100%", width = "100%"),
-                                             absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                                           draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
-                                                           width = 330, height = "auto",
-                                                           
-                                                           dnsMapUI()
-                                             )
-                                         )),
-                                tabPanel("Side by Side",
-                                        fluidRow(
-                                          column(12,
-                                                 htmlOutput("sbs_map")
-                                          )
-                                        ),
-                                        sbsMapUI()
-                                        )
-                                )
+                    
+                    # Render UI Based on Mobile/Desktop
+                    mobileDetect('isMobile'),
+                    pushbar_deps(),
+                    uiOutput('ui')
            ),
            tabPanel("Timeline", icon = icon("clock"),
                     headerPanel(HTML("<h1 class=title>Timeline</h1>")),
