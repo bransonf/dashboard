@@ -6845,11 +6845,16 @@ div.outer_mobile {
 
 /* Mobile Button for Select Data */
 div.mob-bttn {
-  position: fixed;
+  position: absolute;
   bottom: 30px;
-  width: 90%;
+  left:50%;
+  margin-left:-40%;
+  width:80%;
 }
 
+#open {
+  background:#a94442;
+}
 /* give controls fading animation */
 #controls {
 /* Appearance */
@@ -6865,4 +6870,18 @@ transition: opacity 500ms 1s;
 /* Fade in while hovering */
   opacity: 0.95;
 transition-delay: 0;
+}
+
+
+/* Custom Desktop Pushbar */
+#baspush, #advpush, #dnspush, #sbspush {
+  top:160px;
+}
+
+/*bttns*/
+#open_bas, #open_adv, #open_dns {
+  float:right;
+  top:10px;
+  right:20px;
+  background:#a94442;
 }

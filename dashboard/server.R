@@ -286,6 +286,10 @@ shinyServer(function(input, output) {
       s[[1]][[1]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       s[[1]][[2]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       
+      # force inline width to be correct
+      s[[1]][[1]][["attribs"]][["style"]] %<>% gsub("49%", "50%", .)
+      s[[1]][[2]][["attribs"]][["style"]] %<>% gsub("49%", "50%", .)
+      
       return(s)
       
     })
@@ -367,16 +371,44 @@ shinyServer(function(input, output) {
       return(dg_f)
     })
 
-    # Setup Pushbar for Mobile Layout
-    setup_pushbar()
+    # Setup Pushbar
+    setup_pushbar(overlay = FALSE)
     
+    
+    # Mobile Push Bar
     observeEvent(input$open, {
       pushbar_open(id = "mobpush")
     })  
     
     observeEvent(input$close, {
       pushbar_close()
-    })  
+    })
+    
+    # Desktop Push Bar
+    observeEvent(input$open_bas, {
+      pushbar_open(id = "baspush")
+    })
+    
+    observeEvent(input$basclose, {
+      pushbar_close()
+    })
+    
+    observeEvent(input$open_adv, {
+      pushbar_open(id = "advpush")
+    })
+    
+    observeEvent(input$advclose, {
+      pushbar_close()
+    })
+    
+    observeEvent(input$open_dns, {
+      pushbar_open(id = "dnspush")
+    })
+    
+    observeEvent(input$dnsclose, {
+      pushbar_close()
+    })
+    
     
     # Render the UI based on Mobile or Desktop Status
     output$ui <- renderUI({
@@ -403,48 +435,63 @@ shinyServer(function(input, output) {
         headerPanel(HTML("<h1 class=title>Crime Map</h1>")),
         tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
                     tabPanel("Basic",
-                             div(class='outer',
-                                 includeCSS("./www/bootstrap.css"),
-                                 
-                                 leafletOutput("bas_map", height = "100%", width = "100%"),
-                                 absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                               draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
-                                               width = 330, height = "auto",
-                                               
-                                               basMapUI()
-                                 )
-                             )),
+                              div(class='outer',
+                                  includeCSS("./www/bootstrap.css"),
+                                  leafletOutput("bas_map", height = "100%", width = "100%")
+                              ),
+                              div(class='data-btn',
+                                  actionBttn("open_bas", "Select Data", icon('server'), style = 'jelly', color = 'danger'),
+                                  pushbar(
+                                    basMapUI(),
+                                    id = "baspush",
+                                    column(12,
+                                      actionButton("basclose", "Close")
+                                    ),
+                                    from = 'right'
+                                  )
+                              )
+                    ),
                     tabPanel("Advanced",
-                             div(class='outer',
-                                 includeCSS("./www/bootstrap.css"),
-                                 
-                                 leafletOutput("adv_map", height = "100%", width = "100%"),
-                                 absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                               draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
-                                               width = 330, height = "auto",
-                                               
-                                               advMapUI()
-                                 )
-                             )),
+                            div(class='outer',
+                                includeCSS("./www/bootstrap.css"),
+                                leafletOutput("adv_map", height = "100%", width = "100%")
+                            ),
+                            div(class='data-btn',
+                                actionBttn("open_adv", "Select Data", icon('server'), style = 'jelly', color = 'danger'),
+                                pushbar(
+                                  advMapUI(),
+                                  id = "advpush",
+                                  column(12,
+                                    actionButton("advclose", "Close")
+                                  ),
+                                  from = 'right'
+                                )
+                            )
+                    ),
                     tabPanel("Heatmap",
-                             div(class='outer',
-                                 includeCSS("./www/bootstrap.css"),
-                                 
-                                 leafletOutput("dns_map", height = "100%", width = "100%"),
-                                 absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                               draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
-                                               width = 330, height = "auto",
-                                               
-                                               dnsMapUI()
-                                 )
-                             )),
+                            div(class='outer',
+                                includeCSS("./www/bootstrap.css"),
+                                leafletOutput("dns_map", height = "100%", width = "100%")
+                            ),
+                            div(class='data-btn',
+                                actionBttn("open_dns", "Select Data", icon('server'), style = 'jelly', color = 'danger'),
+                                pushbar(
+                                  dnsMapUI(),
+                                  id = "dnspush",
+                                  column(12,
+                                    actionButton("dnsclose", "Close")
+                                  ),
+                                  from = 'right'
+                                )
+                            )
+                    ),
                     tabPanel("Side by Side",
-                             fluidRow(
-                               column(12,
-                                      htmlOutput("sbs_map")
-                               )
-                             ),
-                             sbsMapUI()
+                            fluidRow(
+                              column(12,
+                                htmlOutput("sbs_map")
+                              )
+                            ),
+                            sbsMapUI()
                     )
         )) # end div
         
