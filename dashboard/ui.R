@@ -48,6 +48,21 @@ navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), f
                         dygraphOutput("n_murders"),
                         dygraphOutput("funding_yr")
                       )
+                    ),
+                    fluidRow(
+                      column(10,
+                        dygraphOutput("category_trend")
+                      ),
+                      column(2,
+                        pickerInput("cat_crime", "Crime",
+                                    choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
+                                    options = list(
+                                      `actions-box` = TRUE, 
+                                      size = 10,
+                                      `selected-text-format` = "count > 3"
+                                    ), 
+                                    multiple = TRUE, selected = "Homicide")
+                      )
                     )
            ),
            tabPanel("Prevention", value = "prev", icon = icon("handshake"),

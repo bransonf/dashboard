@@ -370,6 +370,20 @@ shinyServer(function(input, output) {
       dg_f[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
       return(dg_f)
     })
+    
+    cat_data <- reactive({
+      dta <- api_call(apiURL, paste0("catsum?categories=", toJSON(input$cat_crime)))
+      dta %<>% mutate(Date = zoo::as.yearmon(paste(year_occur, month_occur), "%Y %m")) %>% 
+               select(-month_occur, -year_occur) %>%
+               filter(Date >= as.yearmon(2008.1))
+    })
+    
+    # and for different categories of crime over time
+    output$category_trend <- renderDygraph({
+      dg_t <- dygraph(cat_data(), xlab = "Month", ylab = "Number of Incidents", main = "Crime by Category by Month")
+      dg_t[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
+      return(dg_t)
+    })
 
     # Setup Pushbar
     setup_pushbar(overlay = FALSE)
