@@ -1,7 +1,7 @@
 ## Map Component UI
 # Basic Map (Choropleth)
 basMapUI <- function(){
-  column(12, HTML("<h3 class=heading>Select Data to Map:</h3>"),
+  column(12,
          selectInput("bas_base", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
          pickerInput("bas_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
@@ -24,7 +24,7 @@ basMapUI <- function(){
 
 # Advanced Map (Point)
 advMapUI <- function(){
-  column(12, HTML("<h3 class=heading>Select Data to Map:</h3>"),
+  column(12,
          selectInput("adv_base", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
          pickerInput("adv_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
@@ -57,7 +57,7 @@ advMapUI <- function(){
 
 # Density Map
 dnsMapUI <- function(){
-  column(12, HTML("<h3 class=heading>Select Data to Map:</h3>"),
+  column(12,
          selectInput("dns_base", "Basemap", c("Satellite" ,"Terrain", "No Labels", "Dark"), selected = "Terrain"),
          pickerInput("dns_crime", "Crime",
                      choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
