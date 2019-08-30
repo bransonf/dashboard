@@ -4,44 +4,31 @@ library(shiny)
 library(shinyWidgets)
 library(leaflet)
 library(leaflet.extras)
-library(sf) # polygons still depend on 
+library(sf) # spatial class (udunits and gdal depends)
 library(dygraphs) # time-series line graphs
 library(timevis) # timeline
-library(rmarkdown) # report generation
 library(dplyr) # data manipulation and summary
-library(htmltools) # forced EVAl of HTML
 library(leafsync) # side by side
-library(ggplot2) # report generation
-
 library(magrittr) # better syntax see ?`%<>%`
 library(tidyr)
+library(httr) # API requests (openssl depends)
+library(jsonlite) # Parsing
+library(mapview) # mapshot function
+library(RColorBrewer)
+library(pushbar) # JS Push bar for controls on mobile
 
-library(httr)
-library(jsonlite)
-
-# source custom functions
-source("functions.R")
-
-# Load data and define palettes
-
-load("cardiff.rda")
-#load("crimes.rda") DEPRECATED WITH API
-load("bounds.rda")
-load("time_data.rda")
+# source custom functions and load data
+# source("functions.R")  Sourced in UI
+load("data/rtm.rda")
+load("data/bounds.rda")
+source("data/time_data.R")
+load("data/block_units.rda") # Block Units...
 
 # API URL
-apiURL <- "api.bransonf.com/stlcrime/"
-
-# Define Palettes
-inc_pal   <- colorBin("viridis", domain = 0:75000, bins = c(0,22880,32609,45375,58786,74425))
-pov_pal   <- colorBin("viridis", domain = 0:100, bins = c(0,14,24,35,46,62))
-hs_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,71,79,86,91,99))
-ba_pal    <- colorBin("viridis", domain = 0:100, bins = c(0,15,29,47,61,78))
-unemp_pal <- colorBin("viridis", domain = 0:100, bins = c(0,6,11,18,26,36))
-home_pal  <- colorBin("viridis", domain = 0:100, bins = c(0,19,38,51,67,86))
+apiURL <- "http://api.stldata.org/stlcrime/"
 
 # package envrionmental data
-env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, food, bus, school)
+env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, hotel, bus, school)
 
 # Define server logic
 shinyServer(function(input, output) {
@@ -50,180 +37,81 @@ shinyServer(function(input, output) {
   
   ## Dynamic Month Slider based on year
     output$bas_month <- renderUI({
-      # if this year, max is month - 1
-      if(input$bas_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("bas_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("bas_month", "Select a Month:", month.name, cur_month)
-      }
+     monthSliderUI(input$bas_year, cur_month, "bas_month")
     })
     output$adv_month <- renderUI({
-      if(input$adv_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("adv_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("adv_month", "Select a Month:", month.name, cur_month)
-      }
+      monthSliderUI(input$adv_year, cur_month, "adv_month")
     })
     output$dns_month <- renderUI({
-      if(input$dns_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("dns_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("dns_month", "Select a Month:", month.name, cur_month)
-      }
+      monthSliderUI(input$dns_year, cur_month, "dns_month")
     })
     output$sbs_month <- renderUI({
-      if(input$sbs_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("sbs_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("sbs_month", "Select a Month:", month.name, cur_month)
-      }
+      monthSliderUI(input$sbs_year, cur_month, "sbs_month")
     })
-    output$rep_month <- renderUI({
-      if(input$rep_year == as.numeric(format(Sys.Date(), "%Y"))){
-        sliderTextInput("rep_month", "Select a Month:", month.name[1:which(month.name == cur_month)], cur_month)
-      }
-      else{
-        sliderTextInput("rep_month", "Select a Month:", month.name, cur_month)
-      }
+    output$mob_month <- renderUI({
+      monthSliderUI(input$mob_year, cur_month, "mob_month")
     })
   
-  
-  ## Basic Map
-    region_crime <- reactive({
-      
-      if(input$bas_region == "Police Districts"){
-
-        crime <- api_call(apiURL, paste0("district",
-                                         "?month=",input$bas_month,
-                                         "&year=", input$bas_year,
-                                         "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
-          dplyr::mutate(district = as.numeric(district)) %>%
-          dplyr::left_join(districts, ., by = "district") %>%
-          tidyr::spread("ucr_category", "Incidents")
-        
-        crime[is.na(crime)] <- 0
-        
-        return(crime)
-      }
-      else if(input$bas_region == "Neighborhoods"){
-        
-        crime <- api_call(apiURL, paste0("nbhood",
-                                         "?month=",input$bas_month,
-                                         "&year=", input$bas_year,
-                                         "&gun=",  ifelse(input$bas_gun, 'true', 'false'))) %>%
-          dplyr::mutate(neighborhood = as.numeric(neighborhood)) %>%
-          dplyr::left_join(nbhoods, ., by = "neighborhood") %>%
-          tidyr::spread("ucr_category", "Incidents")
-        
-        crime[is.na(crime)] <- 0
-    
-        return(crime)
-      }
+  # Dynamic Filter for gun crime
+    output$bas_gunf <- renderUI({
+      gunFiltUI(input$bas_crime, "bas_gun")
+      })
+    output$adv_gunf <- renderUI({
+      gunFiltUI(input$adv_crime, "adv_gun")
+      })
+    output$dns_gunf <- renderUI({
+      gunFiltUI(input$dns_crime, "dns_gun")
+      })
+    output$sbs_gunf <- renderUI({
+      gunFiltUI(input$sbs_crime, "sbs_gun")
+      })
+    output$mob_gunf <- renderUI({
+      gunFiltUI(input$mob_crime, "mob_gun")
       })
     
-      # define bin and pallete based on selection of crime and region (Not routinely generated, point of possible failure)
-    region_bins <- reactive({
-      binDict(input$bas_region, input$bas_crime)
-    })
-    
-    region_pal <- reactive({
-      pal <- colorBin("YlGnBu", bins = region_bins(), domain = switch (input$bas_crime,
-                                                 "Homicide" = region_crime()$Homicide,
-                                                 "Rape" = region_crime()$Rape,
-                                                 "Robbery" = region_crime()$Robbery,
-                                                 "Aggravated Assault" = region_crime()$`Aggravated Assault`))
-      return(pal)
-    })
-    
-
-    output$bas_map <- renderLeaflet({
+  ## Basic Map
+    basic_map <- reactive({
       bm <- basemap(input$bas_base)$bm
       at <- basemap(input$bas_base)$at
       
       leafInit(bm, at) -> leaf
       
-      labs <- paste0("<h4>",region_crime()$name, "</h4>",
-                     "<b>Homicides: </b>", region_crime()$Homicide, "</br>",
-                     "<b>Rapes: </b>", region_crime()$Rape, "</br>",
-                     "<b>Robbery: </b>", region_crime()$Robbery, "</br>",
-                     "<b>Assault: </b>", region_crime()$`Aggravated Assault`) %>% lapply(htmltools::HTML)
+      region_crime <- regionCrime(input$bas_region, input$bas_month, input$bas_year, input$bas_gun, nbhoods, districts)
       
+      leaf %<>% choropleth(region_crime, input$bas_crime, input$bas_region)
       
-      if(input$bas_popups){
-      leaf %<>% addPolygons(data = region_crime(), popup = labs,
-                            fillColor = ~region_pal()(switch (input$bas_crime,
-                                                              "Homicide" = region_crime()$Homicide,
-                                                              "Rape" = region_crime()$Rape,
-                                                              "Robbery" = region_crime()$Robbery,
-                                                              "Aggravated Assault" = region_crime()$`Aggravated Assault`)),
-                            weight = 2,
-                            opacity = 1,
-                            color = "white",
-                            dashArray = "3",
-                            fillOpacity = 0.7,
-                            highlight = highlightOptions(
-                              weight = 5,
-                              color = "#666",
-                              dashArray = "",
-                              fillOpacity = 0.7,
-                              bringToFront = TRUE))
-      }
-      else
-      {
-      leaf %<>% addPolygons(data = region_crime(), label = labs,
-                            fillColor = ~region_pal()(switch (input$bas_crime,
-                                                              "Homicide" = region_crime()$Homicide,
-                                                              "Rape" = region_crime()$Rape,
-                                                              "Robbery" = region_crime()$Robbery,
-                                                              "Aggravated Assault" = region_crime()$`Aggravated Assault`)),
-                            weight = 2,
-                            opacity = 1,
-                            color = "white",
-                            dashArray = "3",
-                            fillOpacity = 0.7,
-                            highlight = highlightOptions(
-                              weight = 5,
-                              color = "#666",
-                              dashArray = "",
-                              fillOpacity = 0.7,
-                              bringToFront = TRUE),
-                            labelOptions = labelOptions(
-                              style = list("font-weight" = "normal", padding = "3px 8px"),
-                              textsize = "15px",
-                              direction = "auto"))
-      }
       # add a legend
       if(input$bas_legend){
-        leaf %>% addLegend("topleft", region_pal(),
-                           title =  switch (input$bas_crime,
-                                            "Homicide" = "Number of</br>Homicides",
-                                            "Rape" = "Number of Rapes",
-                                            "Robbery" = "Number of</br>Robberies",
-                                            "Aggravated Assault" = "Number of</br>Assaults"
-                                            ),
-                           values = switch (input$bas_crime,
-                                            "Homicide" = region_crime()$Homicide,
-                                            "Rape" = region_crime()$Rape,
-                                            "Robbery" = region_crime()$Robbery,
-                                            "Aggravated Assault" = region_crime()$`Aggravated Assault`)) -> leaf
+        leaf %<>% choroLegend(region_crime, input$bas_crime, input$bas_region)
       }
       
       return(leaf)
     })
-  
-    observeEvent(NULL,{
-      c = input$dns_map_center
-      z = input$dns_map_zoom
-      
-      leafletProxy("bas_map") %>% setView(c$lng, c$lat, z)
+    
+    output$bas_map <- renderLeaflet({
+      basic_map() %>%
+        addFullscreenControl()
     })
+    
+    ## Save Basic Map
+    output$bas_save <- downloadHandler(
+      filename = function(){paste(
+        "STL", input$bas_month, input$bas_year, input$bas_crime,
+        "Map.png", sep = "_")},
+      content = function(file) {
+        withProgress(message = 'Exporting Map...', {
+        basic_map() %>% setView(input$bas_map_center[1],
+                                input$bas_map_center[2],
+                                input$bas_map_zoom) -> m
+          incProgress(.6)
+          mapshot(m, file = file)
+          incProgress(.3, message = "Map Saved")
+        })
+      }
+    )
+    
   ## Advanced Map
-  ## TODO ADD better event reactions so that map zoom does not change (Using observe() and leafletProxy) #https://github.com/rstudio/shiny-examples/blob/master/063-superzip-example/server.R
-    output$adv_map <- renderLeaflet({
+    advanced_map <- reactive({
         # basemap and attribution case
         bm <- basemap(input$adv_base)$bm
         at <- basemap(input$adv_base)$at
@@ -234,7 +122,7 @@ shinyServer(function(input, output) {
         leaf %<>% addDemographic(input$adv_demog, demog, boundary)
          
       # add environment variables
-        leaf %<>% addEnvironment(input$adv_env, env_data)
+        leaf %<>% addEnvironment(input$adv_env, env_data, c(input$adv_crime, input$adv_env))
         
       # add crime Data
       if(length(input$adv_crime) > 0){
@@ -246,55 +134,58 @@ shinyServer(function(input, output) {
                           "&ucr=", jsonlite::toJSON(input$adv_crime)))
           
         # add points to map
-          leaf %<>% addCrimePoints(input$adv_crime, crime)
-        
+          leaf %<>% addCrimePoints(input$adv_crime, crime, c(input$adv_crime, input$adv_env))
+
       }
-        
-      #TODO add injury data
           
       # add legend
       if(input$adv_legend){
         if(input$adv_demog != "None"){
-        p <- switch (input$adv_demog, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
-        v <- switch (input$adv_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
-        t <- switch (input$adv_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
-        
-        leaf %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leaf
+          leaf %<>% demogLegend(demog, input$adv_demog)
         }
-        
-        # draw symbol legend too
-          syms <- c(); col <- c()
-          if("Homicide" %in% input$adv_crime)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
-          if("Rape" %in% input$adv_crime)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
-          if("Robbery" %in% input$adv_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
-          if("Assault" %in% input$adv_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}          
-          if("ATMs" %in% input$adv_env)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
-          if("Bars" %in% input$adv_env)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
-          if("Clubs" %in% input$adv_env)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
-          if("Liquor Stores" %in% input$adv_env) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
-          if("Gas Stations" %in% input$adv_env)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
-          if("Grocery Stores" %in% input$adv_env){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
-          if("Bus Stops" %in% input$adv_env)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
-          if("Schools" %in% input$adv_env)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
-          
-        leaf %>% addCircleLegend(10, syms, col, "topleft") -> leaf  
-        
+        if(length(input$adv_crime) > 0){
+          leaf %<>% crimeLegend(input$adv_crime, c(input$adv_crime, input$adv_env))
+        }
+        if(length(input$adv_env) > 0){
+          leaf %<>% envLegend(input$adv_env, c(input$adv_crime, input$adv_env))
+        }
       }
       
+        # blockunits
+        if(input$adv_bunit){
+          pops <- paste0("<b>Area Council: </b>", bunits$`Area Council`, "<br>",
+                         "<b>Block Unit Number: </b>", bunits$`Block Unit Number`) %>% lapply(HTML)
+          leaf %<>% addMarkers(bunits$lon, bunits$lat, popup = pops, icon = makeIcon("icons/home-15.svg", popupAnchorX = 10, popupAnchorY = 1))
+        }
         
       # print map
       return(leaf)
     })
     
-    observeEvent(NULL, {
-      c = input$bas_map_center
-      z = input$bas_map_zoom
-      
-      leafletProxy("adv_map") %>% setView(c$lng, c$lat, z)
+    output$adv_map <- renderLeaflet({
+      advanced_map() %>%
+        addFullscreenControl()
     })
   
+    ## Save Advanced Map
+    output$adv_save <- downloadHandler(
+      filename = function(){paste(
+        "STL", input$adv_month, input$adv_year,
+        "Crime_Map.png", sep = "_")},
+      content = function(file) {
+        withProgress(message = 'Exporting Map...', {
+          advanced_map() %>% setView(input$adv_map_center[1],
+                                  input$adv_map_center[2],
+                                  input$adv_map_zoom) -> m
+          incProgress(.6)
+          mapshot(m, file = file)
+          incProgress(.3, message = "Map Saved")
+        })
+      }
+    )
+    
   ## Density Map
-    output$dns_map <- renderLeaflet({
+    density_map <- reactive({
       bm <- basemap(input$dns_base)$bm
       at <- basemap(input$dns_base)$at
       
@@ -311,19 +202,35 @@ shinyServer(function(input, output) {
         if(length(crime$wgs_x) < 1){NULL}
         else{
           crime %<>% filter(!is.na(wgs_x) & !is.na(wgs_y))
-          leaf %<>% addWebGLHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, size = input$dns_size, units = "px")}
+          leaf %<>% addHeatmap(lng = crime$wgs_x, lat = crime$wgs_y, radius = input$dns_size, gradient = RColorBrewer::brewer.pal(9,"YlOrRd")[1:8], blur = input$dns_blur)}
           
       }
       
         return(leaf)
     })
     
-    observeEvent(NULL,{
-      c = input$adv_map_center
-      z = input$adv_map_zoom
-      
-      leafletProxy("dns_map") %>% setView(c$lng, c$lat, z)
+    output$dns_map <- renderLeaflet({
+      density_map() %>%
+        addFullscreenControl()
     })
+    
+    ## Save Density Map
+    output$dns_save <- downloadHandler(
+      filename = function(){paste(
+        "STL", input$dns_month, input$dns_year,
+        "Heat_Map.png", sep = "_")},
+      content = function(file) {
+        withProgress(message = 'Exporting Map...', {
+          density_map() %>% setView(input$dns_map_center[1],
+                                  input$dns_map_center[2],
+                                  input$dns_map_zoom) -> m
+          incProgress(.6)
+          mapshot(m, file = file)
+          incProgress(.3, message = "Map Saved")
+        })
+      }
+    )
+    
   ## Side by Side Map
     output$sbs_map <- renderUI({
       # basemap and attribution case
@@ -333,7 +240,7 @@ shinyServer(function(input, output) {
       atR <- basemap(input$sbs_baseR)$at
       
       # left
-      leafInit(bmL, atL) -> leafL
+      leafInit(bmL, atL) %>% addFullscreenControl() -> leafL
       
       # add crime Data
       if(length(input$sbs_crime) > 0){
@@ -345,55 +252,30 @@ shinyServer(function(input, output) {
                                          "&ucr=", jsonlite::toJSON(input$sbs_crime)))
         
         # add points to map
-        leafL %<>% addCrimePoints(input$sbs_crime, crime)
+        leafL %<>% addCrimePoints(input$sbs_crime, crime, c(input$sbs_crime, input$sbs_env))
         
       }
       
-      #TODO add injury data
-      
       # right
-      leafInit(bmR, atR) -> leafR
+      leafInit(bmR, atR) %>% addFullscreenControl() -> leafR
       
       # add demographic layer
       leafR %<>% addDemographic(input$sbs_demog, demog, boundary)
       
       # add environment variables
-      leafR %<>% addEnvironment(input$sbs_env, env_data)
+      leafR %<>% addEnvironment(input$sbs_env, env_data, c(input$sbs_crime, input$sbs_env))
       
       # add legends
       if(input$sbs_legend){
         if(input$sbs_demog != "None"){
-          p <- switch (input$sbs_demog, "Median Income" = inc_pal, "Poverty Rate" = pov_pal, "High School Attainment" = hs_pal, "Bachelors Attainment" = ba_pal, "Unemployment Rate" = unemp_pal, "Home Ownership" = home_pal)
-          v <- switch (input$sbs_demog, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
-          t <- switch (input$sbs_demog, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
-          
-          leafR %>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t) -> leafR
+          leafR %<>% demogLegend(demog, input$sbs_demog)
         }
-        if(any(c("ATMs", "Bars", "Clubs", "Liquor Stores","Gas Stations", "Grocery Stores", "Bus Stops", "Schools") %in% input$sbs_env)){
-          
-          syms <- c(); col <- c()
-          if("ATMs" %in% input$sbs_env)          {syms <- c(syms, "ATM");           col <- c(col, colorDict("atm"))}          
-          if("Bars" %in% input$sbs_env)          {syms <- c(syms, "Bar");           col <- c(col, colorDict("bar"))}          
-          if("Clubs" %in% input$sbs_env)         {syms <- c(syms, "Club");          col <- c(col, colorDict("clb"))}         
-          if("Liquor Stores" %in% input$sbs_env) {syms <- c(syms, "Liquor Store");  col <- c(col, colorDict("liq"))}
-          if("Gas Stations" %in% input$sbs_env)  {syms <- c(syms, "Gas Station");   col <- c(col, colorDict("gas"))}
-          if("Grocery Stores" %in% input$sbs_env){syms <- c(syms, "Grocery Store"); col <- c(col, colorDict("grc"))}
-          if("Bus Stops" %in% input$sbs_env)     {syms <- c(syms, "Bus Stop");      col <- c(col, colorDict("bus"))}
-          if("Schools" %in% input$sbs_env)       {syms <- c(syms, "School");        col <- c(col, colorDict("scl"))}
-          
-          leafR %>% addCircleLegend(10, syms, col, "topleft") -> leafR
+        if(length(input$sbs_crime) > 0){
+          leafL %<>% crimeLegend(input$sbs_crime, c(input$sbs_crime, input$sbs_env))
         }
-        if(any(c("Homicide", "Rape", "Robbery", "Assault") %in% input$sbs_crime)){
-          
-          syms <- c(); col <- c()
-          if("Homicide" %in% input$sbs_crime)    {syms <- c(syms, "Homicide");      col <- c(col, colorDict("mrd"))}          
-          if("Rape" %in% input$sbs_crime)        {syms <- c(syms, "Rape");          col <- c(col, colorDict("rap"))}          
-          if("Robbery" %in% input$sbs_crime)     {syms <- c(syms, "Robbery");       col <- c(col, colorDict("rob"))}          
-          if("Aggravated Assault" %in% input$sbs_crime)     {syms <- c(syms, "Assault");       col <- c(col, colorDict("ast"))}
-          
-          leafL %<>% addCircleLegend(10, syms, col, "topleft")
+        if(length(input$sbs_env) > 0){
+          leafR %<>% envLegend(input$sbs_env, c(input$sbs_crime, input$sbs_env))
         }
-      
       }
       
       ## Create side by side
@@ -404,9 +286,59 @@ shinyServer(function(input, output) {
       s[[1]][[1]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       s[[1]][[2]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       
+      # force inline width to be correct
+      s[[1]][[1]][["attribs"]][["style"]] %<>% gsub("49%", "50%", .)
+      s[[1]][[2]][["attribs"]][["style"]] %<>% gsub("49%", "50%", .)
+      
       return(s)
       
     })
+    
+  ## Mobile Map
+    output$mob_map <- renderLeaflet({
+      # basemap and attribution case
+      bm <- basemap(input$mob_base)$bm
+      at <- "" # No Attribution on Mobile...
+      
+      leafInit(bm, at) %>%
+        addFullscreenControl() -> leaf
+      
+      # add demographic data
+      leaf %<>% addDemographic(input$mob_demog, demog, boundary)
+      
+      # add environment variables
+      leaf %<>% addEnvironment(input$mob_env, env_data, c(input$mob_crime, input$mob_env))
+      
+      # add crime Data
+      if(length(input$mob_crime) > 0){
+        
+        crime <- api_call(apiURL, paste0("coords",
+                                         "?month=", input$mob_month,
+                                         "&year=", input$mob_year,
+                                         "&gun=", ifelse(input$mob_gun, 'true', 'false'),
+                                         "&ucr=", jsonlite::toJSON(input$mob_crime)))
+        
+        # add points to map
+        leaf %<>% addCrimePoints(input$mob_crime, crime, c(input$mob_crime, input$mob_env))
+        
+      }
+      
+      # add legend
+      if(input$mob_legend){
+        if(input$mob_demog != "None"){
+          leaf %<>% demogLegend(demog, input$mob_demog)
+        }
+        if(length(input$mob_crime) > 0){
+          leaf %<>% crimeLegend(input$mob_crime, c(input$mob_crime, input$mob_env))
+        }
+        if(length(input$mob_env) > 0){
+          leaf %<>% envLegend(input$mob_env, c(input$mob_crime, input$mob_env))
+        }
+      }
+      
+      # print map
+      return(leaf)
+  })
     
     # draw a timeline # https://visjs.org/docs/timeline/#Configuration_Options
     output$time <- renderTimevis({
@@ -434,58 +366,135 @@ shinyServer(function(input, output) {
 
     # and for funding
     output$funding_yr <- renderDygraph({
-      dg_f <- dygraph(vp_funding, xlab = "Year", ylab = "Total Funding ($ Thousands)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("Total", "Total Funding ($)")
+      dg_f <- dygraph(vp_funding, xlab = "Year", ylab = "Total Funding (Thousands $)", main = "Violence Prevention Funding by Year", group = "tline") %>% dyGroup("Total", "Total Funding ($)")
       dg_f[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
       return(dg_f)
     })
+
+    # Setup Pushbar
+    setup_pushbar(overlay = FALSE)
     
-    # outputs for downloads
     
-    output$dlhmc  <- downloadHandler(filename = function(){
-                                      "Stl_Homicides.csv"
-                                      },
-                                      content = function(file){
-                                       write.csv(n_homicides, file = file, row.names = FALSE)
-                                      }
-                      )
+    # Mobile Push Bar
+    observeEvent(input$open, {
+      pushbar_open(id = "mobpush")
+    })  
     
-    output$dlfund <- downloadHandler("Stl_ViolenceFunding.csv",
-                                      content = function(file){
-                                       write.csv(vp_funding, file = file, row.names = FALSE)
-                                      }
-                      )
+    observeEvent(input$close, {
+      pushbar_close()
+    })
     
-    # generate custom reports using the crime data
+    # Desktop Push Bar
+    observeEvent(input$open_bas, {
+      pushbar_open(id = "baspush")
+    })
     
-   output$report <- downloadHandler(
-     filename = function(){
-        paste0("cardiff_Report_", substr(Sys.Date(),6,10),".pdf") # once LaTeX is available, PDF
-     },
-     content = function(file){
-       # store in a temp dir because of dir privledges on server
-       tempReport <- file.path(tempdir(), "report.Rmd")
-       file.copy("report.Rmd",  tempReport, overwrite = TRUE)
-       
-       
-       # store and send params to be rendered
-       params <- list(
-                  maps =  input$rep_maps,
-                  tables = input$rep_table,
-                  crimes = input$rep_crime,
-                  month = input$rep_month,
-                  yr = input$rep_year,
-                  stlbound = boundary,
-                  dist = districts,
-                  hood = nbhoods,
-                  baseurl = apiURL
-                  )
-       
-       rmarkdown::render(tempReport, output_file = file,
-                         params = params,
-                         envir = new.env(parent = globalenv())
-                         )
-       
-     }
-   )
+    observeEvent(input$basclose, {
+      pushbar_close()
+    })
     
+    observeEvent(input$open_adv, {
+      pushbar_open(id = "advpush")
+    })
+    
+    observeEvent(input$advclose, {
+      pushbar_close()
+    })
+    
+    observeEvent(input$open_dns, {
+      pushbar_open(id = "dnspush")
+    })
+    
+    observeEvent(input$dnsclose, {
+      pushbar_close()
+    })
+    
+    
+    # Render the UI based on Mobile or Desktop Status
+    output$ui <- renderUI({
+      if(input$isMobile){
+        # Mobile Version
+        div(
+          div(class='outer_mobile',
+              includeCSS("./www/bootstrap.css"),
+              leafletOutput('mob_map', height = '100%', width = '100%')  
+          ),
+          div(class='mob-bttn',
+              actionBttn("open", "Select Data", icon('server'), style = "jelly", block = TRUE, color = 'danger')),
+              pushbar(
+                mobMapUI(),
+                id = "mobpush", # add id to get event
+                actionButton("close", "Close"),
+                from = 'bottom'
+              )
+        )
+      }
+      else{
+        # Desktop Version
+        div(
+        headerPanel(HTML("<h1 class=title>Crime Map</h1>")),
+        tabsetPanel(id = "map_op", type = "pills", # See Map_UI.R for MapUI components
+                    tabPanel("Basic",
+                              div(class='outer',
+                                  includeCSS("./www/bootstrap.css"),
+                                  leafletOutput("bas_map", height = "100%", width = "100%")
+                              ),
+                              div(class='data-btn',
+                                  actionBttn("open_bas", "Select Data", icon('server'), style = 'jelly', color = 'danger'),
+                                  pushbar(
+                                    basMapUI(),
+                                    id = "baspush",
+                                    column(12,
+                                      actionButton("basclose", "Close")
+                                    ),
+                                    from = 'right'
+                                  )
+                              )
+                    ),
+                    tabPanel("Advanced",
+                            div(class='outer',
+                                includeCSS("./www/bootstrap.css"),
+                                leafletOutput("adv_map", height = "100%", width = "100%")
+                            ),
+                            div(class='data-btn',
+                                actionBttn("open_adv", "Select Data", icon('server'), style = 'jelly', color = 'danger'),
+                                pushbar(
+                                  advMapUI(),
+                                  id = "advpush",
+                                  column(12,
+                                    actionButton("advclose", "Close")
+                                  ),
+                                  from = 'right'
+                                )
+                            )
+                    ),
+                    tabPanel("Heatmap",
+                            div(class='outer',
+                                includeCSS("./www/bootstrap.css"),
+                                leafletOutput("dns_map", height = "100%", width = "100%")
+                            ),
+                            div(class='data-btn',
+                                actionBttn("open_dns", "Select Data", icon('server'), style = 'jelly', color = 'danger'),
+                                pushbar(
+                                  dnsMapUI(),
+                                  id = "dnspush",
+                                  column(12,
+                                    actionButton("dnsclose", "Close")
+                                  ),
+                                  from = 'right'
+                                )
+                            )
+                    ),
+                    tabPanel("Side by Side",
+                            fluidRow(
+                              column(12,
+                                htmlOutput("sbs_map")
+                              )
+                            ),
+                            sbsMapUI()
+                    )
+        )) # end div
+        
+      }
+    })
 })
