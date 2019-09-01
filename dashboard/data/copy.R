@@ -1,6 +1,14 @@
 # Create copy for dashboard
 
-about <- HTML("<p class = 'sans'> This project is the result of collaboration among several major institutions. The majority of development was conducted at The Institute for Public Health at Washington University in St. Louis. <a href ='https://chris-prener.github.io', target ='_blank'>Christopher Prener</a> of Saint Louis University contributed significantly in the access and cleaning of crime data with his R package <a href='https://slu-opengis.github.io/compstatr/', target ='_blank'>compstatr</a>. Hosting for this project is provided by the <a href='https://stldata.org' target='_blank'>Regional Data Alliance</a>. For long term support of this dashboard, to notify of issues, or to ask further about methodology or development, please contact <a href='mailto:bransonf@wustl.edu'>Branson Fox</a><center><img src='images/IPH.png', width = '300px'><img src='images/RDA.png', width = '300px'></center>")
+about <- HTML("<p class = 'sans'> The STL Crime app was proudly developed at <a href='https://publichealth.wustl.edu/', target ='_blank'>The Institute for Public Health</a> at Washington University in St. Louis.
+We would like to recognize the significant contributions made by <a href ='https://chris-prener.github.io', target ='_blank'>Christopher Prener</a> of Saint Louis University in his development of the <a href='https://slu-opengis.github.io/compstatr/', target ='_blank'>compstatr package</a>, used for accessing and cleaning crime data,
+Jon Leek of the Regional Data Alliance for his assistance in the deployment of this app,
+and the <a href='https://stldata.org' target='_blank'>St. Louis Regional Data Alliance</a> for providing web hosting.
+For questions about development, methodology, or to notify of issues, please contact <a href='mailto:bransonf@wustl.edu'>Branson Fox</a>
+<center>
+    <img src='images/IPH.png', width = '300px'>
+    <img src='images/RDA.png', width = '300px'>
+</center>")
 methods <- HTML("<p class='sans'>Demographic data comes from the 2017 American Community Survey 5 Year estimates (2013-2017 ACS5). Poverty was calculated as number of individuals living below the 2017 poverty line out of poverty calculable population. Educational Attainment was calculated for the population above the age of 18. Unemployment rate was calculated as number of individuals reporting unemployment out of total individuals reporting currently being in the workforce. Home ownership was calculated as number of individuals reporting ownership of the home they occupy out of total number of homes.</p>
                 <p class='sans'>Crime data comes from the <a href ='https://www.slmpd.org/Crimereports.shtml' target='_blank'>Saint Louis Metropolitan Police Department</a> and is updated monthly. Homicides are assumed to have always involved a firearm for the purpose of filtering.</p>
                 <p class='sans'>Environmental data for schools, parks and bus stops were provided by the City of Saint Louis. Other environmental data were scraped and aggregated from various web sources.</p>
