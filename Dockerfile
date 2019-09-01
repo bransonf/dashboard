@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
 	libgdal-dev \
 	libssl-dev \
 	libcurl4-openssl-dev \
-	libcairo2-dev
+	libcairo2-dev \
+	pandoc
 
 
 # install R libraries
