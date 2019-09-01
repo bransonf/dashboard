@@ -16,6 +16,7 @@ library(jsonlite) # Parsing
 library(mapview) # mapshot function
 library(RColorBrewer)
 library(pushbar) # JS Push bar for controls on mobile
+library(lubridate)
 
 # source custom functions and load data
 # source("functions.R")  Sourced in UI
