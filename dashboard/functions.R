@@ -159,6 +159,10 @@ addCrimePoints <- function(map, variables, data, all){
     all <- all[-which(all == "Zones")]
   }
   
+  if(class(data) == "list"){
+    return(map)
+  }
+  
   if("Homicide" %in% variables){
     
     x <- filter(data, ucr_category == "Homicide") %>%
@@ -518,16 +522,6 @@ choropleth <- function(map, data, variable, region){
                 direction = "auto"))
 }
 
-# render a UI slider element with most recent month
-monthSliderUI <- function(sel_year, max_month, label){
-  if(sel_year == as.numeric(format(Sys.Date(), "%Y"))){
-    sliderTextInput(label, "Select a Month:", month.name[1:which(month.name == max_month)], max_month)
-  }
-  else{
-    sliderTextInput(label, "Select a Month:", month.name, max_month)
-  }
-}
-
 # call and parse region crime
 regionCrime <- function(region, month, year, gun, hood, dist){
   if(region == "Police Districts"){
@@ -585,3 +579,26 @@ mobileDetect <- function(inputId, value = 0) {
                type = "hidden")
   )
 }
+
+# function for parsing returned date into components
+parseDate <- function(apiResponse){
+  month <- which(month.name == strsplit(apiResponse, " ")[[1]][1])
+  year <- strsplit(apiResponse, " ")[[1]][2]
+  max_day <- lubridate::days_in_month(month)
+  
+  out <- as.Date(paste(year, month, max_day, sep = "-"))
+  return(out)
+}
+
+# select all days in the current month
+selectDays <- function(cur_month){
+  
+  start <- as.Date(paste(sep = "-", year(cur_month), month(cur_month), "01")) + 1
+  end <- cur_month + 1
+  
+  range <- c(start, end)
+  return(range)
+}
+
+# constant date
+latest_data <- parseDate(api_call(apiURL, "latest"))

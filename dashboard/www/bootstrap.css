@@ -6876,6 +6876,7 @@ transition-delay: 0;
 /* Custom Desktop Pushbar */
 #baspush, #advpush, #dnspush, #sbspush {
   top:160px;
+  width:306px; /* adds 50 px*/
 }
 
 /*bttns*/
@@ -6884,4 +6885,8 @@ transition-delay: 0;
   top:10px;
   right:20px;
   background:#a94442;
+}
+
+.form-group {
+  font-family: 'Open Sans', sans-serif;
 }

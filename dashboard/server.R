@@ -32,25 +32,6 @@ env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, hotel
 
 # Define server logic
 shinyServer(function(input, output) {
-  #  get current month
-  cur_month <- strsplit(api_call(apiURL, "latest")," ")[[1]][1]
-  
-  ## Dynamic Month Slider based on year
-    output$bas_month <- renderUI({
-     monthSliderUI(input$bas_year, cur_month, "bas_month")
-    })
-    output$adv_month <- renderUI({
-      monthSliderUI(input$adv_year, cur_month, "adv_month")
-    })
-    output$dns_month <- renderUI({
-      monthSliderUI(input$dns_year, cur_month, "dns_month")
-    })
-    output$sbs_month <- renderUI({
-      monthSliderUI(input$sbs_year, cur_month, "sbs_month")
-    })
-    output$mob_month <- renderUI({
-      monthSliderUI(input$mob_year, cur_month, "mob_month")
-    })
   
   # Dynamic Filter for gun crime
     output$bas_gunf <- renderUI({
@@ -76,7 +57,11 @@ shinyServer(function(input, output) {
       
       leafInit(bm, at) -> leaf
       
-      region_crime <- regionCrime(input$bas_region, input$bas_month, input$bas_year, input$bas_gun, nbhoods, districts)
+      # parsing month and year
+      bas_month <- month.name[lubridate::month(input$bas_date)]
+      bas_year <- lubridate::year(input$bas_date)
+      
+      region_crime <- regionCrime(input$bas_region, bas_month, bas_year, input$bas_gun, nbhoods, districts)
       
       leaf %<>% choropleth(region_crime, input$bas_crime, input$bas_region)
       
@@ -127,12 +112,12 @@ shinyServer(function(input, output) {
       # add crime Data
       if(length(input$adv_crime) > 0){
         
-        crime <- api_call(apiURL, paste0("coords",
-                          "?month=", input$adv_month,
-                          "&year=", input$adv_year,
+        crime <- api_call(apiURL, paste0("range",
+                          "?start=", input$adv_date[1],
+                          "&end=", input$adv_date[2],
                           "&gun=", ifelse(input$adv_gun, 'true', 'false'),
                           "&ucr=", jsonlite::toJSON(input$adv_crime)))
-          
+        
         # add points to map
           leaf %<>% addCrimePoints(input$adv_crime, crime, c(input$adv_crime, input$adv_env))
 
@@ -193,9 +178,9 @@ shinyServer(function(input, output) {
       
       # add crime Data
       if(length(input$dns_crime) > 0){
-        crime <- api_call(apiURL, paste0("coords",
-                                         "?month=", input$dns_month,
-                                         "&year=", input$dns_year,
+        crime <- api_call(apiURL, paste0("range",
+                                         "?start=", input$dns_date[1],
+                                         "&end=", input$dns_date[2],
                                          "&gun=", ifelse(input$dns_gun, 'true', 'false'),
                                          "&ucr=", jsonlite::toJSON(input$dns_crime)))
                    
@@ -245,9 +230,9 @@ shinyServer(function(input, output) {
       # add crime Data
       if(length(input$sbs_crime) > 0){
         
-        crime <- api_call(apiURL, paste0("coords",
-                                         "?month=", input$sbs_month,
-                                         "&year=", input$sbs_year,
+        crime <- api_call(apiURL, paste0("range",
+                                         "?start=", input$sbs_date[1],
+                                         "&end=", input$sbs_date[2],
                                          "&gun=", ifelse(input$sbs_gun, 'true', 'false'),
                                          "&ucr=", jsonlite::toJSON(input$sbs_crime)))
         
@@ -312,9 +297,9 @@ shinyServer(function(input, output) {
       # add crime Data
       if(length(input$mob_crime) > 0){
         
-        crime <- api_call(apiURL, paste0("coords",
-                                         "?month=", input$mob_month,
-                                         "&year=", input$mob_year,
+        crime <- api_call(apiURL, paste0("range",
+                                         "?start=", input$mob_date[1],
+                                         "&end=", input$mob_date[2],
                                          "&gun=", ifelse(input$mob_gun, 'true', 'false'),
                                          "&ucr=", jsonlite::toJSON(input$mob_crime)))
         
