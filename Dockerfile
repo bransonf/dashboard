@@ -14,7 +14,13 @@ RUN apt-get update && apt-get install -y \
 
 
 # install R libraries
-RUN R -e "install.packages(c('shiny','shinyWidgets','leaflet','leaflet.extras','sf','dygraphs','timevis','dplyr','leafsync','magrittr','tidyr','httr','jsonlite','mapview','RColorBrewer','pushbar'))"
+RUN R -e "install.packages(c('shiny','shinyWidgets','leaflet','leaflet.extras','sf','dygraphs','timevis','dplyr','leafsync','magrittr','tidyr','httr','jsonlite','mapview','RColorBrewer','pushbar','lubridate','webshot','remotes'))"
+
+# install dev version packages
+RUN R -e "remotes::install_github("JohnCoene/waiter")"
+
+# install phantomJS for image capture
+RUN R -e "webshot::install_phantomjs()"
 
 # copy app to image
 RUN mkdir /root/dashboard

@@ -16,7 +16,8 @@ library(jsonlite) # Parsing
 library(mapview) # mapshot function
 library(RColorBrewer)
 library(pushbar) # JS Push bar for controls on mobile
-library(lubridate)
+library(lubridate) # date/time manipulation
+library(waiter) # loading screens (GitHub Version!)
 
 # source custom functions and load data
 # source("functions.R")  Sourced in UI
@@ -78,6 +79,9 @@ shinyServer(function(input, output) {
       basic_map() %>%
         addFullscreenControl()
     })
+    
+    # stop waiter screen
+    hide_waiter()
     
     ## Save Basic Map
     output$bas_save <- downloadHandler(

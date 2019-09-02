@@ -8,6 +8,7 @@ library(sf)
 library(dygraphs)
 library(timevis)
 library(pushbar)
+library(waiter)
 
 # load Map UI and copy
 source("functions.R")
@@ -17,6 +18,12 @@ source("data/copy.R")
 # begin page  
 navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), fluid = TRUE, theme = "bootstrap.css", collapsible = TRUE, windowTitle = "Crime Dashboard",
            tabPanel("Map", icon = icon("map"),
+                    use_waiter(),
+                    show_waiter_on_load(
+                      tagList(spin_folding_cube(),
+                              span("Loading...", style = "color:white;")
+                      )
+                    ),
                     tags$head(
                       tags$script(src = "customHref.js"), # import the custom href function
                       # Import favicon package
