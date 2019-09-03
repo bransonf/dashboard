@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y \
 	libssl-dev \
 	libcurl4-openssl-dev \
 	libcairo2-dev \
-	pandoc
+	pandoc \
+	wget
 
 
 # install R libraries
