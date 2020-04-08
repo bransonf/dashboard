@@ -6879,6 +6879,10 @@ transition-delay: 0;
   width:306px; /* adds 50 px*/
 }
 
+#baspush.opened, #advpush.opened, #dnspush.opened, #sbspush.opened {
+  box-shadow:-3px 3px 5px #ccc;
+}
+
 /*bttns*/
 #open_bas, #open_adv, #open_dns {
   float:right;
@@ -6886,7 +6890,38 @@ transition-delay: 0;
   right:20px;
   background:#a94442;
 }
+#basclose, #advclose, #dnsclose, #bas_save, #adv_save, #dns_save {
+  margin:5px;
+}
 
 .form-group {
   font-family: 'Open Sans', sans-serif;
+}
+
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+    color: #fff;
+    text-decoration: none;
+    background-color: #a94442;
+    outline: 0;
+}
+
+.datepicker--cell.-selected-, .datepicker--cell.-selected-.-current-,.datepicker--cell.-selected-.-focus-{
+    color: #fff;
+    background: #c95b59;
+}
+
+#tlbreak {
+  margin:50px 0 50px 0;
+}
+
+.bttn-jelly, .bttn-jelly:before {
+    border-radius: 10px;
+    -webkit-transition: all .2s cubic-bezier(.02,.01,.47,1);
+    transition: all .2s cubic-bezier(.02,.01,.47,1);
+}
+
+.bttn-jelly:focus:before, .bttn-jelly:hover:before {
+    opacity:0;
+    -webkit-transform: scale(1);
+    transform: scale(1);
 }

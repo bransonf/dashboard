@@ -18,6 +18,7 @@ library(RColorBrewer)
 library(pushbar) # JS Push bar for controls on mobile
 library(lubridate) # date/time manipulation
 library(waiter) # loading screens (GitHub Version!)
+library(xts) # class for time series data
 
 # source custom functions and load data
 # source("functions.R")  Sourced in UI
@@ -51,6 +52,9 @@ shinyServer(function(input, output) {
     output$mob_gunf <- renderUI({
       gunFiltUI(input$mob_crime, "mob_gun")
       })
+    output$trend_gunf <- renderUI({
+      gunFiltUI(input$trend_crime, "trend_gun")
+    })
     
   ## Basic Map
     basic_map <- reactive({
@@ -272,7 +276,7 @@ shinyServer(function(input, output) {
       s = leafsync::sync(leafL, leafR)
       
       # set height
-      h = 650
+      h = 'calc(100vh - 500px)'
       s[[1]][[1]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       s[[1]][[2]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       
@@ -345,6 +349,17 @@ shinyServer(function(input, output) {
         zoomMax = 6.307e+11, # Approx 20 years
         zoomMin = 1.314e+9 # Approx .5 Month
       ))
+    })
+    
+    # draw a custom plot based on user selections
+    output$custom_trend <- renderDygraph({
+      # API Call to Get Data
+      api_data <- parseTrend(start = input$trend_date[1], end = input$trend_date[2], input$trend_interval, input$trend_gun, input$trend_crime)
+      
+      # Make DyGraph
+      dg_c <- dygraph(api_data, ylab = "Number of Incidents")
+      dg_c[["x"]][["attrs"]][["animatedZooms"]] <- TRUE # Force animated zooms
+      return(dg_c)
     })
     
     #  draw a plot for murders
@@ -486,5 +501,9 @@ shinyServer(function(input, output) {
         )) # end div
         
       }
+    })
+    
+    output$trend_ui <- renderUI({
+      trendUI()
     })
 })

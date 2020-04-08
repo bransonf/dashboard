@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 
 
 # install R libraries
-RUN R -e "install.packages(c('shiny','shinyWidgets','leaflet','leaflet.extras','sf','dygraphs','timevis','dplyr','leafsync','magrittr','tidyr','httr','jsonlite','mapview','RColorBrewer','pushbar','lubridate','webshot','remotes'))"
+RUN R -e "install.packages(c('shiny','shinyWidgets','leaflet','leaflet.extras','sf','dygraphs','timevis','dplyr','leafsync','magrittr','tidyr','httr','jsonlite','mapview','RColorBrewer','pushbar','lubridate','webshot','remotes', 'xts'))"
 
 # install dev version packages
 RUN R -e "remotes::install_github('JohnCoene/waiter')"

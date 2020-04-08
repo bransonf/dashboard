@@ -43,7 +43,17 @@ navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), f
                     pushbar_deps(),
                     uiOutput('ui')
            ),
-           tabPanel("Timeline", icon = icon("clock"),
+           tabPanel("Trends", icon = icon("calendar-alt"),
+                    headerPanel(HTML("<h1 class=title>Trends</h1>")),
+                    fluidRow(
+                      column(8, offset = 1,
+                        dygraphOutput("custom_trend")
+                      ),
+                      column(2,
+                        uiOutput('trend_ui')    
+                      )
+                    ),
+                    HTML('<div id="tlbreak"></div>'),
                     headerPanel(HTML("<h1 class=title>Timeline</h1>")),
                     fluidRow(
                       column(10, offset = 1,

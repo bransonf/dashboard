@@ -153,3 +153,24 @@ mobMapUI <- function(){
          checkboxInput("mob_legend", "Show Legend(s)")
   )
 }
+
+# Trend UI Componenet
+trendUI <- function(){
+  column(12,
+         selectInput("trend_interval", "Interval", c("Daily" ,"Weekly", "Monthly", "Yearly"), selected = "Daily"),
+         pickerInput("trend_crime", "Crime",
+                     choices = c("Homicide", "Rape", "Robbery", "Aggravated Assault", "Burglary", "Larceny", "Vehicle Theft", "Arson", "Simple Assault", "Forgery", "Fraud", "Embezzlement", "Stolen Property", "Destruction of Property", "Weapons Offense", "Sex Offense", "VMCSL", "Offense Against Family", "DWI/DUI", "Liquor Laws", "Disorderly Conduct", "Loitering/Begging", "Other"),
+                     selected = "Homicide",
+                     options = list(
+                       `actions-box` = TRUE, 
+                       size = 10,
+                       `selected-text-format` = "count > 3"
+                     ), 
+                     multiple = TRUE),
+         uiOutput("trend_gunf"),
+         airDatepickerInput("trend_date", "Time Period", selectDays(latest_data),
+                            range = TRUE,
+                            minDate = "2008-01-02",
+                            maxDate = latest_data + 1)
+  )
+}

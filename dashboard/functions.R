@@ -602,3 +602,41 @@ selectDays <- function(cur_month){
 
 # constant date
 latest_data <- parseDate(api_call(apiURL, "latest"))
+
+# parse trend data from API
+parseTrend <- function(start, end, interval, gun, ucr){
+  api_data <- api_call(apiURL, 
+                       paste0("trends",
+                              "?start=", start,
+                              "&end=", end,
+                              "&gun=",  ifelse(gun, 'true', 'false'),
+                              "&ucr=", jsonlite::toJSON(ucr)
+                       )
+  )
+  # Replace NAs
+  api_data[is.na(api_data)] <- 0
+  
+  # Remove First Column and Make it Row Names
+  row.names(api_data) <- api_data$date_occur
+  
+  # Change to Date class
+  api_data$date_occur %<>% as.Date
+  order_dates <- api_data$date_occur
+  
+  # Remove First Column
+  api_data$date_occur <- NULL
+  
+  # Coerce to XTS
+  x_data <- xts::xts(api_data, order.by = order_dates)
+  
+  # If Interval, Split XTS
+  if(interval == 'Weekly'){
+    x_data %<>% apply.weekly(colSums)
+  }else if(interval == 'Monthly'){
+    x_data %<>% apply.monthly(colSums)
+  }else if(interval == 'Yearly'){
+    x_data %<>% apply.yearly(colSums)
+  }
+    
+  return(x_data)
+}
