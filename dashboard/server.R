@@ -276,7 +276,7 @@ shinyServer(function(input, output) {
       s = leafsync::sync(leafL, leafR)
       
       # set height
-      h = 'calc(100vh - 500px)'
+      h = '60vh'
       s[[1]][[1]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       s[[1]][[2]][["children"]][[1]][["sizingPolicy"]][["defaultHeight"]] <- h
       
