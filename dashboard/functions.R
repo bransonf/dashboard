@@ -441,7 +441,7 @@ demogLegend <- function(map, demog, variable){
   v <- switch (variable, "Median Income" = demog$med_income, "Poverty Rate" = demog$pov_pct, "High School Attainment" = demog$hs_pct, "Bachelors Attainment" = demog$ba_pct, "Unemployment Rate" = demog$unemploy_pct, "Home Ownership" = demog$home_own_pct)
   t <- switch (variable, "Median Income" = "Median Income</br>(2017 Dollars)", "Poverty Rate" = "Poverty Rate %", "High School Attainment" = "High School</br>Attainment %", "Bachelors Attainment" = "Bachelors</br>Attainment %", "Unemployment Rate" = "Unemployment</br>Rate %", "Home Ownership" = "Home</br>Ownership %")
   
- map %<>% addLegend("topleft", pal = p, values = v, opacity = .5, title = t)
+ map %<>% leaflet::addLegend("topleft", pal = p, values = v, opacity = .5, title = t)
 }
 
 # add environment legend
@@ -485,7 +485,7 @@ choroLegend <- function(map, data, variable, region){
                    paste0(variable,"s"))
   
   title = paste0("Number of ", plural)
-  map %<>% addLegend("topleft", pal, data[[variable]], title = title)
+  map %<>% leaflet::addLegend("topleft", pal, data[[variable]], title = title)
     
   return(map)
 }
