@@ -28,7 +28,7 @@ source("data/time_data.R")
 load("data/block_units.rda") # Block Units...
 
 # API URL
-apiURL <- "http://api.stldata.org/"
+apiURL <- "http://35.223.52.80/"
 
 # package envrionmental data
 env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, hotel, bus, school)
