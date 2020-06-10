@@ -604,7 +604,7 @@ selectDays <- function(cur_month){
 latest_data <- parseDate(api_call(apiURL, "latest"))
 
 # parse trend data from API
-parseTrend <- function(start, end, interval, gun, ucr){
+parseTrend <- function(start, end, interval, gun, ucr, seasonal){
   api_data <- api_call(apiURL, 
                        paste0("trends",
                               "?start=", start,
@@ -637,6 +637,25 @@ parseTrend <- function(start, end, interval, gun, ucr){
   }else if(interval == 'Yearly'){
     x_data %<>% apply.yearly(colSums)
   }
+  
+  # If Seasonal, Adjust for Trend
+  if(is.null(seasonal)){
+    seasonal = FALSE
+  }
+  if(seasonal){
+    for (col in names(x_data)){
+      x_data[,col] <- as.vector(decompose(TSstudio::xts_to_ts(x_data[,col]))$trend) 
+    }
+  }
     
   return(x_data)
+}
+
+# When to Render the Seasonality Toggle
+seasUI <- function(interval, date){
+  if(interval == 'Monthly' & (date[2] - date[1] > 730)){
+    checkboxInput("trend_seas", "Adjust for Seasonality")
+  }else{
+    NULL
+  }
 }

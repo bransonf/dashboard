@@ -19,6 +19,7 @@ library(pushbar) # JS Push bar for controls on mobile
 library(lubridate) # date/time manipulation
 library(waiter) # loading screens (GitHub Version!)
 library(xts) # class for time series data
+library(TSstudio) # method for converting XTS to TS
 
 # source custom functions and load data
 # source("functions.R")  Sourced in UI
@@ -54,6 +55,11 @@ shinyServer(function(input, output) {
       })
     output$trend_gunf <- renderUI({
       gunFiltUI(input$trend_crime, "trend_gun")
+    })
+    
+  # Dynamic Filter for seasonality toggle
+    output$trend_seasf <- renderUI({
+      seasUI(input$trend_interval, input$trend_date)
     })
     
   ## Basic Map
@@ -354,7 +360,7 @@ shinyServer(function(input, output) {
     # draw a custom plot based on user selections
     output$custom_trend <- renderDygraph({
       # API Call to Get Data
-      api_data <- parseTrend(start = input$trend_date[1], end = input$trend_date[2], input$trend_interval, input$trend_gun, input$trend_crime)
+      api_data <- parseTrend(start = input$trend_date[1], end = input$trend_date[2], input$trend_interval, input$trend_gun, input$trend_crime, input$trend_seas)
       
       # Make DyGraph
       dg_c <- dygraph(api_data, ylab = "Number of Incidents")

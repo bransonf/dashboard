@@ -171,6 +171,7 @@ trendUI <- function(){
          airDatepickerInput("trend_date", "Time Period", selectDays(latest_data),
                             range = TRUE,
                             minDate = "2008-01-02",
-                            maxDate = latest_data + 1)
+                            maxDate = latest_data + 1),
+         uiOutput("trend_seasf")
   )
 }
