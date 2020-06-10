@@ -19,7 +19,6 @@ library(pushbar) # JS Push bar for controls on mobile
 library(lubridate) # date/time manipulation
 library(waiter) # loading screens (GitHub Version!)
 library(xts) # class for time series data
-library(TSstudio) # method for converting XTS to TS
 
 # source custom functions and load data
 # source("functions.R")  Sourced in UI
