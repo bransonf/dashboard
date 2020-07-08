@@ -1,7 +1,7 @@
 # GLOBAL FUNCTIONS FOR APP
 
 ## Constants
-apiURL <- "http://35.223.52.80/"
+apiURL <- "http://localhost:8000/legacy/"
 
 # add circles to legend for points
 addCircleLegend <- function(map, size, text, color, position){
@@ -130,7 +130,6 @@ leafInit <- function(bm, at){
 
 # function to make API calls and parse the response
 api_call <- function(base, endpoint){
-  
  parsed <- httr::GET(utils::URLencode(paste0(base, endpoint))) %>%
  httr::content(., as = "text", encoding = "utf-8") %>%
    jsonlite::fromJSON()
@@ -613,6 +612,34 @@ parseTrend <- function(start, end, interval, gun, ucr, seasonal){
                               "&ucr=", jsonlite::toJSON(ucr)
                        )
   )
+  ### Fix the API Data to accommodate new Schema ###
+  start = as.Date(start)
+  end = as.Date(end)
+  df <- data.frame(stringsAsFactors = FALSE,
+                   date_occur = seq.Date(start, end, by = 'day'))
+  if(length(api_data) == 0){
+    row.names(df) <- df$date_occur
+    
+    # Change to Date class
+    df$date_occur %<>% as.Date
+    order_dates <- df$date_occur
+    
+    # Remove First Column
+    df$date_occur <- NULL
+    
+    # Coerce to XTS
+    x_data <- xts::xts(df, order.by = order_dates)
+    return(x_data)
+  }
+  
+  api_data %<>%
+    mutate(date_occur = as.Date(date_occur)) %>%
+    group_by(date_occur, category) %>%
+    summarise(incidents = sum(sum)) %>%
+    spread(category, incidents) %>%
+    left_join(df, .)
+  ### End Schema Revision ###
+  
   # Replace NAs
   api_data[is.na(api_data)] <- 0
   
