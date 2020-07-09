@@ -11,7 +11,7 @@ basMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = FALSE),
-         uiOutput("bas_gunf"),
+         #uiOutput("bas_gunf"),
          airMonthpickerInput("bas_date", "Month", latest_data + 1,
                               minDate = "2008-01-02",
                               maxDate = latest_data + 1),
@@ -35,7 +35,7 @@ advMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         uiOutput("adv_gunf"),
+         #uiOutput("adv_gunf"),
          airDatepickerInput("adv_date", "Time Period", selectDays(latest_data),
                               range = TRUE,
                               minDate = "2008-01-02",
@@ -70,7 +70,7 @@ dnsMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         uiOutput("dns_gunf"),
+         #uiOutput("dns_gunf"),
          airDatepickerInput("dns_date", "Time Period", selectDays(latest_data),
                             range = TRUE,
                             minDate = "2008-01-02",
@@ -95,7 +95,7 @@ sbsMapUI <- function(){
                          `selected-text-format` = "count > 3"
                        ), 
                        multiple = TRUE),
-           uiOutput("sbs_gunf"),
+           #uiOutput("sbs_gunf"),
            airDatepickerInput("sbs_date", "Time Period", selectDays(latest_data),
                               range = TRUE,
                               minDate = "2008-01-02",
@@ -133,7 +133,7 @@ mobMapUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         uiOutput("mob_gunf"),
+         #uiOutput("mob_gunf"),
          airDatepickerInput("mob_date", "Time Period", selectDays(latest_data),
                             range = TRUE,
                             minDate = "2008-01-02",
@@ -167,7 +167,7 @@ trendUI <- function(){
                        `selected-text-format` = "count > 3"
                      ), 
                      multiple = TRUE),
-         uiOutput("trend_gunf"),
+         #uiOutput("trend_gunf"),
          airDatepickerInput("trend_date", "Time Period", selectDays(latest_data),
                             range = TRUE,
                             minDate = "2008-01-02",
