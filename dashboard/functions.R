@@ -1,7 +1,7 @@
 # GLOBAL FUNCTIONS FOR APP
 
 ## Constants
-apiURL <- "http://localhost:8000/legacy/"
+apiURL <- "http://api.stldata.org/legacy/"
 
 # add circles to legend for points
 addCircleLegend <- function(map, size, text, color, position){
@@ -581,8 +581,8 @@ mobileDetect <- function(inputId, value = 0) {
 
 # function for parsing returned date into components
 parseDate <- function(apiResponse){
-  month <- which(month.name == strsplit(apiResponse, " ")[[1]][1])
-  year <- strsplit(apiResponse, " ")[[1]][2]
+  month <- lubridate::month(as.Date(apiResponse))
+  year <- lubridate::year(as.Date(apiResponse))
   max_day <- lubridate::days_in_month(month)
   
   out <- as.Date(paste(year, month, max_day, sep = "-"))
@@ -600,7 +600,7 @@ selectDays <- function(cur_month){
 }
 
 # constant date
-latest_data <- parseDate(api_call(apiURL, "latest"))
+latest_data <- parseDate(api_call(apiURL, "latest")$crime_last_update)
 
 # parse trend data from API
 parseTrend <- function(start, end, interval, gun, ucr, seasonal){
