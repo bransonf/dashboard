@@ -1,0 +1,7 @@
+{
+    email bransonfox@umsl.edu
+}
+
+app.stldata.org {
+    reverse_proxy crime-dashboard:3838
+}
