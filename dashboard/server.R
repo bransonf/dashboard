@@ -28,7 +28,7 @@ source("data/time_data.R")
 load("data/block_units.rda") # Block Units...
 
 # API URL
-apiURL <- "http://api.stldata.org/crime/legacy/"
+apiURL <- "https://api.stldata.org/crime/legacy/"
 
 # package envrionmental data
 env_data <- list(venues, park, hayden, wedge, atm, bar, club, liquor, gas, hotel, bus, school)
