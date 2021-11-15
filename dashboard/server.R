@@ -90,7 +90,7 @@ shinyServer(function(input, output) {
     })
     
     # stop waiter screen
-    hide_waiter()
+    waiter_hide()
     
     ## Save Basic Map
     output$bas_save <- downloadHandler(

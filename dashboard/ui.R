@@ -19,7 +19,7 @@ source("data/copy.R")
 navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), fluid = TRUE, theme = "bootstrap.css", collapsible = TRUE, windowTitle = "Crime Dashboard",
            tabPanel("Map", icon = icon("map"),
                     use_waiter(),
-                    show_waiter_on_load(
+                    waiter_show_on_load(
                       tagList(spin_folding_cube(),
                               span("Loading...", style = "color:white;")
                       )
