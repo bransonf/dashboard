@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.0.1
+FROM rocker/r-ver:4.1.1
 
 MAINTAINER Branson Fox <bransonf@wustl.edu>
 
