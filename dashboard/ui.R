@@ -19,7 +19,7 @@ source("data/copy.R")
 navbarPage(HTML("<div><img src='favicon/favicon-32x32.png'> STL Crime</div>"), fluid = TRUE, theme = "bootstrap.css", collapsible = TRUE, windowTitle = "Crime Dashboard",
            modalDialog(
              footer = modalButton("Dismiss"),
-             size = "xl",
+             size = "l",
              easyClose = TRUE,
              fade = TRUE
            ),
