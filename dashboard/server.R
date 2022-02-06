@@ -511,4 +511,9 @@ shinyServer(function(input, output) {
     output$trend_ui <- renderUI({
       trendUI()
     })
+    
+    showModal(modalDialog(
+      title = "Data Will No Longer Be Updated",
+      HTML("Due to underlying changes in how the City of St. Louis reports and shares crime data, this dashboard is no longer being updated.\n For the most recent developments, please go to <a href='https://www.slmpd.org/crime_stats.shtml'>https://www.slmpd.org/crime_stats.shtml</a>")
+    ))
 })
